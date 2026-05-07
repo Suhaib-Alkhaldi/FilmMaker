@@ -25,6 +25,7 @@
 
   <ItemGroup>
     <Folder Include="Helper\Enum\" />
+    <Folder Include="Project Notes\" />
   </ItemGroup>
 
 </Project>

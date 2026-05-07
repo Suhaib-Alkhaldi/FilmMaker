@@ -20,6 +20,7 @@ builder.Host.UseSerilog();
 // Add services to the container.
 
 builder.Services.AddScoped<ILocationService, LocationService>();
+builder.Services.AddScoped<ILocationTermsOfUseService, LocationTermsOfUseService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

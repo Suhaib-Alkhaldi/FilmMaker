@@ -7,7 +7,7 @@ namespace FilmMaker.Entities
         public int LocationId { get; set; }
 
         [ForeignKey("LocationId")]
-        public virtual Location Location { get; set; } = new Location();
+        public virtual Location Location { get; set; }
         public string Term { get; set; } = string.Empty;
     }
 }

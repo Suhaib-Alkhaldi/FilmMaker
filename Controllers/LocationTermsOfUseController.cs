@@ -1,6 +1,7 @@
 ﻿using FilmMaker.Attribute;
 using FilmMaker.DTO.TermsOfUse;
 using FilmMaker.Services.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,11 +9,12 @@ namespace FilmMaker.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [AllowAnonymous]
     public class LocationTermsOfUseController : ControllerBase
     {
-        private readonly ILocationTermsOfUse _locationTermsService;
+        private readonly ILocationTermsOfUseService _locationTermsService;
 
-        public LocationTermsOfUseController(ILocationTermsOfUse locationTermsService)
+        public LocationTermsOfUseController(ILocationTermsOfUseService locationTermsService)
         {
             _locationTermsService = locationTermsService;
         }

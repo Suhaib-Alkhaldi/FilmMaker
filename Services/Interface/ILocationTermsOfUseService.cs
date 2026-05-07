@@ -3,7 +3,7 @@ using FilmMaker.DTO.TermsOfUse;
 
 namespace FilmMaker.Services.Interface
 {
-    public interface ILocationTermsOfUse
+    public interface ILocationTermsOfUseService
     {
         Task<ApiResponse<List<LocationTermsOfUseDTO>>> AllTermsOfUseByLocationAsync(int locationId);
         Task<ApiResponse<LocationTermsOfUseDTO>> UpdateTermsOfUseAsync(LocationTermsOfUseDTO updateLocationTermOfUseDTO, int UserId);

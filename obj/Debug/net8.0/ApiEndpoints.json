@@ -135,7 +135,7 @@
     "Parameters": [
       {
         "Name": "location",
-        "Type": "FilmMaker.DTO.Location.LocationDTO",
+        "Type": "FilmMaker.DTO.Location.UpdateLocationDTO",
         "IsRequired": true
       },
       {

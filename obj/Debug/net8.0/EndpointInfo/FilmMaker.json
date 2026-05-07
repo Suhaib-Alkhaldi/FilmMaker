@@ -65,17 +65,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/LocationDTO"
+                "$ref": "#/components/schemas/UpdateLocationDTO"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/LocationDTO"
+                "$ref": "#/components/schemas/UpdateLocationDTO"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/LocationDTO"
+                "$ref": "#/components/schemas/UpdateLocationDTO"
               }
             }
           }
@@ -483,10 +483,6 @@
       "LocationDTO": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
           "locationName": {
             "type": "string",
             "nullable": true
@@ -540,6 +536,46 @@
           },
           "term": {
             "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateLocationDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "locationName": {
+            "type": "string",
+            "nullable": true
+          },
+          "locationDescription": {
+            "type": "string",
+            "nullable": true
+          },
+          "dailyPrice": {
+            "type": "number",
+            "format": "double"
+          },
+          "locationStatusId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "locationOnGoogleMaps": {
+            "type": "string",
+            "nullable": true
+          },
+          "latitude": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "longitude": {
+            "type": "number",
+            "format": "double",
             "nullable": true
           }
         },

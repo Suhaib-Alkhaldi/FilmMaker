@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FilmMaker.Services.Service
 {
-    public class LocationTermsOfUseService : ILocationTermsOfUse
+    public class LocationTermsOfUseService : ILocationTermsOfUseService
     {
         private readonly FilmMakerDbContext _context;
 

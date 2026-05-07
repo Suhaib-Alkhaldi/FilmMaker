@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("FilmMaker")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fe396e83cfb2696b7e1d8ffe012aebaa9fe40878")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ba2ce19b83e4857114dadaddb9a8b46384044a1a")]
 [assembly: System.Reflection.AssemblyProductAttribute("FilmMaker")]
 [assembly: System.Reflection.AssemblyTitleAttribute("FilmMaker")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

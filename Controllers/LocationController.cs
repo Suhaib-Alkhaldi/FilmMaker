@@ -8,6 +8,7 @@ namespace FilmMaker.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [AllowAnonymous]
     public class LocationController : ControllerBase
     {
         private readonly ILocationService _locationService;
@@ -30,7 +31,7 @@ namespace FilmMaker.Controllers
 
         [AuthorizeLocationOwner]
         [HttpPut("update")]
-        public async Task<IActionResult> UpdateLocation([FromBody] LocationDTO location, [FromQuery] int currentUserId)
+        public async Task<IActionResult> UpdateLocation([FromBody] UpdateLocationDTO location, [FromQuery] int currentUserId)
         {
 
             var result = await _locationService.UpdateLocation(location, currentUserId);

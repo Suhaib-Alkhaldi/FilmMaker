@@ -79,19 +79,19 @@ namespace FilmMaker.Services.Service
 
         }
 
-        public async Task<ApiResponse<LocationDTO>> UpdateLocation(LocationDTO location, int currentUserId)
+        public async Task<ApiResponse<UpdateLocationDTO>> UpdateLocation(UpdateLocationDTO location, int currentUserId)
         {
             var locationOwnerId = await GetLocationOwnerIdByUserId(currentUserId, _filmMakerDbContext);
 
             if (locationOwnerId == null)
-                return new ApiResponse<LocationDTO>
+                return new ApiResponse<UpdateLocationDTO>
                 {
                     MessageAr = "صاحب الموقع غير موجود.",
                     MessageEn = "Location owner not found.",
                     Success = false,
                 };
 
-            var validationResult = ValidateLocation(location);
+            var validationResult = ValidateUpdateLocation(location);
             if (validationResult != null)
             {
                 return validationResult;
@@ -104,7 +104,7 @@ namespace FilmMaker.Services.Service
                     .FirstOrDefaultAsync(l => l.Id == location.Id);
 
                 if (existingLocation == null)
-                    return new ApiResponse<LocationDTO>
+                    return new ApiResponse<UpdateLocationDTO>
                     {
                         MessageAr = "الموقع غير موجود.",
                         MessageEn = "Location not found.",
@@ -125,7 +125,7 @@ namespace FilmMaker.Services.Service
 
                 await _filmMakerDbContext.SaveChangesAsync();
 
-                return new ApiResponse<LocationDTO>
+                return new ApiResponse<UpdateLocationDTO>
                 {
                     Data = location,
                     MessageAr = "تم تحديث الموقع.",
@@ -135,7 +135,7 @@ namespace FilmMaker.Services.Service
             }
             catch
             {
-                return new ApiResponse<LocationDTO>
+                return new ApiResponse<UpdateLocationDTO>
                 {
                     MessageAr = "حدث خطأ أثناء تحديث الموقع.",
                     MessageEn = "An error occurred while updating the location.",
@@ -403,11 +403,46 @@ namespace FilmMaker.Services.Service
             return null; 
         }
 
+        private Common.ApiResponse<UpdateLocationDTO>? ValidateUpdateLocation(UpdateLocationDTO location)
+        {
+            if (string.IsNullOrEmpty(location.LocationName))
+            {
+                return new Common.ApiResponse<UpdateLocationDTO>
+                {
+                    MessageAr = "اسم الموقع مطلوب.",
+                    MessageEn = "Location name is required.",
+                    Success = false,
+                };
+            }
+
+            if (string.IsNullOrEmpty(location.LocationDescription))
+            {
+                return new Common.ApiResponse<UpdateLocationDTO>
+                {
+                    MessageAr = "وصف الموقع مطلوب.",
+                    MessageEn = "Location description is required.",
+                    Success = false,
+                };
+            }
+
+            if (location.DailyPrice <= 0)
+            {
+                return new Common.ApiResponse<UpdateLocationDTO>
+                {
+                    MessageAr = "يجب أن يكون السعر اليومي أكبر من صفر.",
+                    MessageEn = "Daily price must be greater than zero.",
+                    Success = false,
+                };
+            }
+
+            return null;
+        }
+
         private static async Task<int?> GetLocationOwnerIdByUserId(int userId, FilmMakerDbContext context)
         {
             var locationOwner = await context.locationOwnerProfiles
                                 .FirstOrDefaultAsync(x => x.UserId == userId);
-            return locationOwner.Id;
+            return locationOwner?.Id;
         }
 
         private static GetLocationDTO MapToGetLocationDTO(Location l) => new()
