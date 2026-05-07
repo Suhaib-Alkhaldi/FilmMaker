@@ -1,0 +1,132 @@
+[2026-05-07 11:37:44 WRN] No store type was specified for the decimal property 'Price' on entity type 'DigitalContract'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+[2026-05-07 11:37:44 WRN] No store type was specified for the decimal property 'DailyPrice' on entity type 'Location'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+[2026-05-07 11:37:44 WRN] No store type was specified for the decimal property 'Latitude' on entity type 'Location'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+[2026-05-07 11:37:44 WRN] No store type was specified for the decimal property 'Longitude' on entity type 'Location'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+[2026-05-07 11:37:44 WRN] No store type was specified for the decimal property 'TotalPrice' on entity type 'LocationBookingRequest'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+[2026-05-07 11:37:44 WRN] No store type was specified for the decimal property 'CommissionRate' on entity type 'LocationManagerProfile'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+[2026-05-07 11:37:44 WRN] No store type was specified for the decimal property 'Price' on entity type 'DigitalContract'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+[2026-05-07 11:37:44 WRN] No store type was specified for the decimal property 'DailyPrice' on entity type 'Location'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+[2026-05-07 11:37:44 WRN] No store type was specified for the decimal property 'Latitude' on entity type 'Location'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+[2026-05-07 11:37:44 WRN] No store type was specified for the decimal property 'Longitude' on entity type 'Location'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+[2026-05-07 11:37:44 WRN] No store type was specified for the decimal property 'TotalPrice' on entity type 'LocationBookingRequest'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+[2026-05-07 11:37:44 WRN] No store type was specified for the decimal property 'CommissionRate' on entity type 'LocationManagerProfile'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+[2026-05-07 11:38:39 WRN] No store type was specified for the decimal property 'Price' on entity type 'DigitalContract'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+[2026-05-07 11:38:39 WRN] No store type was specified for the decimal property 'DailyPrice' on entity type 'Location'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+[2026-05-07 11:38:39 WRN] No store type was specified for the decimal property 'Latitude' on entity type 'Location'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+[2026-05-07 11:38:39 WRN] No store type was specified for the decimal property 'Longitude' on entity type 'Location'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+[2026-05-07 11:38:39 WRN] No store type was specified for the decimal property 'TotalPrice' on entity type 'LocationBookingRequest'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+[2026-05-07 11:38:39 WRN] No store type was specified for the decimal property 'CommissionRate' on entity type 'LocationManagerProfile'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+[2026-05-07 11:38:39 WRN] No store type was specified for the decimal property 'Price' on entity type 'DigitalContract'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+[2026-05-07 11:38:39 WRN] No store type was specified for the decimal property 'DailyPrice' on entity type 'Location'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+[2026-05-07 11:38:39 WRN] No store type was specified for the decimal property 'Latitude' on entity type 'Location'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+[2026-05-07 11:38:39 WRN] No store type was specified for the decimal property 'Longitude' on entity type 'Location'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+[2026-05-07 11:38:39 WRN] No store type was specified for the decimal property 'TotalPrice' on entity type 'LocationBookingRequest'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+[2026-05-07 11:38:39 WRN] No store type was specified for the decimal property 'CommissionRate' on entity type 'LocationManagerProfile'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+[2026-05-07 11:38:40 ERR] Failed executing DbCommand (23ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE [digitalContract] (
+    [Id] int NOT NULL IDENTITY,
+    [Terms] nvarchar(max) NOT NULL,
+    [Price] decimal(18,2) NOT NULL,
+    [ContractStart] datetime2 NOT NULL,
+    [ContractEnd] datetime2 NOT NULL,
+    [ContractStatusId] int NOT NULL,
+    [BookingStatusId] int NOT NULL,
+    [CreatedBy] nvarchar(max) NOT NULL,
+    [CreatedAt] datetime2 NOT NULL,
+    [UpdatedBy] nvarchar(max) NOT NULL,
+    [UpdatedAt] datetime2 NOT NULL,
+    [IsActive] bit NOT NULL,
+    [IsDeleted] bit NOT NULL,
+    CONSTRAINT [PK_digitalContract] PRIMARY KEY ([Id]),
+    CONSTRAINT [FK_digitalContract_lockupItems_BookingStatusId] FOREIGN KEY ([BookingStatusId]) REFERENCES [lockupItems] ([Id]) ON DELETE CASCADE,
+    CONSTRAINT [FK_digitalContract_lockupItems_ContractStatusId] FOREIGN KEY ([ContractStatusId]) REFERENCES [lockupItems] ([Id]) ON DELETE CASCADE
+);
+[2026-05-07 11:41:09 WRN] No store type was specified for the decimal property 'Price' on entity type 'DigitalContract'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+[2026-05-07 11:41:09 WRN] No store type was specified for the decimal property 'DailyPrice' on entity type 'Location'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+[2026-05-07 11:41:09 WRN] No store type was specified for the decimal property 'Latitude' on entity type 'Location'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+[2026-05-07 11:41:09 WRN] No store type was specified for the decimal property 'Longitude' on entity type 'Location'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+[2026-05-07 11:41:09 WRN] No store type was specified for the decimal property 'TotalPrice' on entity type 'LocationBookingRequest'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+[2026-05-07 11:41:09 WRN] No store type was specified for the decimal property 'CommissionRate' on entity type 'LocationManagerProfile'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+[2026-05-07 11:41:10 WRN] No store type was specified for the decimal property 'Price' on entity type 'DigitalContract'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+[2026-05-07 11:41:10 WRN] No store type was specified for the decimal property 'DailyPrice' on entity type 'Location'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+[2026-05-07 11:41:10 WRN] No store type was specified for the decimal property 'Latitude' on entity type 'Location'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+[2026-05-07 11:41:10 WRN] No store type was specified for the decimal property 'Longitude' on entity type 'Location'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+[2026-05-07 11:41:10 WRN] No store type was specified for the decimal property 'TotalPrice' on entity type 'LocationBookingRequest'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+[2026-05-07 11:41:10 WRN] No store type was specified for the decimal property 'CommissionRate' on entity type 'LocationManagerProfile'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+[2026-05-07 11:41:14 WRN] No store type was specified for the decimal property 'Price' on entity type 'DigitalContract'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+[2026-05-07 11:41:14 WRN] No store type was specified for the decimal property 'DailyPrice' on entity type 'Location'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+[2026-05-07 11:41:14 WRN] No store type was specified for the decimal property 'Latitude' on entity type 'Location'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+[2026-05-07 11:41:14 WRN] No store type was specified for the decimal property 'Longitude' on entity type 'Location'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+[2026-05-07 11:41:14 WRN] No store type was specified for the decimal property 'TotalPrice' on entity type 'LocationBookingRequest'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+[2026-05-07 11:41:14 WRN] No store type was specified for the decimal property 'CommissionRate' on entity type 'LocationManagerProfile'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+[2026-05-07 11:41:14 ERR] Failed executing DbCommand (37ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE [locationBookingRequests] (
+    [Id] int NOT NULL IDENTITY,
+    [BookingRequestStatusId] int NOT NULL,
+    [ShootingDate] datetime2 NOT NULL,
+    [RequestDetails] nvarchar(max) NOT NULL,
+    [LocationOwnerId] int NOT NULL,
+    [LocationManagerId] int NOT NULL,
+    [ProductionCompanyId] int NOT NULL,
+    [TotalPrice] decimal(18,2) NOT NULL,
+    [IsCancelled] bit NOT NULL,
+    [CreatedBy] nvarchar(max) NOT NULL,
+    [CreatedAt] datetime2 NOT NULL,
+    [UpdatedBy] nvarchar(max) NOT NULL,
+    [UpdatedAt] datetime2 NOT NULL,
+    [IsActive] bit NOT NULL,
+    [IsDeleted] bit NOT NULL,
+    CONSTRAINT [PK_locationBookingRequests] PRIMARY KEY ([Id]),
+    CONSTRAINT [FK_locationBookingRequests_locationManagerProfiles_LocationManagerId] FOREIGN KEY ([LocationManagerId]) REFERENCES [locationManagerProfiles] ([Id]) ON DELETE CASCADE,
+    CONSTRAINT [FK_locationBookingRequests_locationOwnerProfiles_LocationOwnerId] FOREIGN KEY ([LocationOwnerId]) REFERENCES [locationOwnerProfiles] ([Id]) ON DELETE CASCADE,
+    CONSTRAINT [FK_locationBookingRequests_lockupItems_BookingRequestStatusId] FOREIGN KEY ([BookingRequestStatusId]) REFERENCES [lockupItems] ([Id]) ON DELETE CASCADE,
+    CONSTRAINT [FK_locationBookingRequests_productionCompanyProfiles_ProductionCompanyId] FOREIGN KEY ([ProductionCompanyId]) REFERENCES [productionCompanyProfiles] ([Id]) ON DELETE CASCADE
+);
+[2026-05-07 11:45:44 ERR] Failed executing DbCommand (13ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE [payments] (
+    [Id] int NOT NULL IDENTITY,
+    [BookingId] int NOT NULL,
+    [Amount] float NOT NULL,
+    [PaymentStatusId] int NOT NULL,
+    [PaymentTypeId] int NOT NULL,
+    [CreatedBy] nvarchar(max) NOT NULL,
+    [CreatedAt] datetime2 NOT NULL,
+    [UpdatedBy] nvarchar(max) NOT NULL,
+    [UpdatedAt] datetime2 NOT NULL,
+    [IsActive] bit NOT NULL,
+    [IsDeleted] bit NOT NULL,
+    CONSTRAINT [PK_payments] PRIMARY KEY ([Id]),
+    CONSTRAINT [FK_payments_locationBookingRequests_BookingId] FOREIGN KEY ([BookingId]) REFERENCES [locationBookingRequests] ([Id]) ON DELETE CASCADE,
+    CONSTRAINT [FK_payments_lockupItems_PaymentStatusId] FOREIGN KEY ([PaymentStatusId]) REFERENCES [lockupItems] ([Id]) ON DELETE CASCADE,
+    CONSTRAINT [FK_payments_lockupItems_PaymentTypeId] FOREIGN KEY ([PaymentTypeId]) REFERENCES [lockupItems] ([Id]) ON DELETE CASCADE
+);
+[2026-05-07 11:46:48 ERR] Failed executing DbCommand (12ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE [previousLocations] (
+    [Id] int NOT NULL IDENTITY,
+    [LocationId] int NOT NULL,
+    [LocationStatusId] int NOT NULL,
+    [CreatedBy] nvarchar(max) NOT NULL,
+    [CreatedAt] datetime2 NOT NULL,
+    [UpdatedBy] nvarchar(max) NOT NULL,
+    [UpdatedAt] datetime2 NOT NULL,
+    [IsActive] bit NOT NULL,
+    [IsDeleted] bit NOT NULL,
+    CONSTRAINT [PK_previousLocations] PRIMARY KEY ([Id]),
+    CONSTRAINT [FK_previousLocations_locations_LocationId] FOREIGN KEY ([LocationId]) REFERENCES [locations] ([Id]) ON DELETE CASCADE,
+    CONSTRAINT [FK_previousLocations_lockupItems_LocationStatusId] FOREIGN KEY ([LocationStatusId]) REFERENCES [lockupItems] ([Id]) ON DELETE CASCADE
+);
+[2026-05-07 11:48:31 ERR] Failed executing DbCommand (26ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE [previousLocations] (
+    [Id] int NOT NULL IDENTITY,
+    [LocationId] int NOT NULL,
+    [LocationStatusId] int NOT NULL,
+    [CreatedBy] nvarchar(max) NOT NULL,
+    [CreatedAt] datetime2 NOT NULL,
+    [UpdatedBy] nvarchar(max) NOT NULL,
+    [UpdatedAt] datetime2 NOT NULL,
+    [IsActive] bit NOT NULL,
+    [IsDeleted] bit NOT NULL,
+    CONSTRAINT [PK_previousLocations] PRIMARY KEY ([Id]),
+    CONSTRAINT [FK_previousLocations_locations_LocationId] FOREIGN KEY ([LocationId]) REFERENCES [locations] ([Id]) ON DELETE CASCADE,
+    CONSTRAINT [FK_previousLocations_lockupItems_LocationStatusId] FOREIGN KEY ([LocationStatusId]) REFERENCES [lockupItems] ([Id]) ON DELETE CASCADE
+);

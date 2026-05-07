@@ -1,0 +1,6 @@
+@FilmMaker_HostAddress = http://localhost:5008
+
+GET {{FilmMaker_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
