@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using FilmMaker.DataSeed;
+using Microsoft.EntityFrameworkCore;
 
 namespace FilmMaker.Entities
 {
@@ -18,6 +19,7 @@ namespace FilmMaker.Entities
         public DbSet<LockupItem> lockupItems { get; set; }
         public DbSet<DigitalContract> digitalContract { get; set; }
         public DbSet<Payment> payments { get; set; }
+        public DbSet<LocationTermsOfUse> locationTermsOfUse { get; set; }
 
         public FilmMakerDbContext(DbContextOptions<FilmMakerDbContext> options)
         : base(options)
@@ -30,6 +32,8 @@ namespace FilmMaker.Entities
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Seed();
+
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<DigitalContract>()
                         .HasOne(d => d.ContractStatus)
@@ -44,10 +48,10 @@ namespace FilmMaker.Entities
                 .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<LocationBookingRequest>()
-    .HasOne(x => x.LocationOwner)
-    .WithMany()
-    .HasForeignKey(x => x.LocationOwnerId)
-    .OnDelete(DeleteBehavior.NoAction);
+            .HasOne(x => x.LocationOwner)
+            .WithMany()
+            .HasForeignKey(x => x.LocationOwnerId)
+            .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<LocationBookingRequest>()
                 .HasOne(x => x.LocationManager)

@@ -130,3 +130,25 @@ CREATE TABLE [previousLocations] (
     CONSTRAINT [FK_previousLocations_locations_LocationId] FOREIGN KEY ([LocationId]) REFERENCES [locations] ([Id]) ON DELETE CASCADE,
     CONSTRAINT [FK_previousLocations_lockupItems_LocationStatusId] FOREIGN KEY ([LocationStatusId]) REFERENCES [lockupItems] ([Id]) ON DELETE CASCADE
 );
+[2026-05-07 13:29:06 INF] HTTP GET /swagger responded 301 in 8.7335 ms
+[2026-05-07 13:29:06 INF] HTTP GET /swagger/index.html responded 200 in 46.1323 ms
+[2026-05-07 13:29:06 INF] HTTP GET /swagger/swagger-ui.css responded 200 in 30.7705 ms
+[2026-05-07 13:29:06 INF] HTTP GET /swagger/swagger-ui-standalone-preset.js responded 200 in 30.7633 ms
+[2026-05-07 13:29:07 INF] HTTP GET /swagger/swagger-ui-bundle.js responded 200 in 42.3794 ms
+[2026-05-07 13:29:07 INF] HTTP GET /swagger/v1/swagger.json responded 200 in 5.1638 ms
+[2026-05-07 13:29:07 INF] HTTP GET /swagger/favicon-32x32.png responded 200 in 0.2371 ms
+[2026-05-07 13:29:07 INF] HTTP GET /swagger/v1/swagger.json responded 200 in 0.3952 ms
+[2026-05-07 16:37:27 ERR] Failed executing DbCommand (22ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE [Roles] (
+    [Id] int NOT NULL IDENTITY,
+    [Name] nvarchar(max) NOT NULL,
+    [CreatedBy] nvarchar(max) NOT NULL,
+    [CreatedAt] datetime2 NOT NULL,
+    [UpdatedBy] nvarchar(max) NOT NULL,
+    [UpdatedAt] datetime2 NOT NULL,
+    [IsActive] bit NOT NULL,
+    [IsDeleted] bit NOT NULL,
+    CONSTRAINT [PK_Roles] PRIMARY KEY ([Id])
+);
+[2026-05-07 16:39:29 INF] HTTP GET /swagger/index.html responded 200 in 40.8847 ms
+[2026-05-07 16:39:29 INF] HTTP GET /swagger/v1/swagger.json responded 200 in 7.2207 ms

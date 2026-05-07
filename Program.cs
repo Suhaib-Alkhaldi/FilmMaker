@@ -1,4 +1,6 @@
 using FilmMaker.Entities;
+using FilmMaker.Services.Interface;
+using FilmMaker.Services.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -16,6 +18,8 @@ Log.Logger = new LoggerConfiguration()
 builder.Host.UseSerilog();
 
 // Add services to the container.
+
+builder.Services.AddScoped<ILocationService, LocationService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

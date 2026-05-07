@@ -1,0 +1,275 @@
+[
+  {
+    "ContainingType": "FilmMaker.Controllers.LocationController",
+    "Method": "GetLocationById",
+    "RelativePath": "api/Location/{locationId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "locationId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FilmMaker.Controllers.LocationController",
+    "Method": "GetAllLocations",
+    "RelativePath": "api/Location/all",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FilmMaker.Controllers.LocationController",
+    "Method": "GetAllUnArchivedLocations",
+    "RelativePath": "api/Location/all-unarchived",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FilmMaker.Controllers.LocationController",
+    "Method": "CreateLocation",
+    "RelativePath": "api/Location/create",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "location",
+        "Type": "FilmMaker.DTO.Location.LocationDTO",
+        "IsRequired": true
+      },
+      {
+        "Name": "currentUserId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FilmMaker.Controllers.LocationController",
+    "Method": "GetLocationsByOwnerId",
+    "RelativePath": "api/Location/owner/{ownerId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "ownerId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FilmMaker.Controllers.LocationController",
+    "Method": "GetOwnerActiveLocations",
+    "RelativePath": "api/Location/owner/{ownerId}/active",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "ownerId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FilmMaker.Controllers.LocationController",
+    "Method": "GetOwnerArchivedLocations",
+    "RelativePath": "api/Location/owner/{ownerId}/archived",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "ownerId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FilmMaker.Controllers.LocationController",
+    "Method": "ToggleArchive",
+    "RelativePath": "api/Location/toggle-archive/{locationId}",
+    "HttpMethod": "PATCH",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "locationId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "currentUserId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FilmMaker.Controllers.LocationController",
+    "Method": "UpdateLocation",
+    "RelativePath": "api/Location/update",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "location",
+        "Type": "FilmMaker.DTO.Location.LocationDTO",
+        "IsRequired": true
+      },
+      {
+        "Name": "currentUserId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FilmMaker.Controllers.LocationTermsOfUseController",
+    "Method": "CreateTermsOfUse",
+    "RelativePath": "api/LocationTermsOfUse/create",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "term",
+        "Type": "FilmMaker.DTO.TermsOfUse.LocationTermsOfUseDTO",
+        "IsRequired": true
+      },
+      {
+        "Name": "currentUserId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FilmMaker.Controllers.LocationTermsOfUseController",
+    "Method": "CreateManyTermsOfUse",
+    "RelativePath": "api/LocationTermsOfUse/create-many",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "terms",
+        "Type": "System.Collections.Generic.List\u00601[[FilmMaker.DTO.TermsOfUse.LocationTermsOfUseDTO, FilmMaker, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "IsRequired": true
+      },
+      {
+        "Name": "currentUserId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FilmMaker.Controllers.LocationTermsOfUseController",
+    "Method": "DeleteTermsOfUse",
+    "RelativePath": "api/LocationTermsOfUse/delete",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "currentUserId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "locationId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "termId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FilmMaker.Controllers.LocationTermsOfUseController",
+    "Method": "GetAllTermsOfUseByLocation",
+    "RelativePath": "api/LocationTermsOfUse/location/{locationId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "locationId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FilmMaker.Controllers.LocationTermsOfUseController",
+    "Method": "UpdateTermsOfUse",
+    "RelativePath": "api/LocationTermsOfUse/update",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "term",
+        "Type": "FilmMaker.DTO.TermsOfUse.LocationTermsOfUseDTO",
+        "IsRequired": true
+      },
+      {
+        "Name": "currentUserId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FilmMaker.Controllers.LocationTermsOfUseController",
+    "Method": "UpdateManyTermsOfUse",
+    "RelativePath": "api/LocationTermsOfUse/update-many",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "terms",
+        "Type": "System.Collections.Generic.List\u00601[[FilmMaker.DTO.TermsOfUse.LocationTermsOfUseDTO, FilmMaker, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "IsRequired": true
+      },
+      {
+        "Name": "currentUserId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  }
+]

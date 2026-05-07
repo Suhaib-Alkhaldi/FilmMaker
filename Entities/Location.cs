@@ -21,5 +21,9 @@ namespace FilmMaker.Entities
         public bool IsArchived { get; set; } = false;
         public decimal? Latitude { get; set; }
         public decimal? Longitude { get; set; }
+
+        public ICollection<LocationBookingRequest> LocationBookingRequests { get; set; }
+
+        public ICollection<LocationTermsOfUse> LocationTermsOfUses { get; set; }
     }
 }

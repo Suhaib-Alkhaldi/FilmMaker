@@ -24,11 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
-    <Folder Include="DTO\" />
     <Folder Include="Helper\Enum\" />
-    <Folder Include="Services\Interface\" />
-    <Folder Include="Services\Service\" />
   </ItemGroup>
 
 </Project>
