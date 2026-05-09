@@ -26,5 +26,28 @@ namespace FilmMaker.Controllers
 
             return Ok(result);
         }
+
+        [HttpPost("register-location-manager")]
+        public async Task<IActionResult> RegisterLocationManager(RegisterLocationManagerRequestDto request)
+        {
+            var result = await _authService.RegisterLocationManager(request);
+
+            if (!result.Success)
+                return BadRequest(result);
+
+            return Ok(result);
+        }
+
+        [HttpPost("Login")]
+        public async Task<IActionResult> Login(LoginRequestDto request)
+        {
+            var result = await _authService.Login(request);
+
+            if (!result.Success)
+                return BadRequest(result);
+
+            return Ok(result);
+        }
+
     }
 }
