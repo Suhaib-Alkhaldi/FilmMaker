@@ -12,6 +12,9 @@ namespace FilmMaker.Entities
         public int RoleId { get; set; }
         [ForeignKey("RoleId")]
         public Role Roles { get; set; }
-        public List<ServiceProviderProfile> serviceProviders { get; set; }
+        public LocationOwnerProfile? LocationOwnerProfile { get; set; }
+        public LocationManagerProfile? LocationManagerProfile { get; set; }
+        public ProductionCompanyProfile? ProductionCompanyProfile { get; set; }
+        public ServiceProviderProfile? ServiceProviderProfile { get; set; }
     }
 }

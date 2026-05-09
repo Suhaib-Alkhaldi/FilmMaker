@@ -4,21 +4,35 @@ namespace FilmMaker.Entities
 {
     public class LocationBookingRequest : SharedEntity
     {
-        public int BookingRequestStatusId { get; set; }
-        [ForeignKey("BookingRequestStatusId")]
-        public LockupItem BookingStatus { get; set; }
+        public int LocationId { get; set; }
+
+        [ForeignKey("LocationId")]
+        public Location Location { get; set; } = null!;
+        public int BookingStatusId { get; set; }
+
+        [ForeignKey("BookingStatusId")]
+        public LockupItem BookingStatus { get; set; } = null!;
         public DateTime ShootingDate { get; set; }
-        public string RequestDetails { get; set; }
+        public string RequestDetails { get; set; } = string.Empty;
         public int LocationOwnerId { get; set; }
-        [ForeignKey("LocationOwnerId")]
-        public LocationOwnerProfile LocationOwner {  get; set; }
-        public int LocationManagerId { get; set; }
-        [ForeignKey("LocationManagerId")]
-        public LocationManagerProfile LocationManager {  get; set; }
+
+        [ForeignKey(nameof(LocationOwnerId))]
+        public LocationOwnerProfile LocationOwner { get; set; } = null!;
+
+        public int? LocationManagerId { get; set; }
+
+        [ForeignKey(nameof(LocationManagerId))]
+        public LocationManagerProfile? LocationManager { get; set; }
+
         public int ProductionCompanyId { get; set; }
+
         [ForeignKey("ProductionCompanyId")]
-        public ProductionCompanyProfile ProductionCompany {  get; set; }
+        public ProductionCompanyProfile ProductionCompany { get; set; } = null!;
+
         public decimal TotalPrice { get; set; }
-        public bool IsCancelled { get; set; }
+
+        public DateTime RequestedAtUtc { get; set; } = DateTime.UtcNow;
+
+        public ICollection<BookingStatusHistory> StatusHistories { get; set; }
     }
 }

@@ -1,0 +1,12 @@
+@"
+.vs/
+bin/
+obj/
+Logs/
+*.user
+*.suo
+*.dll
+*.exe
+*.pdb
+appsettings.Development.json
+"@ | Out-File -Encoding utf8 .gitignore

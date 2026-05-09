@@ -10,7 +10,8 @@ namespace FilmMaker.Entities
         public int? YearsOfExperience { get; set; }
         public string? Description { get; set; } = string.Empty;
         public decimal? CommissionRate { get; set; }
-        public List<string>? PreviousProject {  get; set; }
-        public List<string>? Cities {  get; set; }
+        public int Rate { get; set; }
+        public ICollection<LocationManagerCity> Cities { get; set; }
+        public ICollection<PreviousProject> PreviousProjects { get; set; }
     }
 }

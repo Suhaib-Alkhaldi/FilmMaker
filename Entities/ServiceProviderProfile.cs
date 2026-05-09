@@ -8,9 +8,8 @@ namespace FilmMaker.Entities
         public int UserId { get; set; }
 
         [ForeignKey("UserId")]
-        public User User { get; set; } = new User();
-        public List<string>? ServiceType { get; set; }
-        public List<LockupItem>? ServiceTypes {  get; set; }
+        public User User { get; set; }
         public DateTime RegisterDate { get; set; } = DateTime.Now;
+        public ICollection<ServiceProviderServiceType> ServiceTypes { get; set; }
     }
 }

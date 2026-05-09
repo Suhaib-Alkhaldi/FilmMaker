@@ -7,17 +7,39 @@ namespace FilmMaker.Entities
 
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
-        public DbSet<ProductionCompanyProfile>productionCompanyProfiles { get; set; }
-        public DbSet<LocationOwnerProfile> locationOwnerProfiles { get; set; }
-        public DbSet<LocationManagerProfile> locationManagerProfiles { get; set; }
-        public DbSet<ServiceProviderProfile> serviceProviderProfiles { get; set; }
-        public DbSet<LocationBookingRequest> locationBookingRequests { get; set; }
-        public DbSet<Location> locations { get; set; }
-        public DbSet<PreviousLocation> previousLocations { get; set; }
-        public DbSet<LockupCategory> lockupCategories { get; set; }
-        public DbSet<LockupItem> lockupItems { get; set; }
-        public DbSet<DigitalContract> digitalContract { get; set; }
-        public DbSet<Payment> payments { get; set; }
+
+        public DbSet<LockupCategory> LockupCategories { get; set; }
+        public DbSet<LockupItem> LockupItems { get; set; }
+
+        // Profiles
+        public DbSet<LocationOwnerProfile> LocationOwnerProfiles { get; set; }
+        public DbSet<LocationManagerProfile> LocationManagerProfiles { get; set; }
+        public DbSet<LocationManagerCity> LocationManagerCities { get; set; }
+        public DbSet<PreviousProject> PreviousProjects { get; set; }
+
+        public DbSet<ProductionCompanyProfile> ProductionCompanyProfiles { get; set; }
+        public DbSet<ProductionCompanyProductionType> ProductionCompanyProductionTypes { get; set; }
+
+        public DbSet<ServiceProviderProfile> ServiceProviderProfiles { get; set; }
+        public DbSet<ServiceProviderServiceType> ServiceProviderServiceTypes { get; set; }
+
+        // Locations
+        public DbSet<Location> Locations { get; set; }
+        public DbSet<LocationMedia> LocationMedia { get; set; }
+        public DbSet<LocationTermsOfUse> LocationTermsOfUse { get; set; }
+        public DbSet<LocationArchiveHistory> LocationArchiveHistories { get; set; }
+
+        // Booking
+        public DbSet<LocationBookingRequest> LocationBookingRequests { get; set; }
+        public DbSet<BookingStatusHistory> BookingStatusHistories { get; set; }
+
+        // Contract
+        public DbSet<DigitalContract> DigitalContracts { get; set; }
+        public DbSet<DigitalContractApproval> DigitalContractApprovals { get; set; }
+
+        // Payment / Escrow
+        public DbSet<Payment> Payments { get; set; }
+        public DbSet<EscrowTransaction> EscrowTransactions { get; set; }
 
         public FilmMakerDbContext(DbContextOptions<FilmMakerDbContext> options)
         : base(options)
@@ -31,23 +53,38 @@ namespace FilmMaker.Entities
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<DigitalContract>()
-                        .HasOne(d => d.ContractStatus)
-                        .WithMany()
-                        .HasForeignKey(d => d.ContractStatusId)
-                        .OnDelete(DeleteBehavior.NoAction);
 
-            modelBuilder.Entity<DigitalContract>()
-                .HasOne(d => d.BookingStatus)
+
+            modelBuilder.Entity<LocationArchiveHistory>()
+                .HasOne(x => x.Location)
+                .WithMany(x => x.ArchiveHistories)
+                .HasForeignKey(x => x.LocationId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<LocationArchiveHistory>()
+                .HasOne(x => x.ArchivedByUser)
                 .WithMany()
-                .HasForeignKey(d => d.BookingStatusId)
+                .HasForeignKey(x => x.ArchivedByUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<LocationArchiveHistory>()
+                .HasOne(x => x.RestoredByUser)
+                .WithMany()
+                .HasForeignKey(x => x.RestoredByUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+
+            modelBuilder.Entity<LocationBookingRequest>()
+                .HasOne(x => x.Location)
+                .WithMany()
+                .HasForeignKey(x => x.LocationId)
                 .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<LocationBookingRequest>()
-    .HasOne(x => x.LocationOwner)
-    .WithMany()
-    .HasForeignKey(x => x.LocationOwnerId)
-    .OnDelete(DeleteBehavior.NoAction);
+                .HasOne(x => x.LocationOwner)
+                .WithMany()
+                .HasForeignKey(x => x.LocationOwnerId)
+                .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<LocationBookingRequest>()
                 .HasOne(x => x.LocationManager)
@@ -64,33 +101,48 @@ namespace FilmMaker.Entities
             modelBuilder.Entity<LocationBookingRequest>()
                 .HasOne(x => x.BookingStatus)
                 .WithMany()
-                .HasForeignKey(x => x.BookingRequestStatusId)
+                .HasForeignKey(x => x.BookingStatusId)
                 .OnDelete(DeleteBehavior.NoAction);
 
-            modelBuilder.Entity<DigitalContract>()
-                .Property(x => x.Price)
-                .HasPrecision(18, 2);
 
-            modelBuilder.Entity<Location>()
-                .Property(x => x.DailyPrice)
-                .HasPrecision(18, 2);
 
-            modelBuilder.Entity<Location>()
-                .Property(x => x.Latitude)
-                .HasPrecision(18, 6);
+            modelBuilder.Entity<BookingStatusHistory>()
+                .HasOne(x => x.LocationBookingRequest)
+                .WithMany(x => x.StatusHistories)
+                .HasForeignKey(x => x.LocationBookingRequestId)
+                .OnDelete(DeleteBehavior.NoAction);
 
-            modelBuilder.Entity<Location>()
-                .Property(x => x.Longitude)
-                .HasPrecision(18, 6);
+            modelBuilder.Entity<BookingStatusHistory>()
+                .HasOne(x => x.FromStatus)
+                .WithMany()
+                .HasForeignKey(x => x.FromStatusId)
+                .OnDelete(DeleteBehavior.NoAction);
 
-            modelBuilder.Entity<LocationBookingRequest>()
-                .Property(x => x.TotalPrice)
-                .HasPrecision(18, 2);
+            modelBuilder.Entity<BookingStatusHistory>()
+                .HasOne(x => x.ToStatus)
+                .WithMany()
+                .HasForeignKey(x => x.ToStatusId)
+                .OnDelete(DeleteBehavior.NoAction);
 
-            modelBuilder.Entity<LocationManagerProfile>()
-                .Property(x => x.CommissionRate)
-                .HasPrecision(5, 2);
+            modelBuilder.Entity<BookingStatusHistory>()
+                .HasOne(x => x.ChangedByUser)
+                .WithMany()
+                .HasForeignKey(x => x.ChangedByUserId)
+                .OnDelete(DeleteBehavior.NoAction);
 
+
+
+            modelBuilder.Entity<Payment>()
+                .HasOne(x => x.LocationBookingRequest)
+                .WithMany()
+                .HasForeignKey(x => x.LocationBookingRequestId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Payment>()
+                .HasOne(x => x.DigitalContract)
+                .WithMany()
+                .HasForeignKey(x => x.DigitalContractId)
+                .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Payment>()
                 .HasOne(x => x.PaymentStatus)
@@ -103,20 +155,6 @@ namespace FilmMaker.Entities
                 .WithMany()
                 .HasForeignKey(x => x.PaymentTypeId)
                 .OnDelete(DeleteBehavior.NoAction);
-
-            modelBuilder.Entity<Payment>()
-                .HasOne(x => x.LocationBookingRequest)
-                .WithMany()
-                .HasForeignKey(x => x.BookingId)
-                .OnDelete(DeleteBehavior.NoAction);
-
-
-            modelBuilder.Entity<PreviousLocation>()
-                    .HasOne(pl => pl.LocationStatus)
-                    .WithMany()
-                    .HasForeignKey(pl => pl.LocationStatusId)
-                    .OnDelete(DeleteBehavior.NoAction);
-
         }
     }
 }
