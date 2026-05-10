@@ -38,14 +38,23 @@ namespace FilmMaker.Controllers
            return Ok(result);
         }
 
-        //[AuthorizeLocationOwner]
-        //[HttpPatch("toggle-archive/{locationId}")]
-        //public async Task<IActionResult> ToggleArchive(int locationId, [FromQuery] int currentUserId)
-        //{
-        //    var result = await _locationService.ToggleArchive(currentUserId, locationId);
+        [AuthorizeLocationOwner]
+        [HttpPatch("toggle-archive/{locationId}")]
+        public async Task<IActionResult> ToggleArchive(int locationId, [FromQuery] int currentUserId)
+        {
+            var result = await _locationService.ToggleArchive(currentUserId, locationId,true);
 
-        //    return Ok(result);
-        //}
+            return Ok(result);
+        }
+
+        [AuthorizeLocationOwner]
+        [HttpPatch("toggle-unarchive/{locationId}")]
+        public async Task<IActionResult> ToggleUnArchive(int locationId, [FromQuery] int currentUserId)
+        {
+            var result = await _locationService.ToggleArchive(currentUserId, locationId,false);
+
+            return Ok(result);
+        }
 
 
         [AuthorizeAdmin]

@@ -18,7 +18,10 @@ namespace FilmMaker.DataSeed
 
             modelBuilder.Entity<LockupItem>().HasData(
                 new Entities.LockupItem { Id = 1, Name = "Published" , LockupCategoryId = 1},
-                new Entities.LockupItem { Id = 2, Name = "Blocked" , LockupCategoryId = 1}
+                new Entities.LockupItem { Id = 2, Name = "Blocked" , LockupCategoryId = 1},
+                new Entities.LockupItem { Id = 3, Name = "Deleted" , LockupCategoryId = 1 },
+                new Entities.LockupItem { Id = 4, Name = "Under Moderation" , LockupCategoryId = 1 },
+                new Entities.LockupItem { Id = 5, Name = "Archived" , LockupCategoryId = 1 }
             );
 
 

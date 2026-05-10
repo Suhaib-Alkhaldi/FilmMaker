@@ -9,16 +9,16 @@ namespace FilmMaker.Entities
         [ForeignKey("LocationId")]
         public Location Location { get; set; } = null!;
 
-        public int ArchivedByUserId { get; set; }
+        public int? ArchivedByUserId { get; set; }
 
         [ForeignKey("ArchivedByUserId")]
         public User ArchivedByUser { get; set; } = null!;
 
-        public DateTime ArchivedAt { get; set; } = DateTime.UtcNow;
+        public DateTime? ArchivedAt { get; set; } = DateTime.UtcNow;
 
         public string? Reason { get; set; }
 
-        public bool IsRestored { get; set; }
+        public bool? IsRestored { get; set; }
 
         public DateTime? RestoredAt { get; set; }
 

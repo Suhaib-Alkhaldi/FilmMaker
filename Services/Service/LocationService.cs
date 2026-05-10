@@ -321,6 +321,7 @@ namespace FilmMaker.Services.Service
                 .Include(l => l.LocationStatus)
                 .Where(l => l.LocationOwnerId == locationOwnerId
                  && !l.IsDeleted
+                 && l.LocationStatusId == 5
                  )
                 .Select(l => MapToGetLocationDTO(l))
                 .ToListAsync();
@@ -340,7 +341,7 @@ namespace FilmMaker.Services.Service
              .Include(l => l.LocationOwner).ThenInclude(o => o.User)
              .Include(l => l.LocationManager).ThenInclude(m => m.User)
              .Include(l => l.LocationStatus)
-             .Where(l => !l.IsDeleted)
+             .Where(l => !l.IsDeleted && l.LocationStatusId == 1)
              .Select(l => MapToGetLocationDTO(l))
              .ToListAsync();
 
@@ -390,7 +391,88 @@ namespace FilmMaker.Services.Service
 
             return null; 
         }
+        public async Task<ApiResponse<bool>> ToggleArchive(int locationId, int currentUserId, bool isArchived)
+        {
+            var locationOwnerId = await GetLocationOwnerIdByUserId(currentUserId, _filmMakerDbContext);
 
+            if (locationOwnerId == null)
+            {
+                _logger.LogWarning("User with ID {UserId} attempted to update a location but is not a location owner.", currentUserId);
+                return new ApiResponse<bool>
+                {
+                    MessageAr = "صاحب الموقع غير موجود.",
+                    MessageEn = "Location owner not found.",
+                    Success = false,
+                };
+            }
+
+            try
+            {
+                var existingLocation = await _filmMakerDbContext.Locations
+                    .FirstOrDefaultAsync(l => l.Id == locationId);
+
+                if (existingLocation == null)
+                    return new ApiResponse<bool>
+                    {
+                        MessageAr = "الموقع غير موجود.",
+                        MessageEn = "Location not found.",
+                        Success = false,
+                    };
+
+                if(isArchived )
+                {
+                    existingLocation.LocationStatusId = 5;
+
+                    _filmMakerDbContext.LocationArchiveHistories.Add(new LocationArchiveHistory
+                    {
+                        
+                        LocationId = locationId,
+                        ArchivedByUserId = locationOwnerId.Value,
+                        ArchivedAt = DateTime.UtcNow,
+                        CreatedBy = currentUserId.ToString(),
+                        CreatedAt = DateTime.UtcNow
+                    });
+
+                }
+                else
+                {
+                    existingLocation.LocationStatusId = 1;
+
+                    var archiveEntry = await _filmMakerDbContext.LocationArchiveHistories
+                .Where(h => h.LocationId == locationId && h.IsRestored != true)
+                .OrderByDescending(h => h.ArchivedAt)
+                .FirstOrDefaultAsync();
+
+                    if (archiveEntry != null)
+                    {
+                        archiveEntry.IsRestored = true;
+                        archiveEntry.RestoredAt = DateTime.UtcNow;
+                        archiveEntry.RestoredByUserId = locationOwnerId.Value;
+                    }
+                }
+
+                await _filmMakerDbContext.SaveChangesAsync();
+
+                return new ApiResponse<bool>
+                {
+                    Data = true,
+                    MessageAr = isArchived ? "تم أرشفة الموقع." : "تم تفعيل الموقع.",
+                    MessageEn = isArchived ? "Location archived." : "Location activated.",
+                    Success = true,
+                };
+            }
+            catch
+            {
+                _logger.LogError("An error occurred while updating archive the location with ID {LocationId} for user with ID {UserId}.", locationId, currentUserId);
+                return new ApiResponse<bool>
+                {
+                    MessageAr = "حدث خطأ أثناء تحديث أرشفة الموقع.",
+                    MessageEn = "An error occurred while updating the location archive.",
+                    Success = false,
+                };
+            }
+
+        }
         private static async Task<int?> GetLocationOwnerIdByUserId(int userId, FilmMakerDbContext context)
         {
             var locationOwner = await context.LocationOwnerProfiles
@@ -416,6 +498,7 @@ namespace FilmMaker.Services.Service
             Latitude = l.Latitude,
             Longitude = l.Longitude
         };
+
 
     }
 }

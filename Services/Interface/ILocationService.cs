@@ -14,6 +14,8 @@ namespace FilmMaker.Services.Interface
         Task<ApiResponse<List<GetLocationDTO>>> GetOwnerArchivedLocations(int currentUserId);
         Task<ApiResponse<List<GetLocationDTO>>> GetOwnerActiveLocations(int currentUserId);
 
+        Task<ApiResponse<bool>> ToggleArchive(int locationId, int currentUserId, bool isArchived);
+
 
     }
 }
