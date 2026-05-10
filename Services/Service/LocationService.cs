@@ -40,8 +40,6 @@ namespace FilmMaker.Services.Service
 
             try
             {
-
-
                 var newLocation = new Location
                 {
                     LocationName = location.LocationName,
@@ -57,24 +55,16 @@ namespace FilmMaker.Services.Service
                     CreatedBy = currentUserId.ToString(),
                     CreatedAt = DateTime.UtcNow,
                     UpdatedBy = currentUserId.ToString(),
-                    UpdatedAt = DateTime.UtcNow
-                };
-                await _filmMakerDbContext.Locations.AddAsync(newLocation);
-
-
-                if (location.TermsOfUse != null && location.TermsOfUse.Any())
-                {
-                    var termsList = location.TermsOfUse.Select(term => new LocationTermsOfUse
+                    UpdatedAt = DateTime.UtcNow,
+                    TermsOfUse = location.TermsOfUse?
+                    .Select(term => new LocationTermsOfUse
                     {
-                        TermText = term, // Assuming 'TermContent' is your column name
-                        Location = newLocation, // EF handles the Foreign Key mapping automatically
+                        TermText = term,
                         CreatedBy = currentUserId.ToString(),
                         CreatedAt = DateTime.UtcNow
-                    }).ToList();
-
-                    await _filmMakerDbContext.LocationTermsOfUse.AddRangeAsync(termsList);
-
-                }
+                    }).ToList() ?? new List<LocationTermsOfUse>()
+                };
+                await _filmMakerDbContext.Locations.AddAsync(newLocation);
 
                 await _filmMakerDbContext.SaveChangesAsync();
 
@@ -101,7 +91,10 @@ namespace FilmMaker.Services.Service
         {
             var locationOwnerId = await GetLocationOwnerIdByUserId(currentUserId, _filmMakerDbContext);
 
-            if (locationOwnerId == null)
+            var isOwnerOfLocation = await _filmMakerDbContext.Locations
+                .AnyAsync(l => l.Id == location.Id && l.LocationOwnerId == locationOwnerId);
+
+            if (locationOwnerId == null || !isOwnerOfLocation)
             {
                 _logger.LogWarning("User with ID {UserId} attempted to update a location but is not a location owner.", currentUserId);
                 return new ApiResponse<LocationDTO>
@@ -303,6 +296,7 @@ namespace FilmMaker.Services.Service
         {
             var locationOwnerId = await GetLocationOwnerIdByUserId(currentUserId, _filmMakerDbContext);
 
+
             if (locationOwnerId == null)
             {
                 _logger.LogWarning("User with ID {UserId} attempted to fetch locations but is not a location owner.", currentUserId);
@@ -395,7 +389,10 @@ namespace FilmMaker.Services.Service
         {
             var locationOwnerId = await GetLocationOwnerIdByUserId(currentUserId, _filmMakerDbContext);
 
-            if (locationOwnerId == null)
+            var isOwnerOfLocation = await _filmMakerDbContext.Locations
+            .AnyAsync(l => l.Id == locationId && l.LocationOwnerId == locationOwnerId);
+
+            if (locationOwnerId == null || !isOwnerOfLocation)
             {
                 _logger.LogWarning("User with ID {UserId} attempted to update a location but is not a location owner.", currentUserId);
                 return new ApiResponse<bool>
