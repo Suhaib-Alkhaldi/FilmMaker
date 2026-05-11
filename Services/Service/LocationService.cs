@@ -273,8 +273,9 @@ namespace FilmMaker.Services.Service
 
         public async Task<ApiResponse<List<GetLocationDTO>>> GetAllArchivedLocations()
         {
+            var statusId = await GetStatusIdByName("Archived");
             var locations = await _filmMakerDbContext.Locations
-         .Where(l =>  !l.IsDeleted && l.LocationStatusId == 5 )
+         .Where(l =>  !l.IsDeleted && l.LocationStatusId == statusId )
          .Select(l => new GetLocationDTO
          {
              LocationName = l.LocationName,
@@ -441,10 +442,11 @@ namespace FilmMaker.Services.Service
                 };
             }
       
+            int statusId = await GetStatusIdByName("Archived");
             var locations = await _filmMakerDbContext.Locations
            .Where(l => l.LocationOwnerId == locationOwnerId
-                   && !l.IsDeleted
-                   && l.IsActive)
+                   && l.IsDeleted
+                   && !l.IsActive && l.LocationStatusId == statusId)
            .Select(l => new GetLocationDTO
            {
                LocationName = l.LocationName,
@@ -482,9 +484,10 @@ namespace FilmMaker.Services.Service
         public async Task<ApiResponse<List<GetLocationDTO>>> GetAllUnArchivedLocations()
         {
    
+            int statusId = await GetStatusIdByName("Archived");
 
             var locations = await _filmMakerDbContext.Locations
-           .Where(l => !l.IsDeleted && l.LocationStatusId == 1)
+           .Where(l => !l.IsDeleted && l.LocationStatusId != statusId)
            .Select(l => new GetLocationDTO
            {
                LocationName = l.LocationName,
@@ -560,7 +563,9 @@ namespace FilmMaker.Services.Service
                     };
                 }
 
-                existingLocation.LocationStatusId = 5;
+                existingLocation.LocationStatusId = await GetStatusIdByName("Archived");
+                existingLocation.IsDeleted = true;
+                existingLocation.IsActive = false;
 
                 _filmMakerDbContext.LocationArchiveHistories.Add(new LocationArchiveHistory
                 {
@@ -632,7 +637,9 @@ namespace FilmMaker.Services.Service
                     };
                 }
 
-                existingLocation.LocationStatusId = 1;
+                existingLocation.LocationStatusId = await GetStatusIdByName("Active");
+                existingLocation.IsDeleted = false;
+                existingLocation.IsActive = true;
 
                 var archiveEntry = await _filmMakerDbContext.LocationArchiveHistories
                     .Where(h => h.LocationId == locationId && h.IsRestored != true)
@@ -742,7 +749,14 @@ namespace FilmMaker.Services.Service
 
             return null; 
         }
-       
-
+        
+        private async Task<int> GetStatusIdByName(string name)
+        {
+          var status = await _filmMakerDbContext.LockupItems
+                .Where(s => s.Name == name)
+                .Select(s => s.Id)
+                .FirstOrDefaultAsync();
+            return status;
+        }
     }
 }
