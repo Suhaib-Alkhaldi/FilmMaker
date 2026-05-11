@@ -5,7 +5,6 @@ namespace FilmMaker.DTO.Location
 {
     public class LocationDTO
     {
-        public int Id { get; set; }
         public string LocationName { get; set; } = string.Empty;
         public string LocationDescription { get; set; } = string.Empty;
         public decimal DailyPrice { get; set; }

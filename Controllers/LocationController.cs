@@ -8,6 +8,7 @@ namespace FilmMaker.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [AllowAnonymous]
     public class LocationController : ControllerBase
     {
         private readonly ILocationService _locationService;
@@ -23,6 +24,10 @@ namespace FilmMaker.Controllers
         {
        
 
+            if (currentUserId <= 0)
+            {
+                return BadRequest("Invalid user ID.");
+            }
             var result = await _locationService.CreateLocation(location, currentUserId);
 
                 return Ok(result);
@@ -58,10 +63,10 @@ namespace FilmMaker.Controllers
 
 
         [AuthorizeAdmin]
-        [HttpGet("all")]
-        public async Task<IActionResult> GetAllLocations()
+        [HttpGet("all-archived")]
+        public async Task<IActionResult> GetAllArchivedLocations()
         {
-            var locations = await _locationService.GetAllLocations();
+            var locations = await _locationService.GetAllArchivedLocations();
 
             return Ok(locations);
         }

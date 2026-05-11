@@ -38,7 +38,7 @@ namespace FilmMaker.Services.Service
                 return validationResult; 
             }
 
-            if(location.TermsOfUse != null && location.TermsOfUse.Any(term => string.IsNullOrEmpty(term)))
+            if(location.TermsOfUse.Count == 0)
             {
                 _logger.LogWarning("Validation failed for location creation due to empty terms of use by user with ID {UserId}.", currentUserId);
                 return new Common.ApiResponse<LocationDTO>
