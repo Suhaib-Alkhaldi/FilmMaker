@@ -271,10 +271,10 @@ namespace FilmMaker.Services.Service
             }
         }
 
-        public async Task<ApiResponse<List<GetLocationDTO>>> GetAllLocations()
+        public async Task<ApiResponse<List<GetLocationDTO>>> GetAllArchivedLocations()
         {
             var locations = await _filmMakerDbContext.Locations
-         .Where(l =>  !l.IsDeleted)
+         .Where(l =>  !l.IsDeleted && l.LocationStatusId == 5 )
          .Select(l => new GetLocationDTO
          {
              LocationName = l.LocationName,
