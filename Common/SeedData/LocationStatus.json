@@ -1,0 +1,24 @@
+{
+  "LocationStatus": [
+    {
+      "id": 1,
+      "lookupCategoryId": 2,
+      "name": "Active"
+    },
+    {
+      "id": 2,
+      "lookupCategoryId": 2,
+      "name": "Archived"
+    },
+    {
+      "id": 3,
+      "lookupCategoryId": 2,
+      "name": "Disabled By Admin"
+    },
+    {
+      "id": 4,
+      "lookupCategoryId": 2,
+      "name": "Removed By Admin"
+    }
+  ]
+}

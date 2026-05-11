@@ -12,6 +12,6 @@ namespace FilmMaker.Entities
         public int CityId { get; set; }
 
         [ForeignKey("CityId")]
-        public LockupItem City { get; set; } = null!;
+        public LookupItem City { get; set; } = null!;
     }
 }

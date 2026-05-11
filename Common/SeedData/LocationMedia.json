@@ -1,0 +1,14 @@
+{
+  "LocationMedia": [
+    {
+      "id": 1,
+      "lookupCategoryId": 3,
+      "name": "Image"
+    },
+    {
+      "id": 2,
+      "lookupCategoryId": 3,
+      "name": "Video"
+    }
+  ]
+}

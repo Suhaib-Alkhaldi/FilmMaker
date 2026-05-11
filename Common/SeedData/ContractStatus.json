@@ -1,0 +1,34 @@
+{
+  "ContractStatus": [
+    {
+      "id": 1,
+      "lookupCategoryId": 5,
+      "name": "Pending"
+    },
+    {
+      "id": 2,
+      "lookupCategoryId": 5,
+      "name": "Paid"
+    },
+    {
+      "id": 3,
+      "lookupCategoryId": 5,
+      "name": "Failed"
+    },
+    {
+      "id": 4,
+      "lookupCategoryId": 5,
+      "name": "Refunded"
+    },
+    {
+      "id": 5,
+      "lookupCategoryId": 5,
+      "name": "Partially Refunded"
+    },
+    {
+      "id": 6,
+      "lookupCategoryId": 5,
+      "name": "Cancelled"
+    }
+  ]
+}

@@ -18,7 +18,7 @@ namespace FilmMaker.Entities
         public int LocationStatusId { get; set; }
 
         [ForeignKey("LocationStatusId")]
-        public LockupItem LocationStatus { get; set; } = null!;
+        public LookupItem LocationStatus { get; set; } = null!;
         public string? LocationOnGoogleMaps { get; set; }
         public decimal? Latitude { get; set; }
         public decimal? Longitude { get; set; }
