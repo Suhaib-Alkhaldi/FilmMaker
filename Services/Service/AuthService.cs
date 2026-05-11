@@ -37,7 +37,7 @@ namespace FilmMaker.Services.Service
                 return validationError;
             }
 
-            var emailError = await EnsureEmailIsUniqueAsync(request.Email);
+            var emailError = await EnsureEmailIsUnique(request.Email);
             if (emailError != null)
             {
                 _logger.LogWarning(
@@ -48,7 +48,7 @@ namespace FilmMaker.Services.Service
                 return emailError;
             }
 
-            var role = await GetRoleByNameAsync("LocationOwner");
+            var role = await GetRoleByName("LocationOwner");
             if (role == null)
             {
                 _logger.LogError(
@@ -128,7 +128,6 @@ namespace FilmMaker.Services.Service
         }
         public async Task<ApiResponse<RegisterResponseDto>> RegisterLocationManager(RegisterLocationManagerRequestDto request)
         {
-
             var validationError = ValidateBasicRegisterRequest(request);
             if (validationError != null)
             {
@@ -140,7 +139,7 @@ namespace FilmMaker.Services.Service
                 return validationError;
             }
 
-            var emailError = await EnsureEmailIsUniqueAsync(request.Email);
+            var emailError = await EnsureEmailIsUnique(request.Email);
             if (emailError != null)
             {
                 _logger.LogWarning(
@@ -151,35 +150,7 @@ namespace FilmMaker.Services.Service
                 return emailError;
             }
 
-            if (request.YearsOfExperience.HasValue && request.YearsOfExperience.Value < 0)
-            {
-                _logger.LogWarning(
-                    "Register location manager validation failed: years of experience cannot be negative. Email: {Email}, YearsOfExperience: {YearsOfExperience}",
-                    request.Email,
-                    request.YearsOfExperience
-                );
-
-                return ApiResponse<RegisterResponseDto>.FailureResponse(
-                    "Years of experience cannot be negative.",
-                    "سنوات الخبرة لا يمكن أن تكون قيمة سالبة."
-                );
-            }
-
-            if (request.CommissionRate.HasValue && request.CommissionRate.Value < 0)
-            {
-                _logger.LogWarning(
-                    "Register location manager validation failed: commission rate cannot be negative. Email: {Email}, CommissionRate: {CommissionRate}",
-                    request.Email,
-                    request.CommissionRate
-                );
-
-                return ApiResponse<RegisterResponseDto>.FailureResponse(
-                    "Commission rate cannot be negative.",
-                    "نسبة العمولة لا يمكن أن تكون قيمة سالبة."
-                );
-            }
-
-            var role = await GetRoleByNameAsync("LocationManager");
+            var role = await GetRoleByName("LocationManager");
             if (role == null)
             {
                 _logger.LogError(
@@ -193,7 +164,6 @@ namespace FilmMaker.Services.Service
                 );
             }
 
-            await using var transaction = await _context.Database.BeginTransactionAsync();
 
             try
             {
@@ -202,18 +172,9 @@ namespace FilmMaker.Services.Service
                 _context.Users.Add(user);
                 await _context.SaveChangesAsync();
 
-                _logger.LogInformation(
-                    "User created successfully for location manager. UserId: {UserId}, Email: {Email}",
-                    user.Id,
-                    user.Email
-                );
-
                 var managerProfile = new LocationManagerProfile
                 {
                     UserId = user.Id,
-                    YearsOfExperience = request.YearsOfExperience,
-                    Description = request.Description,
-                    CommissionRate = request.CommissionRate,
                     Rate = 0,
                     IsActive = true,
                     IsDeleted = false
@@ -222,72 +183,14 @@ namespace FilmMaker.Services.Service
                 _context.LocationManagerProfiles.Add(managerProfile);
                 await _context.SaveChangesAsync();
 
-                _logger.LogInformation(
-                    "Location manager profile created successfully. UserId: {UserId}, ProfileId: {ProfileId}",
-                    user.Id,
-                    managerProfile.Id
-                );
-
-                if (request.Cities != null && request.Cities.Any())
-                {
-                    var managerCities = request.Cities
-                        .Distinct()
-                        .Select(cityId => new LocationManagerCity
-                        {
-                            LocationManagerProfileId = managerProfile.Id,
-                            CityId = cityId,
-                            IsActive = true,
-                            IsDeleted = false
-                        })
-                        .ToList();
-
-                    _context.LocationManagerCities.AddRange(managerCities);
-
-                    _logger.LogInformation(
-                        "Location manager cities prepared. ProfileId: {ProfileId}, CitiesCount: {CitiesCount}",
-                        managerProfile.Id,
-                        managerCities.Count
-                    );
-                }
-
-                var cleanPreviousProjects = request.PreviousProjects == null
-                    ? new List<string>()
-                    : request.PreviousProjects
-                        .Where(x => !string.IsNullOrWhiteSpace(x))
-                        .Select(x => x.Trim())
-                        .Distinct()
-                        .ToList();
-
-                if (cleanPreviousProjects.Any())
-                {
-                    var previousProjects = cleanPreviousProjects
-                        .Select(projectName => new PreviousProject
-                        {
-                            LocationManagerProfileId = managerProfile.Id,
-                            ProjectName = projectName,
-                            IsActive = true,
-                            IsDeleted = false
-                        })
-                        .ToList();
-
-                    _context.PreviousProjects.AddRange(previousProjects);
-
-                    _logger.LogInformation(
-                        "Location manager previous projects prepared. ProfileId: {ProfileId}, ProjectsCount: {ProjectsCount}",
-                        managerProfile.Id,
-                        previousProjects.Count
-                    );
-                }
-
-                await _context.SaveChangesAsync();
-                await transaction.CommitAsync();
 
                 var response = CreateRegisterResponse(user, role.Name);
 
                 _logger.LogInformation(
-                    "Register location manager process completed successfully. UserId: {UserId}, Email: {Email}",
+                    "Register location manager process completed successfully. UserId: {UserId}, Email: {Email}, ProfileId: {ProfileId}",
                     user.Id,
-                    user.Email
+                    user.Email,
+                    managerProfile.Id
                 );
 
                 return ApiResponse<RegisterResponseDto>.SuccessResponse(
@@ -298,8 +201,6 @@ namespace FilmMaker.Services.Service
             }
             catch (Exception ex)
             {
-                await transaction.RollbackAsync();
-
                 _logger.LogError(
                     ex,
                     "Register location manager failed due to unexpected error. Email: {Email}",
@@ -402,7 +303,211 @@ namespace FilmMaker.Services.Service
                 "تم تسجيل الدخول بنجاح."
             );
         }
+        public async Task<ApiResponse<RegisterResponseDto>> RegisterProductionCompany(RegisterProductionCompanyRequestDto request)
+        {
+            var validationError = ValidateBasicRegisterRequest(request);
+            if (validationError != null)
+                return validationError;
 
+            if (string.IsNullOrWhiteSpace(request.Name))
+            {
+                return ApiResponse<RegisterResponseDto>.FailureResponse(
+                    "Company name is required.",
+                    "اسم الشركة مطلوب."
+                );
+            }
+
+            if (string.IsNullOrWhiteSpace(request.Country))
+            {
+                return ApiResponse<RegisterResponseDto>.FailureResponse(
+                    "Country is required.",
+                    "الدولة مطلوبة."
+                );
+            }
+
+            if (string.IsNullOrWhiteSpace(request.City))
+            {
+                return ApiResponse<RegisterResponseDto>.FailureResponse(
+                    "City is required.",
+                    "المدينة مطلوبة."
+                );
+            }
+
+            var emailError = await EnsureEmailIsUnique(request.Email);
+            if (emailError != null)
+                return emailError;
+
+
+            var role = await GetRoleByName("ProductionCompany");
+            if (role == null)
+            {
+                return ApiResponse<RegisterResponseDto>.FailureResponse(
+                    "ProductionCompany role was not found.",
+                    "دور شركة الإنتاج غير موجود."
+                );
+            }
+
+
+            try
+            {
+                var user = CreateUser(request, role.Id);
+
+                _context.Users.Add(user);
+                await _context.SaveChangesAsync();
+
+                var profile = new ProductionCompanyProfile
+                {
+                    UserId = user.Id,
+                    CompanyName = request.Name.Trim(),
+                    Country = request.Country.Trim(),
+                    City = request.City.Trim(),
+                    Bio = request.Bio,
+                    IsActive = true,
+                    IsDeleted = false
+                };
+
+                _context.ProductionCompanyProfiles.Add(profile);
+                await _context.SaveChangesAsync();
+
+                if (request.ProductionTypeId != null && request.ProductionTypeId.Any())
+                {
+                    var productionTypes = request.ProductionTypeId
+                        .Distinct()
+                        .Select(typeId => new ProductionCompanyProductionType
+                        {
+                            ProductionCompanyProfileId = profile.Id,
+                            ProductionTypeId = typeId,
+                            IsActive = true,
+                            IsDeleted = false
+                        })
+                        .ToList();
+
+                    _context.ProductionCompanyProductionTypes.AddRange(productionTypes);
+                    await _context.SaveChangesAsync();
+                }
+
+
+                var response = CreateRegisterResponse(user, role.Name);
+
+                return ApiResponse<RegisterResponseDto>.SuccessResponse(
+                    response,
+                    "Production company account created successfully.",
+                    "تم إنشاء حساب شركة الإنتاج بنجاح."
+                );
+            }
+            catch (Exception ex)
+            {
+
+                _logger.LogError(
+                    ex,
+                    "Register production company failed. Email: {Email}",
+                    request.Email
+                );
+
+                return ApiResponse<RegisterResponseDto>.FailureResponse(
+                    "An unexpected error occurred while creating the production company account.",
+                    "حدث خطأ غير متوقع أثناء إنشاء حساب شركة الإنتاج."
+                );
+            }
+        }
+        public async Task<ApiResponse<RegisterResponseDto>> RegisterServiceProvider(RegisterServiceProviderRequestDto request)
+        {
+            var validationError = ValidateBasicRegisterRequest(request);
+            if (validationError != null)
+                return validationError;
+
+            var emailError = await EnsureEmailIsUnique(request.Email);
+            if (emailError != null)
+                return emailError;
+
+            var role = await GetRoleByName("ServiceProvider");
+            if (role == null)
+            {
+                return ApiResponse<RegisterResponseDto>.FailureResponse(
+                    "ServiceProvider role was not found.",
+                    "دور مزود الخدمة غير موجود."
+                );
+            }
+
+            try
+            {
+                var user = CreateUser(request, role.Id);
+
+                _context.Users.Add(user);
+                await _context.SaveChangesAsync();
+
+                var profile = new ServiceProviderProfile
+                {
+                    UserId = user.Id,
+                    IsActive = true,
+                    IsDeleted = false
+                };
+
+                _context.ServiceProviderProfiles.Add(profile);
+                await _context.SaveChangesAsync();
+
+                var selectedServiceTypes = request.ServiceTypeIds == null
+                    ? new List<ServiceProviderServiceType>()
+                    : request.ServiceTypeIds
+                        .Distinct()
+                        .Select(serviceTypeId => new ServiceProviderServiceType
+                        {
+                            ServiceProviderId = profile.Id,
+                            ServiceTypeId = serviceTypeId,
+                            IsCustom = false,
+                            IsActive = true,
+                            IsDeleted = false
+                        })
+                        .ToList();
+
+                var customServiceTypes = request.CustomServiceTypes == null
+                    ? new List<ServiceProviderServiceType>()
+                    : request.CustomServiceTypes
+                        .Where(x => !string.IsNullOrWhiteSpace(x))
+                        .Select(x => x.Trim())
+                        .Distinct()
+                        .Select(customName => new ServiceProviderServiceType
+                        {
+                            ServiceProviderId = profile.Id,
+                            CustomServiceTypeName = customName,
+                            IsCustom = true,
+                            IsActive = true,
+                            IsDeleted = false
+                        })
+                        .ToList();
+
+                var allServiceTypes = selectedServiceTypes
+                    .Concat(customServiceTypes)
+                    .ToList();
+
+                if (allServiceTypes.Any())
+                {
+                    _context.ServiceProviderServiceTypes.AddRange(allServiceTypes);
+                    await _context.SaveChangesAsync();
+                }
+
+                var response = CreateRegisterResponse(user, role.Name);
+
+                return ApiResponse<RegisterResponseDto>.SuccessResponse(
+                    response,
+                    "Service provider account created successfully.",
+                    "تم إنشاء حساب مزود الخدمة بنجاح."
+                );
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Register service provider failed. Email: {Email}",
+                    request.Email
+                );
+
+                return ApiResponse<RegisterResponseDto>.FailureResponse(
+                    "An unexpected error occurred while creating the service provider account.",
+                    "حدث خطأ غير متوقع أثناء إنشاء حساب مزود الخدمة."
+                );
+            }
+        }
 
 
         private ApiResponse<RegisterResponseDto>? ValidateBasicRegisterRequest(BaseRegisterDto request)
@@ -530,7 +635,7 @@ namespace FilmMaker.Services.Service
 
             return null;
         }
-        private async Task<ApiResponse<RegisterResponseDto>?> EnsureEmailIsUniqueAsync(string email)
+        private async Task<ApiResponse<RegisterResponseDto>?> EnsureEmailIsUnique(string email)
         {
             var normalizedEmail = email.Trim().ToLower();
 
@@ -562,7 +667,7 @@ namespace FilmMaker.Services.Service
 
             return null;
         }
-        private async Task<Role?> GetRoleByNameAsync(string roleName)
+        private async Task<Role?> GetRoleByName(string roleName)
         {
             return await _context.Roles.Where(x => x.Name == roleName).FirstOrDefaultAsync();
         }
@@ -590,5 +695,7 @@ namespace FilmMaker.Services.Service
                 Role = roleName
             };
         }
+
+        
     }
 }

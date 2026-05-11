@@ -37,6 +37,26 @@ namespace FilmMaker.Controllers
 
             return Ok(result);
         }
+        [HttpPost("register-production-company")]
+        public async Task<IActionResult> RegisterProductionCompany(RegisterProductionCompanyRequestDto request)
+        {
+            var result = await _authService.RegisterProductionCompany(request);
+
+            if (!result.Success)
+                return BadRequest(result);
+
+            return Ok(result);
+        }
+        [HttpPost("register-service-provider")]
+        public async Task<IActionResult> RegisterServiceProvider(RegisterServiceProviderRequestDto request)
+        {
+            var result = await _authService.RegisterServiceProvider(request);
+
+            if (!result.Success)
+                return BadRequest(result);
+
+            return Ok(result);
+        }
 
         [HttpPost("Login")]
         public async Task<IActionResult> Login(LoginRequestDto request)
