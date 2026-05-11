@@ -86,6 +86,7 @@ using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<FilmMakerDbContext>();
     LookupSeeder.Seed(context);
+    RoleSeeder.Seed(context);
 }
 
 app.UseSerilogRequestLogging();

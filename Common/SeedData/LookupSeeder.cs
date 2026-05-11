@@ -13,19 +13,6 @@ namespace FilmMaker.Common.SeedData
         {
             new LookupCategory
             {
-                Name = "Roles",
-                LookupItems = new List<LookupItem>
-                {
-                    new() { Name = "Admin" },
-                    new() { Name = "Location Owner" },
-                    new() { Name = "Location Manager" },
-                    new() { Name = "Production Company" },
-                    new() { Name = "Service Provider" }
-                }
-            },
-
-            new LookupCategory
-            {
                 Name = "Location Status",
                 LookupItems = new List<LookupItem>
                 {
