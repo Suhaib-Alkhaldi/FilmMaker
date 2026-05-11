@@ -12,7 +12,9 @@ namespace FilmMaker.DTO.Location
         public string LocationOwnerName { get; set; }
         public string LocationManagerName { get; set; }
         public bool IsActive { get; set; }
-        public bool IsArchived { get; set; }
+
+        public string StatusName { get; set; }
+
         public string LocationStatusName { get; set; }
         public string LocationOnGoogleMaps { get; set; }
         public decimal? Latitude { get; set; }

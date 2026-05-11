@@ -30,7 +30,7 @@ namespace FilmMaker.Controllers
 
         [AuthorizeLocationOwner]
         [HttpPut("update")]
-        public async Task<IActionResult> UpdateLocation([FromBody] LocationDTO location, [FromQuery] int currentUserId)
+        public async Task<IActionResult> UpdateLocation([FromBody] UpdateLocationDTO location, [FromQuery] int currentUserId)
         {
 
             var result = await _locationService.UpdateLocation(location, currentUserId);
@@ -39,19 +39,19 @@ namespace FilmMaker.Controllers
         }
 
         [AuthorizeLocationOwner]
-        [HttpPatch("toggle-archive/{locationId}")]
+        [HttpPatch("archive/{locationId}")]
         public async Task<IActionResult> ToggleArchive(int locationId, [FromQuery] int currentUserId)
         {
-            var result = await _locationService.ToggleArchive(currentUserId, locationId,true);
+            var result = await _locationService.ArchiveLocation(locationId,currentUserId);
 
             return Ok(result);
         }
 
         [AuthorizeLocationOwner]
-        [HttpPatch("toggle-unarchive/{locationId}")]
+        [HttpPatch("restore-archive/{locationId}")]
         public async Task<IActionResult> ToggleUnArchive(int locationId, [FromQuery] int currentUserId)
         {
-            var result = await _locationService.ToggleArchive(currentUserId, locationId,false);
+            var result = await _locationService.RestoreArchivedLocation(locationId, currentUserId);
 
             return Ok(result);
         }
