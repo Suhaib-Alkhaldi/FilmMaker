@@ -1,0 +1,59 @@
+{
+  "lookupCategories": [
+    {
+      "id": 1,
+      "key": "Roles",
+      "name": "Roles"
+    },
+    {
+      "id": 2,
+      "key": "LocationStatus",
+      "name": "Location Status"
+    },
+    {
+      "id": 3,
+      "key": "LocationMedia",
+      "name": "Location Media"
+    },
+    {
+      "id": 4,
+      "key": "BookingStatus",
+      "name": "Booking Status"
+    },
+    {
+      "id": 5,
+      "key": "ContractStatus",
+      "name": "Contract Status"
+    },
+    {
+      "id": 6,
+      "key": "PaymentType",
+      "name": "Payment Type"
+    },
+    {
+      "id": 7,
+      "key": "EscrowStatus",
+      "name": "Escrow Status"
+    },
+    {
+      "id": 8,
+      "key": "ProductionType",
+      "name": "Production Type"
+    },
+    {
+      "id": 9,
+      "key": "ServiceType",
+      "name": "Service Type"
+    },
+    {
+      "id": 10,
+      "key": "City",
+      "name": "City"
+    },
+    {
+      "id": 11,
+      "key": "Country",
+      "name": "Country"
+    }
+  ]
+}

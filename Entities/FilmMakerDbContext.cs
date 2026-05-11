@@ -8,8 +8,8 @@ namespace FilmMaker.Entities
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
 
-        public DbSet<LockupCategory> LockupCategories { get; set; }
-        public DbSet<LockupItem> LockupItems { get; set; }
+        public DbSet<LookupCategory> LookupCategories { get; set; }
+        public DbSet<LookupItem> LookupItems { get; set; }
 
         // Profiles
         public DbSet<LocationOwnerProfile> LocationOwnerProfiles { get; set; }

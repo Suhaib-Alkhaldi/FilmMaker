@@ -11,11 +11,11 @@ namespace FilmMaker.Entities
         public int FromStatusId { get; set; }
 
         [ForeignKey("FromStatusId")]
-        public LockupItem FromStatus { get; set; }
+        public LookupItem FromStatus { get; set; }
         public int ToStatusId { get; set; }
 
         [ForeignKey("ToStatusId")]
-        public LockupItem ToStatus { get; set; }
+        public LookupItem ToStatus { get; set; }
         public int ChangedByUserId { get; set; }
 
         [ForeignKey("ChangedByUserId")]

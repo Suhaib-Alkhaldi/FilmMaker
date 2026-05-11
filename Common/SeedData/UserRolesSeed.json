@@ -1,0 +1,29 @@
+{
+  "UserRoles": [
+    {
+      "id": 1,
+      "lookupCategoryId": 1,
+      "name": "Admin"
+    },
+    {
+      "id": 2,
+      "lookupCategoryId": 1,
+      "name": "Location Owner"
+    },
+    {
+      "id": 3,
+      "lookupCategoryId": 1,
+      "name": "Location Manager"
+    },
+    {
+      "id": 4,
+      "lookupCategoryId": 1,
+      "name": "Production Company"
+    },
+    {
+      "id": 5,
+      "lookupCategoryId": 1,
+      "name": "Service Provider"
+    }
+  ]
+}

@@ -1,3 +1,4 @@
+using FilmMaker.Common.SeedData;
 using FilmMaker.Entities;
 using FilmMaker.Services.Interface;
 using FilmMaker.Services.Service;
@@ -6,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
+using System;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -79,6 +81,13 @@ builder.Services.AddAuthentication(options =>
 });
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<FilmMakerDbContext>();
+    LookupSeeder.Seed(context);
+}
+
 app.UseSerilogRequestLogging();
 
 // Configure the HTTP request pipeline.

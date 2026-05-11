@@ -1,0 +1,49 @@
+{
+  "ProductionType": [
+    {
+      "id": 1,
+      "lookupCategoryId": 8,
+      "name": "Film"
+    },
+    {
+      "id": 2,
+      "lookupCategoryId": 8,
+      "name": "Series"
+    },
+    {
+      "id": 3,
+      "lookupCategoryId": 8,
+      "name": "Advertisement"
+    },
+    {
+      "id": 4,
+      "lookupCategoryId": 8,
+      "name": "Documentary"
+    },
+    {
+      "id": 5,
+      "lookupCategoryId": 8,
+      "name": "Music Video"
+    },
+    {
+      "id": 6,
+      "lookupCategoryId": 8,
+      "name": "TV Show"
+    },
+    {
+      "id": 7,
+      "lookupCategoryId": 8,
+      "name": "Short Film"
+    },
+    {
+      "id": 8,
+      "lookupCategoryId": 8,
+      "name": "Commercial"
+    },
+    {
+      "id": 9,
+      "lookupCategoryId": 8,
+      "name": "Other"
+    }
+  ]
+}

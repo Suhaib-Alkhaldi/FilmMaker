@@ -1,0 +1,29 @@
+{
+  "PaymentType": [
+    {
+      "id": 1,
+      "lookupCategoryId": 6,
+      "name": "Advance Payment"
+    },
+    {
+      "id": 2,
+      "lookupCategoryId": 6,
+      "name": "Full Payment"
+    },
+    {
+      "id": 3,
+      "lookupCategoryId": 6,
+      "name": "Remaining Payment"
+    },
+    {
+      "id": 4,
+      "lookupCategoryId": 6,
+      "name": "Refund"
+    },
+    {
+      "id": 5,
+      "lookupCategoryId": 6,
+      "name": "Cancellation Fee"
+    }
+  ]
+}
