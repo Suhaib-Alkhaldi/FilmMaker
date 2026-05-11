@@ -1,6 +1,6 @@
-﻿using FilmMaker.DTO.Auth.Request;
+﻿using FilmMaker.Attribute;
+using FilmMaker.DTO.Auth.Request;
 using FilmMaker.Services.Interface;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FilmMaker.Controllers
@@ -15,7 +15,6 @@ namespace FilmMaker.Controllers
         {
             _authService = authService;
         }
-
         [HttpPost("register-location-owner")]
         public async Task<IActionResult> RegisterLocationOwner(RegisterLocationOwnerRequestDto request)
         {

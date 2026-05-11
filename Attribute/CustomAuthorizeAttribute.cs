@@ -17,7 +17,7 @@ namespace FilmMaker.Attribute
         public AuthorizeLocationOwnerAttribute()
         {
             AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme;
-            Roles = "LocationOwner";
+            Roles = "Location Owner";
         }
     }
 
@@ -26,7 +26,7 @@ namespace FilmMaker.Attribute
         public AuthorizeLocationManagerAttribute()
         {
             AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme;
-            Roles = "LocationManager";
+            Roles = "Location Manager";
         }
     }
     public class AuthorizeProductionCompanyAttribute : AuthorizeAttribute
@@ -34,7 +34,7 @@ namespace FilmMaker.Attribute
         public AuthorizeProductionCompanyAttribute()
         {
             AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme;
-            Roles = "ProductionCompany";
+            Roles = "Production Company";
         }
     }
     public class AuthorizeServiceProviderAttribute : AuthorizeAttribute
@@ -42,7 +42,7 @@ namespace FilmMaker.Attribute
         public AuthorizeServiceProviderAttribute()
         {
             AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme;
-            Roles = "ServiceProvider";
+            Roles = "Service Provider";
         }
     }
 }

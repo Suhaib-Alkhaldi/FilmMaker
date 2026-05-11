@@ -48,7 +48,7 @@ namespace FilmMaker.Services.Service
                 return emailError;
             }
 
-            var role = await GetRoleByName("LocationOwner");
+            var role = await GetRoleByName("Location Owner");
             if (role == null)
             {
                 _logger.LogError(
@@ -62,7 +62,6 @@ namespace FilmMaker.Services.Service
                 );
             }
 
-            await using var transaction = await _context.Database.BeginTransactionAsync();
 
             try
             {
@@ -94,7 +93,6 @@ namespace FilmMaker.Services.Service
                     ownerProfile.Id
                 );
 
-                await transaction.CommitAsync();
 
                 var response = CreateRegisterResponse(user, role.Name);
 
@@ -112,7 +110,7 @@ namespace FilmMaker.Services.Service
             }
             catch (Exception ex)
             {
-                await transaction.RollbackAsync();
+
 
                 _logger.LogError(
                     ex,
@@ -150,7 +148,7 @@ namespace FilmMaker.Services.Service
                 return emailError;
             }
 
-            var role = await GetRoleByName("LocationManager");
+            var role = await GetRoleByName("Location Manager");
             if (role == null)
             {
                 _logger.LogError(
@@ -338,7 +336,7 @@ namespace FilmMaker.Services.Service
                 return emailError;
 
 
-            var role = await GetRoleByName("ProductionCompany");
+            var role = await GetRoleByName("Production Company");
             if (role == null)
             {
                 return ApiResponse<RegisterResponseDto>.FailureResponse(
@@ -420,7 +418,7 @@ namespace FilmMaker.Services.Service
             if (emailError != null)
                 return emailError;
 
-            var role = await GetRoleByName("ServiceProvider");
+            var role = await GetRoleByName("Service Provider");
             if (role == null)
             {
                 return ApiResponse<RegisterResponseDto>.FailureResponse(

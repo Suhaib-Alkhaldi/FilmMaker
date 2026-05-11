@@ -12,7 +12,7 @@ namespace FilmMaker.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "LockupCategories",
+                name: "LookupCategories",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -27,7 +27,7 @@ namespace FilmMaker.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_LockupCategories", x => x.Id);
+                    table.PrimaryKey("PK_LookupCategories", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -50,13 +50,13 @@ namespace FilmMaker.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "LockupItems",
+                name: "LookupItems",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    LookupCategoryId = table.Column<int>(type: "int", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    LockupCategoryId = table.Column<int>(type: "int", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -66,11 +66,11 @@ namespace FilmMaker.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_LockupItems", x => x.Id);
+                    table.PrimaryKey("PK_LookupItems", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_LockupItems_LockupCategories_LockupCategoryId",
-                        column: x => x.LockupCategoryId,
-                        principalTable: "LockupCategories",
+                        name: "FK_LookupItems_LookupCategories_LookupCategoryId",
+                        column: x => x.LookupCategoryId,
+                        principalTable: "LookupCategories",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -241,9 +241,9 @@ namespace FilmMaker.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_LocationManagerCities_LockupItems_CityId",
+                        name: "FK_LocationManagerCities_LookupItems_CityId",
                         column: x => x.CityId,
-                        principalTable: "LockupItems",
+                        principalTable: "LookupItems",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -313,9 +313,9 @@ namespace FilmMaker.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Locations_LockupItems_LocationStatusId",
+                        name: "FK_Locations_LookupItems_LocationStatusId",
                         column: x => x.LocationStatusId,
-                        principalTable: "LockupItems",
+                        principalTable: "LookupItems",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -339,9 +339,9 @@ namespace FilmMaker.Migrations
                 {
                     table.PrimaryKey("PK_ProductionCompanyProductionTypes", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ProductionCompanyProductionTypes_LockupItems_ProductionTypeId",
+                        name: "FK_ProductionCompanyProductionTypes_LookupItems_ProductionTypeId",
                         column: x => x.ProductionTypeId,
-                        principalTable: "LockupItems",
+                        principalTable: "LookupItems",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -373,9 +373,9 @@ namespace FilmMaker.Migrations
                 {
                     table.PrimaryKey("PK_ServiceProviderServiceTypes", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ServiceProviderServiceTypes_LockupItems_ServiceTypeId",
+                        name: "FK_ServiceProviderServiceTypes_LookupItems_ServiceTypeId",
                         column: x => x.ServiceTypeId,
-                        principalTable: "LockupItems",
+                        principalTable: "LookupItems",
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_ServiceProviderServiceTypes_ServiceProviderProfiles_ServiceProviderId",
@@ -469,9 +469,9 @@ namespace FilmMaker.Migrations
                         principalTable: "Locations",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_LocationBookingRequests_LockupItems_BookingStatusId",
+                        name: "FK_LocationBookingRequests_LookupItems_BookingStatusId",
                         column: x => x.BookingStatusId,
-                        principalTable: "LockupItems",
+                        principalTable: "LookupItems",
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_LocationBookingRequests_ProductionCompanyProfiles_ProductionCompanyId",
@@ -509,9 +509,9 @@ namespace FilmMaker.Migrations
                         principalTable: "Locations",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_LocationMedia_LockupItems_MediaTypeId",
+                        name: "FK_LocationMedia_LookupItems_MediaTypeId",
                         column: x => x.MediaTypeId,
-                        principalTable: "LockupItems",
+                        principalTable: "LookupItems",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -577,14 +577,14 @@ namespace FilmMaker.Migrations
                         principalTable: "LocationBookingRequests",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_BookingStatusHistories_LockupItems_FromStatusId",
+                        name: "FK_BookingStatusHistories_LookupItems_FromStatusId",
                         column: x => x.FromStatusId,
-                        principalTable: "LockupItems",
+                        principalTable: "LookupItems",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_BookingStatusHistories_LockupItems_ToStatusId",
+                        name: "FK_BookingStatusHistories_LookupItems_ToStatusId",
                         column: x => x.ToStatusId,
-                        principalTable: "LockupItems",
+                        principalTable: "LookupItems",
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_BookingStatusHistories_Users_ChangedByUserId",
@@ -623,9 +623,9 @@ namespace FilmMaker.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_DigitalContracts_LockupItems_ContractStatusId",
+                        name: "FK_DigitalContracts_LookupItems_ContractStatusId",
                         column: x => x.ContractStatusId,
-                        principalTable: "LockupItems",
+                        principalTable: "LookupItems",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -697,14 +697,14 @@ namespace FilmMaker.Migrations
                         principalTable: "LocationBookingRequests",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Payments_LockupItems_PaymentStatusId",
+                        name: "FK_Payments_LookupItems_PaymentStatusId",
                         column: x => x.PaymentStatusId,
-                        principalTable: "LockupItems",
+                        principalTable: "LookupItems",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Payments_LockupItems_PaymentTypeId",
+                        name: "FK_Payments_LookupItems_PaymentTypeId",
                         column: x => x.PaymentTypeId,
-                        principalTable: "LockupItems",
+                        principalTable: "LookupItems",
                         principalColumn: "Id");
                 });
 
@@ -738,9 +738,9 @@ namespace FilmMaker.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_EscrowTransactions_LockupItems_EscrowStatusId",
+                        name: "FK_EscrowTransactions_LookupItems_EscrowStatusId",
                         column: x => x.EscrowStatusId,
-                        principalTable: "LockupItems",
+                        principalTable: "LookupItems",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -904,9 +904,9 @@ namespace FilmMaker.Migrations
                 column: "LocationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_LockupItems_LockupCategoryId",
-                table: "LockupItems",
-                column: "LockupCategoryId");
+                name: "IX_LookupItems_LookupCategoryId",
+                table: "LookupItems",
+                column: "LookupCategoryId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Payments_DigitalContractId",
@@ -1029,13 +1029,13 @@ namespace FilmMaker.Migrations
                 name: "LocationOwnerProfiles");
 
             migrationBuilder.DropTable(
-                name: "LockupItems");
+                name: "LookupItems");
 
             migrationBuilder.DropTable(
                 name: "Users");
 
             migrationBuilder.DropTable(
-                name: "LockupCategories");
+                name: "LookupCategories");
 
             migrationBuilder.DropTable(
                 name: "Roles");
