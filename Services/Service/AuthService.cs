@@ -356,7 +356,6 @@ namespace FilmMaker.Services.Service
                 var profile = new ProductionCompanyProfile
                 {
                     UserId = user.Id,
-                    CompanyName = request.Name.Trim(),
                     Country = request.Country.Trim(),
                     City = request.City.Trim(),
                     Bio = request.Bio,

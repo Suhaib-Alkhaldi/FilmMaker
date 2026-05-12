@@ -2,6 +2,7 @@
 using FilmMaker.DTO.Profile.Request;
 using FilmMaker.DTO.Profile.Response;
 using FilmMaker.Entities;
+using FilmMaker.Helper.Hashing;
 using FilmMaker.Helper.Validation;
 using FilmMaker.Services.Interface;
 using Microsoft.EntityFrameworkCore;
@@ -251,8 +252,575 @@ namespace FilmMaker.Services.Service
             }
         }
 
+        public async Task<ApiResponse<ProductionCompanyProfileResponseDto>> GetMyProductionCompanyProfile(int currentUserId)
+        {
+            try
+            {
+                var profile = await _context.ProductionCompanyProfiles
+                    .Where(x => x.UserId == currentUserId && !x.IsDeleted)
+                    .Select(x => new ProductionCompanyProfileResponseDto
+                    {
+                        ProfileId = x.Id,
+                        UserId = x.UserId,
+
+                        Name = x.User.Name,
+                        Email = x.User.Email,
+                        PhoneNumber = x.User.PhoneNumber,
+                        IBAN = x.User.IBAN,
+
+                        Country = x.Country,
+                        City = x.City,
+                        Bio = x.Bio,
+
+                        ProductionTypes = x.ProductionTypes
+                            .Where(p => !p.IsDeleted)
+                            .Select(p => p.ProductionType.Name)
+                            .ToList()
+                    })
+                    .FirstOrDefaultAsync();
+
+                if (profile == null)
+                {
+                    _logger.LogWarning(
+                        "Production company profile was not found. UserId: {UserId}",
+                        currentUserId
+                    );
+
+                    return ApiResponse<ProductionCompanyProfileResponseDto>.FailureResponse(
+                        "Production company profile was not found.",
+                        "لم يتم العثور على ملف شركة الإنتاج."
+                    );
+                }
+
+                return ApiResponse<ProductionCompanyProfileResponseDto>.SuccessResponse(
+                    profile,
+                    "Production company profile fetched successfully.",
+                    "تم جلب ملف شركة الإنتاج بنجاح."
+                );
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Error while fetching production company profile. UserId: {UserId}",
+                    currentUserId
+                );
+
+                return ApiResponse<ProductionCompanyProfileResponseDto>.FailureResponse(
+                    "An unexpected error occurred while fetching the profile.",
+                    "حدث خطأ غير متوقع أثناء جلب الملف الشخصي."
+                );
+            }
+        }
+        public async Task<ApiResponse<ProductionCompanyProfileResponseDto>> UpdateProductionCompanyProfile(UpdateProductionCompanyProfileRequestDto request, int currentUserId)
+        {
+            if (request == null)
+            {
+                return ApiResponse<ProductionCompanyProfileResponseDto>.FailureResponse(
+                    "Invalid request.",
+                    "الطلب غير صحيح."
+                );
+            }
+
+            var validationError = await ValidateUpdateProductionCompanyProfileRequest(request);
+            if (validationError != null)
+                return validationError;
+
+            var profile = await _context.ProductionCompanyProfiles
+                .Include(x => x.User)
+                .Include(x => x.ProductionTypes)
+                .Where(x => x.UserId == currentUserId && !x.IsDeleted)
+                .FirstOrDefaultAsync();
+
+            if (profile == null)
+            {
+                _logger.LogWarning(
+                    "Production company profile was not found for update. UserId: {UserId}",
+                    currentUserId
+                );
+
+                return ApiResponse<ProductionCompanyProfileResponseDto>.FailureResponse(
+                    "Production company profile was not found.",
+                    "لم يتم العثور على ملف شركة الإنتاج."
+                );
+            }
 
 
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(request.Name))
+                {
+                    profile.User.Name = request.Name.Trim();
+                }
+
+                if (!string.IsNullOrWhiteSpace(request.PhoneNumber))
+                {
+                    profile.User.PhoneNumber = request.PhoneNumber.Trim();
+                }
+
+                if (request.IBAN != null)
+                {
+                    profile.User.IBAN = string.IsNullOrWhiteSpace(request.IBAN)
+                        ? null
+                        : request.IBAN.Trim();
+                }
+
+                if (!string.IsNullOrWhiteSpace(request.Country))
+                {
+                    profile.Country = request.Country.Trim();
+                }
+
+                if (!string.IsNullOrWhiteSpace(request.City))
+                {
+                    profile.City = request.City.Trim();
+                }
+
+                if (request.Bio != null)
+                {
+                    profile.Bio = string.IsNullOrWhiteSpace(request.Bio)
+                        ? null
+                        : request.Bio.Trim();
+                }
+
+                profile.User.UpdatedBy = currentUserId.ToString();
+                profile.User.UpdatedAt = DateTime.UtcNow;
+
+                profile.UpdatedBy = currentUserId.ToString();
+                profile.UpdatedAt = DateTime.UtcNow;
+
+                if (request.ProductionTypeIds != null)
+                {
+                    UpdateProductionCompanyProductionTypes(
+                        profile,
+                        request.ProductionTypeIds,
+                        currentUserId
+                    );
+                }
+
+                await _context.SaveChangesAsync();
+
+                _logger.LogInformation(
+                    "Production company profile updated successfully. UserId: {UserId}, ProfileId: {ProfileId}",
+                    currentUserId,
+                    profile.Id
+                );
+
+                return await GetMyProductionCompanyProfile(currentUserId);
+            }
+            catch (Exception ex)
+            {
+
+                _logger.LogError(
+                    ex,
+                    "Error while updating production company profile. UserId: {UserId}, ProfileId: {ProfileId}",
+                    currentUserId,
+                    profile.Id
+                );
+
+                return ApiResponse<ProductionCompanyProfileResponseDto>.FailureResponse(
+                    "An unexpected error occurred while updating the profile.",
+                    "حدث خطأ غير متوقع أثناء تحديث الملف الشخصي."
+                );
+            }
+        }
+
+
+
+
+        public async Task<ApiResponse<ServiceProviderProfileResponseDto>> GetMyServiceProviderProfile(int currentUserId)
+        {
+            try
+            {
+                var profile = await _context.ServiceProviderProfiles
+                    .Where(x => x.UserId == currentUserId && !x.IsDeleted)
+                    .Select(x => new ServiceProviderProfileResponseDto
+                    {
+                        ProfileId = x.Id,
+                        UserId = x.UserId,
+
+                        Name = x.User.Name,
+                        Email = x.User.Email,
+                        PhoneNumber = x.User.PhoneNumber,
+                        IBAN = x.User.IBAN,
+
+                        ServiceTypes = x.ServiceTypes
+                            .Where(s => !s.IsDeleted && !s.IsCustom && s.ServiceType != null)
+                            .Select(s => s.ServiceType!.Name)
+                            .ToList(),
+
+                        CustomServiceTypes = x.ServiceTypes
+                            .Where(s => !s.IsDeleted && s.IsCustom && s.CustomServiceTypeName != null)
+                            .Select(s => s.CustomServiceTypeName!)
+                            .ToList()
+                    })
+                    .FirstOrDefaultAsync();
+
+                if (profile == null)
+                {
+                    _logger.LogWarning(
+                        "Service provider profile was not found. UserId: {UserId}",
+                        currentUserId
+                    );
+
+                    return ApiResponse<ServiceProviderProfileResponseDto>.FailureResponse(
+                        "Service provider profile was not found.",
+                        "لم يتم العثور على ملف مزود الخدمة."
+                    );
+                }
+
+                return ApiResponse<ServiceProviderProfileResponseDto>.SuccessResponse(
+                    profile,
+                    "Service provider profile fetched successfully.",
+                    "تم جلب ملف مزود الخدمة بنجاح."
+                );
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Error while fetching service provider profile. UserId: {UserId}",
+                    currentUserId
+                );
+
+                return ApiResponse<ServiceProviderProfileResponseDto>.FailureResponse(
+                    "An unexpected error occurred while fetching the profile.",
+                    "حدث خطأ غير متوقع أثناء جلب الملف الشخصي."
+                );
+            }
+        }
+
+        public async Task<ApiResponse<ServiceProviderProfileResponseDto>> UpdateServiceProviderProfile(UpdateServiceProviderProfileRequestDto request, int currentUserId)
+        {
+            if (request == null)
+            {
+                return ApiResponse<ServiceProviderProfileResponseDto>.FailureResponse(
+                    "Invalid request.",
+                    "الطلب غير صحيح."
+                );
+            }
+
+            var validationError = await ValidateUpdateServiceProviderProfileRequest(request);
+            if (validationError != null)
+                return validationError;
+
+            var profile = await _context.ServiceProviderProfiles
+                .Include(x => x.User)
+                .Include(x => x.ServiceTypes)
+                .Where(x => x.UserId == currentUserId &&!x.IsDeleted)
+                .FirstOrDefaultAsync();
+
+            if (profile == null)
+            {
+                _logger.LogWarning(
+                    "Service provider profile was not found for update. UserId: {UserId}",
+                    currentUserId
+                );
+
+                return ApiResponse<ServiceProviderProfileResponseDto>.FailureResponse(
+                    "Service provider profile was not found.",
+                    "لم يتم العثور على ملف مزود الخدمة."
+                );
+            }
+
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(request.Name))
+                {
+                    profile.User.Name = request.Name.Trim();
+                }
+
+                if (!string.IsNullOrWhiteSpace(request.PhoneNumber))
+                {
+                    profile.User.PhoneNumber = request.PhoneNumber.Trim();
+                }
+
+                if (request.IBAN != null)
+                {
+                    profile.User.IBAN = string.IsNullOrWhiteSpace(request.IBAN)
+                        ? null
+                        : request.IBAN.Trim();
+                }
+
+                profile.User.UpdatedBy = currentUserId.ToString();
+                profile.User.UpdatedAt = DateTime.UtcNow;
+
+                profile.UpdatedBy = currentUserId.ToString();
+                profile.UpdatedAt = DateTime.UtcNow;
+
+                if (request.ServiceTypeIds != null)
+                {
+                    UpdateServiceProviderLookupServiceTypes(
+                        profile,
+                        request.ServiceTypeIds,
+                        currentUserId
+                    );
+                }
+
+                if (request.CustomServiceTypes != null)
+                {
+                    UpdateServiceProviderCustomServiceTypes(
+                        profile,
+                        request.CustomServiceTypes,
+                        currentUserId
+                    );
+                }
+
+                await _context.SaveChangesAsync();
+
+                _logger.LogInformation(
+                    "Service provider profile updated successfully. UserId: {UserId}, ProfileId: {ProfileId}",
+                    currentUserId,
+                    profile.Id
+                );
+
+                return await GetMyServiceProviderProfile(currentUserId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Error while updating service provider profile. UserId: {UserId}, ProfileId: {ProfileId}",
+                    currentUserId,
+                    profile.Id
+                );
+
+                return ApiResponse<ServiceProviderProfileResponseDto>.FailureResponse(
+                    "An unexpected error occurred while updating the profile.",
+                    "حدث خطأ غير متوقع أثناء تحديث الملف الشخصي."
+                );
+            }
+        }
+
+
+        public async Task<ApiResponse<LocationOwnerProfileResponseDto>> GetMyLocationOwnerProfile(int currentUserId)
+        {
+            try
+            {
+                var profile = await _context.LocationOwnerProfiles
+                    .Where(x => x.UserId == currentUserId && !x.IsDeleted)
+                    .Select(x => new LocationOwnerProfileResponseDto
+                    {
+                        ProfileId = x.Id,
+                        UserId = x.UserId,
+                        Name = x.User.Name,
+                        Email = x.User.Email,
+                        PhoneNumber = x.User.PhoneNumber,
+                        IBAN = x.User.IBAN,
+                        RegisterDate = x.RegisterDate
+                    })
+                    .FirstOrDefaultAsync();
+
+                if (profile == null)
+                {
+                    _logger.LogWarning(
+                        "Location owner profile was not found. UserId: {UserId}",
+                        currentUserId
+                    );
+
+                    return ApiResponse<LocationOwnerProfileResponseDto>.FailureResponse(
+                        "Location owner profile was not found.",
+                        "لم يتم العثور على ملف صاحب الموقع."
+                    );
+                }
+
+                return ApiResponse<LocationOwnerProfileResponseDto>.SuccessResponse(
+                    profile,
+                    "Location owner profile fetched successfully.",
+                    "تم جلب ملف صاحب الموقع بنجاح."
+                );
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Error while fetching location owner profile. UserId: {UserId}",
+                    currentUserId
+                );
+
+                return ApiResponse<LocationOwnerProfileResponseDto>.FailureResponse(
+                    "An unexpected error occurred while fetching the profile.",
+                    "حدث خطأ غير متوقع أثناء جلب الملف الشخصي."
+                );
+            }
+        }
+
+        public async Task<ApiResponse<LocationOwnerProfileResponseDto>> UpdateLocationOwnerProfile(UpdateLocationOwnerProfileRequestDto request, int currentUserId)
+        {
+            if (request == null)
+            {
+                return ApiResponse<LocationOwnerProfileResponseDto>.FailureResponse(
+                    "Invalid request.",
+                    "الطلب غير صحيح."
+                );
+            }
+
+            var validationError = ValidateUpdateLocationOwnerProfileRequest(request);
+            if (validationError != null)
+                return validationError;
+
+            var profile = await _context.LocationOwnerProfiles
+                .Include(x => x.User).Where(x =>
+                    x.UserId == currentUserId &&
+                    !x.IsDeleted)
+                .FirstOrDefaultAsync();
+
+            if (profile == null)
+            {
+                _logger.LogWarning(
+                    "Location owner profile was not found for update. UserId: {UserId}",
+                    currentUserId
+                );
+
+                return ApiResponse<LocationOwnerProfileResponseDto>.FailureResponse(
+                    "Location owner profile was not found.",
+                    "لم يتم العثور على ملف صاحب الموقع."
+                );
+            }
+
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(request.Name))
+                {
+                    profile.User.Name = request.Name.Trim();
+                }
+
+                if (!string.IsNullOrWhiteSpace(request.PhoneNumber))
+                {
+                    profile.User.PhoneNumber = request.PhoneNumber.Trim();
+                }
+
+                if (request.IBAN != null)
+                {
+                    profile.User.IBAN = string.IsNullOrWhiteSpace(request.IBAN)
+                        ? null
+                        : request.IBAN.Trim();
+                }
+
+                profile.User.UpdatedBy = currentUserId.ToString();
+                profile.User.UpdatedAt = DateTime.UtcNow;
+
+                profile.UpdatedBy = currentUserId.ToString();
+                profile.UpdatedAt = DateTime.UtcNow;
+
+                await _context.SaveChangesAsync();
+
+                _logger.LogInformation(
+                    "Location owner profile updated successfully. UserId: {UserId}, ProfileId: {ProfileId}",
+                    currentUserId,
+                    profile.Id
+                );
+
+                return await GetMyLocationOwnerProfile(currentUserId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Error while updating location owner profile. UserId: {UserId}, ProfileId: {ProfileId}",
+                    currentUserId,
+                    profile.Id
+                );
+
+                return ApiResponse<LocationOwnerProfileResponseDto>.FailureResponse(
+                    "An unexpected error occurred while updating the profile.",
+                    "حدث خطأ غير متوقع أثناء تحديث الملف الشخصي."
+                );
+            }
+        }
+
+        public async Task<ApiResponse<bool>> ChangePassword(ChangePasswordRequestDto request, int currentUserId)
+        {
+            if (request == null)
+            {
+                return ApiResponse<bool>.FailureResponse(
+                    "Invalid request.",
+                    "الطلب غير صحيح."
+                );
+            }
+
+            var validationError = ValidateChangePasswordRequest(request);
+            if (validationError != null)
+                return validationError;
+
+            try
+            {
+                var user = await _context.Users.Where(x =>
+                        x.Id == currentUserId &&
+                        !x.IsDeleted &&
+                        x.IsActive)
+                    .FirstOrDefaultAsync();
+
+                if (user == null)
+                {
+                    _logger.LogWarning(
+                        "Change password failed. User was not found. UserId: {UserId}",
+                        currentUserId
+                    );
+
+                    return ApiResponse<bool>.FailureResponse(
+                        "User was not found.",
+                        "لم يتم العثور على المستخدم."
+                    );
+                }
+
+                var currentPasswordHash = HashingHelper.HashValueWith384(request.CurrentPassword);
+
+                if (user.Password != currentPasswordHash)
+                {
+                    _logger.LogWarning(
+                        "Change password failed. Current password is incorrect. UserId: {UserId}",
+                        currentUserId
+                    );
+
+                    return ApiResponse<bool>.FailureResponse(
+                        "Current password is incorrect.",
+                        "كلمة المرور الحالية غير صحيحة."
+                    );
+                }
+
+                var newPasswordHash = HashingHelper.HashValueWith384(request.NewPassword);
+
+                if (user.Password == newPasswordHash)
+                {
+                    return ApiResponse<bool>.FailureResponse(
+                        "New password cannot be the same as the current password.",
+                        "كلمة المرور الجديدة لا يمكن أن تكون نفس كلمة المرور الحالية."
+                    );
+                }
+
+                user.Password = newPasswordHash;
+                user.UpdatedBy = currentUserId.ToString();
+                user.UpdatedAt = DateTime.UtcNow;
+
+                await _context.SaveChangesAsync();
+
+                _logger.LogInformation(
+                    "Password changed successfully. UserId: {UserId}",
+                    currentUserId
+                );
+
+                return ApiResponse<bool>.SuccessResponse(
+                    true,
+                    "Password changed successfully.",
+                    "تم تغيير كلمة المرور بنجاح."
+                );
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Error while changing password. UserId: {UserId}",
+                    currentUserId
+                );
+
+                return ApiResponse<bool>.FailureResponse(
+                    "An unexpected error occurred while changing the password.",
+                    "حدث خطأ غير متوقع أثناء تغيير كلمة المرور."
+                );
+            }
+        }
+
+        #region location manager private methods
         private async Task<ApiResponse<LocationManagerProfileResponseDto>?> ValidateUpdateLocationManagerProfileRequest(UpdateLocationManagerProfileRequestDto request)
         {
             if (string.IsNullOrWhiteSpace(request.Name))
@@ -484,5 +1052,335 @@ namespace FilmMaker.Services.Service
 
             return null;
         }
+        #endregion
+
+
+
+        #region Production company private methods
+        private async Task<ApiResponse<ProductionCompanyProfileResponseDto>?> ValidateUpdateProductionCompanyProfileRequest(
+                UpdateProductionCompanyProfileRequestDto request)
+        {
+            if (!string.IsNullOrWhiteSpace(request.PhoneNumber) &&
+                !PhoneNumberValidation.IsValidPhoneNumber(request.PhoneNumber))
+            {
+                return ApiResponse<ProductionCompanyProfileResponseDto>.FailureResponse(
+                    "Invalid phone number format.",
+                    "صيغة رقم الهاتف غير صحيحة."
+                );
+            }
+
+            if (request.ProductionTypeIds != null && request.ProductionTypeIds.Any())
+            {
+                var productionTypeValidationError = await ValidateProductionTypeId(
+                    request.ProductionTypeIds
+                );
+
+                if (productionTypeValidationError != null)
+                    return productionTypeValidationError;
+            }
+
+            return null;
+        }
+        private async Task<ApiResponse<ProductionCompanyProfileResponseDto>?> ValidateProductionTypeId(List<int> productionTypeIds)
+        {
+            if (productionTypeIds == null || !productionTypeIds.Any())
+                return null;
+
+            var distinctProductionTypeIds = productionTypeIds.Distinct().ToList();
+
+            var validProductionTypeIds = await _context.LookupItems
+                .Where(x =>
+                    distinctProductionTypeIds.Contains(x.Id) &&
+                    x.LookupCategory.Name == "ProductionType" &&
+                    !x.IsDeleted)
+                .Select(x => x.Id)
+                .ToListAsync();
+
+            var hasInvalidProductionType = distinctProductionTypeIds.Any(id =>
+                !validProductionTypeIds.Contains(id));
+
+            if (hasInvalidProductionType)
+            {
+                return ApiResponse<ProductionCompanyProfileResponseDto>.FailureResponse(
+                    "One or more selected production types are invalid.",
+                    "واحد أو أكثر من أنواع الإنتاج المحددة غير صحيح."
+                );
+            }
+
+            return null;
+        }
+        private static void UpdateProductionCompanyProductionTypes(ProductionCompanyProfile profile,List<int> productionTypeIds,int currentUserId)
+        {
+            var requestedProductionTypeIds = productionTypeIds
+                .Distinct()
+                .ToList();
+
+            var activeProductionTypes = profile.ProductionTypes
+                .Where(x => !x.IsDeleted)
+                .ToList();
+
+            foreach (var existingProductionType in activeProductionTypes)
+            {
+                if (!requestedProductionTypeIds.Contains(existingProductionType.ProductionTypeId))
+                {
+                    existingProductionType.IsDeleted = true;
+                    existingProductionType.IsActive = false;
+                    existingProductionType.UpdatedBy = currentUserId.ToString();
+                    existingProductionType.UpdatedAt = DateTime.UtcNow;
+                }
+            }
+
+            var existingActiveProductionTypeIds = profile.ProductionTypes
+                .Where(x => !x.IsDeleted)
+                .Select(x => x.ProductionTypeId)
+                .ToHashSet();
+
+            var newProductionTypeIds = requestedProductionTypeIds
+                .Where(typeId => !existingActiveProductionTypeIds.Contains(typeId))
+                .ToList();
+
+            foreach (var productionTypeId in newProductionTypeIds)
+            {
+                profile.ProductionTypes.Add(new ProductionCompanyProductionType
+                {
+                    ProductionCompanyProfileId = profile.Id,
+                    ProductionTypeId = productionTypeId,
+                    IsActive = true,
+                    IsDeleted = false,
+                    CreatedBy = currentUserId.ToString(),
+                    CreatedAt = DateTime.UtcNow
+                });
+            }
+        }
+
+
+        #endregion
+
+
+
+
+        #region Service Provider Private Methods
+
+        private async Task<ApiResponse<ServiceProviderProfileResponseDto>?> ValidateUpdateServiceProviderProfileRequest(UpdateServiceProviderProfileRequestDto request)
+        {
+            if (!string.IsNullOrWhiteSpace(request.PhoneNumber) &&
+                !PhoneNumberValidation.IsValidPhoneNumber(request.PhoneNumber))
+            {
+                return ApiResponse<ServiceProviderProfileResponseDto>.FailureResponse(
+                    "Invalid phone number format.",
+                    "صيغة رقم الهاتف غير صحيحة."
+                );
+            }
+
+            if (request.ServiceTypeIds != null && request.ServiceTypeIds.Any())
+            {
+                var serviceTypeValidationError = await ValidateServiceTypeId(
+                    request.ServiceTypeIds
+                );
+
+                if (serviceTypeValidationError != null)
+                    return serviceTypeValidationError;
+            }
+
+            if (request.CustomServiceTypes != null &&
+                request.CustomServiceTypes.Any(x => string.IsNullOrWhiteSpace(x)))
+            {
+                return ApiResponse<ServiceProviderProfileResponseDto>.FailureResponse(
+                    "Custom service types cannot contain empty values.",
+                    "أنواع الخدمات المخصصة لا يمكن أن تحتوي على قيم فارغة."
+                );
+            }
+
+            return null;
+        }
+
+        private async Task<ApiResponse<ServiceProviderProfileResponseDto>?> ValidateServiceTypeId(List<int> serviceTypeId)
+        {
+            if (serviceTypeId == null || !serviceTypeId.Any())
+                return null;
+
+            var distinctServiceTypeIds = serviceTypeId.Distinct().ToList();
+
+            var validServiceTypeIds = await _context.LookupItems
+                .Where(x =>
+                    distinctServiceTypeIds.Contains(x.Id) &&
+                    x.LookupCategory.Name == "Service Type" &&
+                    !x.IsDeleted)
+                .Select(x => x.Id)
+                .ToListAsync();
+
+            var hasInvalidServiceType = distinctServiceTypeIds.Any(id =>
+                !validServiceTypeIds.Contains(id));
+
+            if (hasInvalidServiceType)
+            {
+                return ApiResponse<ServiceProviderProfileResponseDto>.FailureResponse(
+                    "One or more selected service types are invalid.",
+                    "واحد أو أكثر من أنواع الخدمات المحددة غير صحيح."
+                );
+            }
+
+            return null;
+        }
+
+        private static void UpdateServiceProviderLookupServiceTypes(ServiceProviderProfile profile,List<int> serviceTypeIds,int currentUserId)
+        {
+            var requestedServiceTypeIds = serviceTypeIds
+                .Distinct()
+                .ToList();
+
+            var activeLookupServiceTypes = profile.ServiceTypes
+                .Where(x => !x.IsDeleted && !x.IsCustom)
+                .ToList();
+
+            foreach (var existingServiceType in activeLookupServiceTypes)
+            {
+                if (!existingServiceType.ServiceTypeId.HasValue ||
+                    !requestedServiceTypeIds.Contains(existingServiceType.ServiceTypeId.Value))
+                {
+                    existingServiceType.IsDeleted = true;
+                    existingServiceType.IsActive = false;
+                    existingServiceType.UpdatedBy = currentUserId.ToString();
+                    existingServiceType.UpdatedAt = DateTime.UtcNow;
+                }
+            }
+
+            var existingActiveLookupServiceTypeIds = profile.ServiceTypes
+                .Where(x => !x.IsDeleted && !x.IsCustom && x.ServiceTypeId.HasValue)
+                .Select(x => x.ServiceTypeId!.Value)
+                .ToHashSet();
+
+            var newServiceTypeIds = requestedServiceTypeIds
+                .Where(serviceTypeId => !existingActiveLookupServiceTypeIds.Contains(serviceTypeId))
+                .ToList();
+
+            foreach (var serviceTypeId in newServiceTypeIds)
+            {
+                profile.ServiceTypes.Add(new ServiceProviderServiceType
+                {
+                    ServiceProviderId = profile.Id,
+                    ServiceTypeId = serviceTypeId,
+                    IsCustom = false,
+                    IsActive = true,
+                    IsDeleted = false,
+                    CreatedBy = currentUserId.ToString(),
+                    CreatedAt = DateTime.UtcNow
+                });
+            }
+        }
+
+        private static void UpdateServiceProviderCustomServiceTypes(ServiceProviderProfile profile,List<string> customServiceTypes,int currentUserId)
+        {
+            var requestedCustomServiceTypes = customServiceTypes
+                .Where(x => !string.IsNullOrWhiteSpace(x))
+                .Select(x => x.Trim())
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            var activeCustomServiceTypes = profile.ServiceTypes
+                .Where(x => !x.IsDeleted && x.IsCustom)
+                .ToList();
+
+            foreach (var existingCustomServiceType in activeCustomServiceTypes)
+            {
+                var stillExists = requestedCustomServiceTypes.Any(x =>
+                    string.Equals(
+                        x,
+                        existingCustomServiceType.CustomServiceTypeName,
+                        StringComparison.OrdinalIgnoreCase));
+
+                if (!stillExists)
+                {
+                    existingCustomServiceType.IsDeleted = true;
+                    existingCustomServiceType.IsActive = false;
+                    existingCustomServiceType.UpdatedBy = currentUserId.ToString();
+                    existingCustomServiceType.UpdatedAt = DateTime.UtcNow;
+                }
+            }
+
+            var existingActiveCustomNames = profile.ServiceTypes
+                .Where(x => !x.IsDeleted && x.IsCustom && x.CustomServiceTypeName != null)
+                .Select(x => x.CustomServiceTypeName!)
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+            var newCustomServiceTypes = requestedCustomServiceTypes
+                .Where(customName => !existingActiveCustomNames.Contains(customName))
+                .ToList();
+
+            foreach (var customName in newCustomServiceTypes)
+            {
+                profile.ServiceTypes.Add(new ServiceProviderServiceType
+                {
+                    ServiceProviderId = profile.Id,
+                    CustomServiceTypeName = customName,
+                    IsCustom = true,
+                    IsActive = true,
+                    IsDeleted = false,
+                    CreatedBy = currentUserId.ToString(),
+                    CreatedAt = DateTime.UtcNow
+                });
+            }
+        }
+        #endregion
+
+
+        #region Location Owner Private Methods
+        private ApiResponse<LocationOwnerProfileResponseDto>? ValidateUpdateLocationOwnerProfileRequest(UpdateLocationOwnerProfileRequestDto request)
+        {
+            if (!string.IsNullOrWhiteSpace(request.PhoneNumber) &&
+                !PhoneNumberValidation.IsValidPhoneNumber(request.PhoneNumber))
+            {
+                return ApiResponse<LocationOwnerProfileResponseDto>.FailureResponse(
+                    "Invalid phone number format.",
+                    "صيغة رقم الهاتف غير صحيحة."
+                );
+            }
+
+            return null;
+        }
+        #endregion
+
+
+
+        #region Change Password
+        private ApiResponse<bool>? ValidateChangePasswordRequest(ChangePasswordRequestDto request)
+        {
+            if (string.IsNullOrWhiteSpace(request.CurrentPassword))
+            {
+                return ApiResponse<bool>.FailureResponse(
+                    "Current password is required.",
+                    "كلمة المرور الحالية مطلوبة."
+                );
+            }
+
+            if (string.IsNullOrWhiteSpace(request.NewPassword))
+            {
+                return ApiResponse<bool>.FailureResponse(
+                    "New password is required.",
+                    "كلمة المرور الجديدة مطلوبة."
+                );
+            }
+
+            if (string.IsNullOrWhiteSpace(request.ConfirmNewPassword))
+            {
+                return ApiResponse<bool>.FailureResponse(
+                    "Confirm new password is required.",
+                    "تأكيد كلمة المرور الجديدة مطلوب."
+                );
+            }
+
+            if (request.NewPassword != request.ConfirmNewPassword)
+            {
+                return ApiResponse<bool>.FailureResponse(
+                    "New password and confirm password do not match.",
+                    "كلمة المرور الجديدة وتأكيدها غير متطابقين."
+                );
+            }
+
+           
+
+            return null;
+        }
+        #endregion
     }
 }
