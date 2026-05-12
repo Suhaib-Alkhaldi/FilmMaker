@@ -1,6 +1,9 @@
 ﻿using FilmMaker.Attribute;
 using FilmMaker.DTO.Auth.Request;
+using FilmMaker.DTOs.ProductionCompany;
 using FilmMaker.Services.Interface;
+using FilmMaker.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FilmMaker.Controllers
@@ -10,9 +13,11 @@ namespace FilmMaker.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
+        private readonly IProductionCompanyService _productionCompanyService;
 
-        public AuthController(IAuthService authService)
+        public AuthController(IAuthService authService ,IProductionCompanyService productionCompanyService)
         {
+                _productionCompanyService = productionCompanyService;
             _authService = authService;
         }
         [HttpPost("register-location-owner")]
@@ -37,13 +42,13 @@ namespace FilmMaker.Controllers
             return Ok(result);
         }
         [HttpPost("register-production-company")]
-        public async Task<IActionResult> RegisterProductionCompany(RegisterProductionCompanyRequestDto request)
+        [AllowAnonymous]
+        public async Task<IActionResult> Register([FromBody] RegisterProductionCompanyRequest request)
         {
-            var result = await _authService.RegisterProductionCompany(request);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-            if (!result.Success)
-                return BadRequest(result);
-
+            var result = await _productionCompanyService.RegisterAsync(request);
             return Ok(result);
         }
         [HttpPost("register-service-provider")]
