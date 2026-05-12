@@ -185,6 +185,21 @@ namespace FilmMaker.Controllers
             return Ok(result);
         }
 
+        [HttpPut("ChangePassword")]
+        public async Task<ActionResult<ApiResponse<bool>>> ChangePassword([FromBody] ChangePasswordRequestDto request)
+        {
+            var currentUserId = GetCurrentUserId();
+
+            if (currentUserId == null)
+                return Unauthorized();
+
+            var result = await _profileService.ChangePassword(request, currentUserId.Value);
+
+            if (!result.Success)
+                return BadRequest(result);
+
+            return Ok(result);
+        }
         private int? GetCurrentUserId()
         {
             var userIdClaim = User.FindFirst("UserId")?.Value;
