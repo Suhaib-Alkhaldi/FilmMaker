@@ -4,6 +4,7 @@ using FilmMaker.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FilmMaker.Migrations
 {
     [DbContext(typeof(FilmMakerDbContext))]
-    partial class FilmMakerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260511101102_UpdateIBANInUserTable")]
+    partial class UpdateIBANInUserTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -320,10 +323,10 @@ namespace FilmMaker.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime?>("ArchivedAt")
+                    b.Property<DateTime>("ArchivedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("ArchivedByUserId")
+                    b.Property<int>("ArchivedByUserId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
@@ -338,7 +341,7 @@ namespace FilmMaker.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<bool?>("IsRestored")
+                    b.Property<bool>("IsRestored")
                         .HasColumnType("bit");
 
                     b.Property<int>("LocationId")
@@ -628,17 +631,6 @@ namespace FilmMaker.Migrations
                         .IsUnique();
 
                     b.ToTable("LocationOwnerProfiles");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CreatedAt = new DateTime(2026, 5, 11, 14, 26, 47, 119, DateTimeKind.Local).AddTicks(8154),
-                            IsActive = true,
-                            IsDeleted = false,
-                            RegisterDate = new DateTime(2023, 1, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            UserId = 1
-                        });
                 });
 
             modelBuilder.Entity("FilmMaker.Entities.LocationTermsOfUse", b =>
@@ -988,16 +980,6 @@ namespace FilmMaker.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Roles");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CreatedAt = new DateTime(2026, 5, 11, 14, 26, 47, 119, DateTimeKind.Local).AddTicks(8132),
-                            IsActive = true,
-                            IsDeleted = false,
-                            Name = "Admin"
-                        });
                 });
 
             modelBuilder.Entity("FilmMaker.Entities.ServiceProviderProfile", b =>
@@ -1140,21 +1122,6 @@ namespace FilmMaker.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("Users");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CreatedAt = new DateTime(2026, 5, 11, 14, 26, 47, 119, DateTimeKind.Local).AddTicks(8177),
-                            Email = "alice.johnson@example.com",
-                            IBAN = "US12345678901234567890",
-                            IsActive = true,
-                            IsDeleted = false,
-                            Name = "Alice Johnson",
-                            Password = "HashedPassword123!",
-                            PhoneNumber = "+1-555-0101",
-                            RoleId = 1
-                        });
                 });
 
             modelBuilder.Entity("FilmMaker.Entities.BookingStatusHistory", b =>
@@ -1287,7 +1254,8 @@ namespace FilmMaker.Migrations
                     b.HasOne("FilmMaker.Entities.User", "ArchivedByUser")
                         .WithMany()
                         .HasForeignKey("ArchivedByUserId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("FilmMaker.Entities.Location", "Location")
                         .WithMany("ArchiveHistories")

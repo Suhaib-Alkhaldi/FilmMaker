@@ -16,7 +16,7 @@ namespace FilmMaker.Entities
         public int ContractStatusId { get; set; }
 
         [ForeignKey("ContractStatusId")]
-        public LockupItem ContractStatus { get; set; } = null!;
+        public LookupItem ContractStatus { get; set; } = null!;
         public ICollection<DigitalContractApproval> Approvals { get; set; }
     }
 }

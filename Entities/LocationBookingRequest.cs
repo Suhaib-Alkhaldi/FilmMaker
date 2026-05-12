@@ -11,7 +11,7 @@ namespace FilmMaker.Entities
         public int BookingStatusId { get; set; }
 
         [ForeignKey("BookingStatusId")]
-        public LockupItem BookingStatus { get; set; } = null!;
+        public LookupItem BookingStatus { get; set; } = null!;
         public DateTime ShootingDate { get; set; }
         public string RequestDetails { get; set; } = string.Empty;
         public int LocationOwnerId { get; set; }

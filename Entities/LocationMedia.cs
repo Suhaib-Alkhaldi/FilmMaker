@@ -19,6 +19,6 @@ namespace FilmMaker.Entities
         public int MediaTypeId { get; set; }
 
         [ForeignKey("MediaTypeId")]
-        public LockupItem MediaType { get; set; } = null!;
+        public LookupItem MediaType { get; set; } = null!;
     }
 }

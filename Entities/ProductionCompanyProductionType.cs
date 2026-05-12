@@ -11,6 +11,6 @@ namespace FilmMaker.Entities
         public int ProductionTypeId { get; set; }
 
         [ForeignKey("ProductionTypeId")]
-        public LockupItem ProductionType { get; set; } = null!;
+        public LookupItem ProductionType { get; set; } = null!;
     }
 }

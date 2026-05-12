@@ -16,11 +16,11 @@ namespace FilmMaker.Entities
         public int PaymentStatusId { get; set; }
 
         [ForeignKey("PaymentStatusId")]
-        public LockupItem PaymentStatus { get; set; } = null!;
+        public LookupItem PaymentStatus { get; set; } = null!;
         public int PaymentTypeId { get; set; }
 
         [ForeignKey("PaymentTypeId")]
-        public LockupItem PaymentType { get; set; } = null!;
+        public LookupItem PaymentType { get; set; } = null!;
         public string? PaymentReference { get; set; }
         public DateTime? PaidAt { get; set; }
     }
