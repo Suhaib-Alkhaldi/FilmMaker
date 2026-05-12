@@ -19,7 +19,9 @@ namespace FilmMaker.Services.Service
             _logger = logger;
         }
 
-        public async Task<ApiResponse<LocationManagerProfileResponseDto>> UpdateLocationManagerProfile(UpdateLocationManagerProfileRequestDto request, int currentUserId)
+        public async Task<ApiResponse<LocationManagerProfileResponseDto>> UpdateLocationManagerProfile(
+            UpdateLocationManagerProfileRequestDto request,
+            int currentUserId)
         {
             if (request == null)
             {
@@ -29,15 +31,11 @@ namespace FilmMaker.Services.Service
                 );
             }
 
-            var validationError = await ValidateUpdateLocationManagerProfileRequest(request);
-            if (validationError != null)
-                return validationError;
-
             var profile = await _context.LocationManagerProfiles
                 .Include(x => x.User)
                 .Include(x => x.Cities)
                 .Include(x => x.PreviousProjects)
-                .Where(x => x.UserId == currentUserId &&!x.IsDeleted)
+                .Where(x => x.UserId == currentUserId && !x.IsDeleted)
                 .FirstOrDefaultAsync();
 
             if (profile == null)
@@ -53,26 +51,45 @@ namespace FilmMaker.Services.Service
                 );
             }
 
-
             try
             {
-                profile.User.Name = request.Name.Trim();
-                profile.User.PhoneNumber = request.PhoneNumber.Trim();
-                profile.User.IBAN = string.IsNullOrWhiteSpace(request.IBAN)
-                    ? null
-                    : request.IBAN.Trim();
+                if (!string.IsNullOrWhiteSpace(request.Name))
+                    profile.User.Name = request.Name.Trim();
+
+                if (!string.IsNullOrWhiteSpace(request.PhoneNumber))
+                    profile.User.PhoneNumber = request.PhoneNumber.Trim();
+
+                if (request.IBAN != null)
+                {
+                    profile.User.IBAN = string.IsNullOrWhiteSpace(request.IBAN)
+                        ? null
+                        : request.IBAN.Trim();
+                }
 
                 profile.User.UpdatedBy = currentUserId.ToString();
                 profile.User.UpdatedAt = DateTime.UtcNow;
 
-                profile.YearsOfExperience = request.YearsOfExperience;
-                profile.Description = request.Description?.Trim();
-                profile.CommissionRate = request.CommissionRate;
+                if (request.YearsOfExperience.HasValue)
+                    profile.YearsOfExperience = request.YearsOfExperience.Value;
+
+                if (request.Description != null)
+                    profile.Description = request.Description.Trim();
+
+                if (request.CommissionRate.HasValue)
+                    profile.CommissionRate = request.CommissionRate.Value;
+
                 profile.UpdatedBy = currentUserId.ToString();
                 profile.UpdatedAt = DateTime.UtcNow;
 
-                UpdateLocationManagerCities(profile, request.CityId, currentUserId);
-                UpdatePreviousProjects(profile, request.PreviousProjects, currentUserId);
+                if (request.CityId != null && request.CityId.Any())
+                {
+                    UpdateLocationManagerCities(profile, request.CityId, currentUserId);
+                }
+
+                if (request.PreviousProjects != null)
+                {
+                    UpdatePreviousProjects(profile, request.PreviousProjects, currentUserId);
+                }
 
                 await _context.SaveChangesAsync();
 
@@ -86,7 +103,6 @@ namespace FilmMaker.Services.Service
             }
             catch (Exception ex)
             {
-
                 _logger.LogError(
                     ex,
                     "Error while updating location manager profile. UserId: {UserId}, ProfileId: {ProfileId}",
@@ -100,7 +116,6 @@ namespace FilmMaker.Services.Service
                 );
             }
         }
-        
         public async Task<ApiResponse<LocationManagerProfileResponseDto>> GetMyLocationManagerProfile(int currentUserId)
         {
             try

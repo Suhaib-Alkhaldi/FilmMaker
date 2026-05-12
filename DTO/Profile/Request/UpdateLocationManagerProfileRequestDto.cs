@@ -14,8 +14,8 @@
 
         public decimal? CommissionRate { get; set; }
 
-        public List<int> CityId { get; set; } = new();
+        public List<int>? CityId { get; set; } = new();
 
-        public List<string> PreviousProjects { get; set; }
+        public List<string>? PreviousProjects { get; set; }
     }
 }
