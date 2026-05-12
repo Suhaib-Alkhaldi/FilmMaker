@@ -28,6 +28,7 @@ namespace FilmMaker.Entities
         public DbSet<LocationMedia> LocationMedia { get; set; }
         public DbSet<LocationTermsOfUse> LocationTermsOfUse { get; set; }
         public DbSet<LocationArchiveHistory> LocationArchiveHistories { get; set; }
+        public DbSet<LocationManagementRequest> LocationManagementRequests { get; set; }
 
         // Booking
         public DbSet<LocationBookingRequest> LocationBookingRequests { get; set; }
@@ -154,6 +155,18 @@ namespace FilmMaker.Entities
                 .HasOne(x => x.PaymentType)
                 .WithMany()
                 .HasForeignKey(x => x.PaymentTypeId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<LocationManagementRequest>()
+                .HasOne(x => x.Location)
+                .WithMany()
+                .HasForeignKey(x => x.LocationId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<LocationManagementRequest>()
+                .HasOne(x => x.LocationManagerProfile)
+                .WithMany()
+                .HasForeignKey(x => x.LocationManagerProfileId)
                 .OnDelete(DeleteBehavior.NoAction);
         }
     }
