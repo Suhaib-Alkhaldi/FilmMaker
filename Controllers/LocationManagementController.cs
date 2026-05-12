@@ -26,30 +26,6 @@ namespace FilmMaker.Controllers
             _context = context;
         }
 
-        [HttpGet("locations")]
-        public async Task<ActionResult<ApiResponse<List<LocationSummaryDto>>>> GetLocations(
-            [FromQuery] LocationFilterDto dto)
-        {
-            var response = await _locationManagementService.GetLocationsAsync(dto);
-
-            if (!response.Success)
-                return BadRequest(response);
-
-            return Ok(response);
-        }
-
-        [HttpGet("locations/{locationId}")]
-        public async Task<ActionResult<ApiResponse<LocationSummaryDto>>> GetLocationById(
-            int locationId)
-        {
-            var response = await _locationManagementService.GetLocationByIdAsync(locationId);
-
-            if (!response.Success)
-                return NotFound(response);
-
-            return Ok(response);
-        }
-
         [AuthorizeLocationManager]
         [HttpGet("my-managed-locations")]
         public async Task<ActionResult<ApiResponse<List<LocationSummaryDto>>>> GetManagedLocations()
