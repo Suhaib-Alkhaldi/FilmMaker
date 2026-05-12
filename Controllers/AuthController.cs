@@ -1,6 +1,6 @@
-﻿using FilmMaker.DTO.Auth.Request;
+﻿using FilmMaker.Attribute;
+using FilmMaker.DTO.Auth.Request;
 using FilmMaker.Services.Interface;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FilmMaker.Controllers
@@ -15,7 +15,6 @@ namespace FilmMaker.Controllers
         {
             _authService = authService;
         }
-
         [HttpPost("register-location-owner")]
         public async Task<IActionResult> RegisterLocationOwner(RegisterLocationOwnerRequestDto request)
         {
@@ -31,6 +30,26 @@ namespace FilmMaker.Controllers
         public async Task<IActionResult> RegisterLocationManager(RegisterLocationManagerRequestDto request)
         {
             var result = await _authService.RegisterLocationManager(request);
+
+            if (!result.Success)
+                return BadRequest(result);
+
+            return Ok(result);
+        }
+        [HttpPost("register-production-company")]
+        public async Task<IActionResult> RegisterProductionCompany(RegisterProductionCompanyRequestDto request)
+        {
+            var result = await _authService.RegisterProductionCompany(request);
+
+            if (!result.Success)
+                return BadRequest(result);
+
+            return Ok(result);
+        }
+        [HttpPost("register-service-provider")]
+        public async Task<IActionResult> RegisterServiceProvider(RegisterServiceProviderRequestDto request)
+        {
+            var result = await _authService.RegisterServiceProvider(request);
 
             if (!result.Success)
                 return BadRequest(result);

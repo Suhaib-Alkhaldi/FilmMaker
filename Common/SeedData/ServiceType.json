@@ -1,0 +1,84 @@
+{
+  "ServiceType": [
+    {
+      "id": 1,
+      "lookupCategoryId": 9,
+      "name": "Equipment"
+    },
+    {
+      "id": 2,
+      "lookupCategoryId": 9,
+      "name": "Food And Catering"
+    },
+    {
+      "id": 3,
+      "lookupCategoryId": 9,
+      "name": "Cars"
+    },
+    {
+      "id": 4,
+      "lookupCategoryId": 9,
+      "name": "Lighting"
+    },
+    {
+      "id": 5,
+      "lookupCategoryId": 9,
+      "name": "Security"
+    },
+    {
+      "id": 6,
+      "lookupCategoryId": 9,
+      "name": "Caravans"
+    },
+    {
+      "id": 7,
+      "lookupCategoryId": 9,
+      "name": "Clothes And Wardrobe"
+    },
+    {
+      "id": 8,
+      "lookupCategoryId": 9,
+      "name": "Makeup"
+    },
+    {
+      "id": 9,
+      "lookupCategoryId": 9,
+      "name": "Props"
+    },
+    {
+      "id": 10,
+      "lookupCategoryId": 9,
+      "name": "Sound Equipment"
+    },
+    {
+      "id": 11,
+      "lookupCategoryId": 9,
+      "name": "Transportation"
+    },
+    {
+      "id": 12,
+      "lookupCategoryId": 9,
+      "name": "Accommodation"
+    },
+    {
+      "id": 13,
+      "lookupCategoryId": 9,
+      "name": "Cleaning"
+    },
+    {
+      "id": 14,
+      "lookupCategoryId": 9,
+      "name": "Medical Support"
+    },
+    {
+      "id": 15,
+      "lookupCategoryId": 9,
+      "name": "Drone Services"
+    },
+    {
+      "id": 16,
+      "lookupCategoryId": 9,
+      "name": "Other"
+    }
+  ]
+}

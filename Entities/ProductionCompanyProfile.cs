@@ -4,7 +4,6 @@ namespace FilmMaker.Entities
 {
     public class ProductionCompanyProfile : SharedEntity 
     {
-        public string CompanyName { get; set; } = string.Empty;
         public string Country { get; set; }
         public string City { get; set; }
         public string? Bio {  get; set; }

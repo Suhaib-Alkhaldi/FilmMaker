@@ -16,7 +16,7 @@ namespace FilmMaker.Entities
         public int EscrowStatusId { get; set; }
 
         [ForeignKey("EscrowStatusId")]
-        public LockupItem EscrowStatus { get; set; } = null!;
+        public LookupItem EscrowStatus { get; set; } = null!;
         public DateTime HeldAt{ get; set; } 
         public DateTime? ReleasedAt { get; set; }
         public DateTime? RefundedAt { get; set; }

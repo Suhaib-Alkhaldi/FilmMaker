@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FilmMaker.Migrations
 {
     [DbContext(typeof(FilmMakerDbContext))]
-    [Migration("20260508215931_AddDb")]
-    partial class AddDb
+    [Migration("20260512072337_DeleteCompanyNameFromProductionCompany")]
+    partial class DeleteCompanyNameFromProductionCompany
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -676,7 +676,7 @@ namespace FilmMaker.Migrations
                     b.ToTable("LocationTermsOfUse");
                 });
 
-            modelBuilder.Entity("FilmMaker.Entities.LockupCategory", b =>
+            modelBuilder.Entity("FilmMaker.Entities.LookupCategory", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -708,10 +708,10 @@ namespace FilmMaker.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("LockupCategories");
+                    b.ToTable("LookupCategories");
                 });
 
-            modelBuilder.Entity("FilmMaker.Entities.LockupItem", b =>
+            modelBuilder.Entity("FilmMaker.Entities.LookupItem", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -731,7 +731,7 @@ namespace FilmMaker.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<int>("LockupCategoryId")
+                    b.Property<int>("LookupCategoryId")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
@@ -746,9 +746,9 @@ namespace FilmMaker.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("LockupCategoryId");
+                    b.HasIndex("LookupCategoryId");
 
-                    b.ToTable("LockupItems");
+                    b.ToTable("LookupItems");
                 });
 
             modelBuilder.Entity("FilmMaker.Entities.Payment", b =>
@@ -904,10 +904,6 @@ namespace FilmMaker.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("City")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CompanyName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -1088,7 +1084,6 @@ namespace FilmMaker.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("IBAN")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsActive")
@@ -1133,7 +1128,7 @@ namespace FilmMaker.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("FilmMaker.Entities.LockupItem", "FromStatus")
+                    b.HasOne("FilmMaker.Entities.LookupItem", "FromStatus")
                         .WithMany()
                         .HasForeignKey("FromStatusId")
                         .OnDelete(DeleteBehavior.NoAction)
@@ -1145,7 +1140,7 @@ namespace FilmMaker.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("FilmMaker.Entities.LockupItem", "ToStatus")
+                    b.HasOne("FilmMaker.Entities.LookupItem", "ToStatus")
                         .WithMany()
                         .HasForeignKey("ToStatusId")
                         .OnDelete(DeleteBehavior.NoAction)
@@ -1162,7 +1157,7 @@ namespace FilmMaker.Migrations
 
             modelBuilder.Entity("FilmMaker.Entities.DigitalContract", b =>
                 {
-                    b.HasOne("FilmMaker.Entities.LockupItem", "ContractStatus")
+                    b.HasOne("FilmMaker.Entities.LookupItem", "ContractStatus")
                         .WithMany()
                         .HasForeignKey("ContractStatusId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1200,7 +1195,7 @@ namespace FilmMaker.Migrations
 
             modelBuilder.Entity("FilmMaker.Entities.EscrowTransaction", b =>
                 {
-                    b.HasOne("FilmMaker.Entities.LockupItem", "EscrowStatus")
+                    b.HasOne("FilmMaker.Entities.LookupItem", "EscrowStatus")
                         .WithMany()
                         .HasForeignKey("EscrowStatusId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1237,7 +1232,7 @@ namespace FilmMaker.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("FilmMaker.Entities.LockupItem", "LocationStatus")
+                    b.HasOne("FilmMaker.Entities.LookupItem", "LocationStatus")
                         .WithMany()
                         .HasForeignKey("LocationStatusId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1278,7 +1273,7 @@ namespace FilmMaker.Migrations
 
             modelBuilder.Entity("FilmMaker.Entities.LocationBookingRequest", b =>
                 {
-                    b.HasOne("FilmMaker.Entities.LockupItem", "BookingStatus")
+                    b.HasOne("FilmMaker.Entities.LookupItem", "BookingStatus")
                         .WithMany()
                         .HasForeignKey("BookingStatusId")
                         .OnDelete(DeleteBehavior.NoAction)
@@ -1320,7 +1315,7 @@ namespace FilmMaker.Migrations
 
             modelBuilder.Entity("FilmMaker.Entities.LocationManagerCity", b =>
                 {
-                    b.HasOne("FilmMaker.Entities.LockupItem", "City")
+                    b.HasOne("FilmMaker.Entities.LookupItem", "City")
                         .WithMany()
                         .HasForeignKey("CityId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1354,7 +1349,7 @@ namespace FilmMaker.Migrations
                         .WithMany("Media")
                         .HasForeignKey("LocationId");
 
-                    b.HasOne("FilmMaker.Entities.LockupItem", "MediaType")
+                    b.HasOne("FilmMaker.Entities.LookupItem", "MediaType")
                         .WithMany()
                         .HasForeignKey("MediaTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1395,15 +1390,15 @@ namespace FilmMaker.Migrations
                     b.Navigation("Location");
                 });
 
-            modelBuilder.Entity("FilmMaker.Entities.LockupItem", b =>
+            modelBuilder.Entity("FilmMaker.Entities.LookupItem", b =>
                 {
-                    b.HasOne("FilmMaker.Entities.LockupCategory", "LockupCategory")
-                        .WithMany()
-                        .HasForeignKey("LockupCategoryId")
+                    b.HasOne("FilmMaker.Entities.LookupCategory", "LookupCategory")
+                        .WithMany("LookupItems")
+                        .HasForeignKey("LookupCategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("LockupCategory");
+                    b.Navigation("LookupCategory");
                 });
 
             modelBuilder.Entity("FilmMaker.Entities.Payment", b =>
@@ -1420,13 +1415,13 @@ namespace FilmMaker.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("FilmMaker.Entities.LockupItem", "PaymentStatus")
+                    b.HasOne("FilmMaker.Entities.LookupItem", "PaymentStatus")
                         .WithMany()
                         .HasForeignKey("PaymentStatusId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("FilmMaker.Entities.LockupItem", "PaymentType")
+                    b.HasOne("FilmMaker.Entities.LookupItem", "PaymentType")
                         .WithMany()
                         .HasForeignKey("PaymentTypeId")
                         .OnDelete(DeleteBehavior.NoAction)
@@ -1460,7 +1455,7 @@ namespace FilmMaker.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("FilmMaker.Entities.LockupItem", "ProductionType")
+                    b.HasOne("FilmMaker.Entities.LookupItem", "ProductionType")
                         .WithMany()
                         .HasForeignKey("ProductionTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1501,7 +1496,7 @@ namespace FilmMaker.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("FilmMaker.Entities.LockupItem", "ServiceType")
+                    b.HasOne("FilmMaker.Entities.LookupItem", "ServiceType")
                         .WithMany()
                         .HasForeignKey("ServiceTypeId");
 
@@ -1545,6 +1540,11 @@ namespace FilmMaker.Migrations
                     b.Navigation("Cities");
 
                     b.Navigation("PreviousProjects");
+                });
+
+            modelBuilder.Entity("FilmMaker.Entities.LookupCategory", b =>
+                {
+                    b.Navigation("LookupItems");
                 });
 
             modelBuilder.Entity("FilmMaker.Entities.ProductionCompanyProfile", b =>

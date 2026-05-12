@@ -1,0 +1,54 @@
+{
+  "BookingStatus": [
+    {
+      "id": 1,
+      "lookupCategoryId": 4,
+      "name": "Pending"
+    },
+    {
+      "id": 2,
+      "lookupCategoryId": 4,
+      "name": "Accepted"
+    },
+    {
+      "id": 3,
+      "lookupCategoryId": 4,
+      "name": "Rejected"
+    },
+    {
+      "id": 4,
+      "lookupCategoryId": 4,
+      "name": "Contract Created"
+    },
+    {
+      "id": 5,
+      "lookupCategoryId": 4,
+      "name": "Awaiting Contract Approval"
+    },
+    {
+      "id": 6,
+      "lookupCategoryId": 4,
+      "name": "Contract Signed"
+    },
+    {
+      "id": 7,
+      "lookupCategoryId": 4,
+      "name": "Payment Pending"
+    },
+    {
+      "id": 8,
+      "lookupCategoryId": 4,
+      "name": "Confirmed"
+    },
+    {
+      "id": 9,
+      "lookupCategoryId": 4,
+      "name": "Completed"
+    },
+    {
+      "id": 10,
+      "lookupCategoryId": 4,
+      "name": "Cancelled"
+    }
+  ]
+}

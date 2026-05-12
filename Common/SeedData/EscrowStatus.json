@@ -1,0 +1,29 @@
+{
+  "EscrowStatus": [
+    {
+      "id": 1,
+      "lookupCategoryId": 7,
+      "name": "Held"
+    },
+    {
+      "id": 2,
+      "lookupCategoryId": 7,
+      "name": "Released"
+    },
+    {
+      "id": 3,
+      "lookupCategoryId": 7,
+      "name": "Refunded"
+    },
+    {
+      "id": 4,
+      "lookupCategoryId": 7,
+      "name": "Partially Refunded"
+    },
+    {
+      "id": 5,
+      "lookupCategoryId": 7,
+      "name": "Cancelled"
+    }
+  ]
+}

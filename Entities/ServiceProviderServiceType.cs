@@ -10,7 +10,7 @@ namespace FilmMaker.Entities
         public int? ServiceTypeId { get; set; }
 
         [ForeignKey("ServiceTypeId")]
-        public LockupItem? ServiceType { get; set; }
+        public LookupItem? ServiceType { get; set; }
         public string? CustomServiceTypeName { get; set; }
         public bool IsCustom { get; set; }
     }
