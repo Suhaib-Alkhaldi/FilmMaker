@@ -4,6 +4,7 @@ using FilmMaker.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FilmMaker.Migrations
 {
     [DbContext(typeof(FilmMakerDbContext))]
-    partial class FilmMakerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260510093458_added-seed-data")]
+    partial class addedseeddata
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -628,17 +631,6 @@ namespace FilmMaker.Migrations
                         .IsUnique();
 
                     b.ToTable("LocationOwnerProfiles");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CreatedAt = new DateTime(2026, 5, 11, 14, 26, 47, 119, DateTimeKind.Local).AddTicks(8154),
-                            IsActive = true,
-                            IsDeleted = false,
-                            RegisterDate = new DateTime(2023, 1, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            UserId = 1
-                        });
                 });
 
             modelBuilder.Entity("FilmMaker.Entities.LocationTermsOfUse", b =>
@@ -684,7 +676,7 @@ namespace FilmMaker.Migrations
                     b.ToTable("LocationTermsOfUse");
                 });
 
-            modelBuilder.Entity("FilmMaker.Entities.LookupCategory", b =>
+            modelBuilder.Entity("FilmMaker.Entities.LockupCategory", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -716,10 +708,20 @@ namespace FilmMaker.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("LookupCategories");
+                    b.ToTable("LockupCategories");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedAt = new DateTime(2026, 5, 10, 12, 34, 56, 851, DateTimeKind.Local).AddTicks(957),
+                            IsActive = true,
+                            IsDeleted = false,
+                            Name = "LocationStatus"
+                        });
                 });
 
-            modelBuilder.Entity("FilmMaker.Entities.LookupItem", b =>
+            modelBuilder.Entity("FilmMaker.Entities.LockupItem", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -739,7 +741,7 @@ namespace FilmMaker.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<int>("LookupCategoryId")
+                    b.Property<int>("LockupCategoryId")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
@@ -754,9 +756,56 @@ namespace FilmMaker.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("LookupCategoryId");
+                    b.HasIndex("LockupCategoryId");
 
-                    b.ToTable("LookupItems");
+                    b.ToTable("LockupItems");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedAt = new DateTime(2026, 5, 10, 12, 34, 56, 851, DateTimeKind.Local).AddTicks(1106),
+                            IsActive = true,
+                            IsDeleted = false,
+                            LockupCategoryId = 1,
+                            Name = "Published"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedAt = new DateTime(2026, 5, 10, 12, 34, 56, 851, DateTimeKind.Local).AddTicks(1107),
+                            IsActive = true,
+                            IsDeleted = false,
+                            LockupCategoryId = 1,
+                            Name = "Blocked"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CreatedAt = new DateTime(2026, 5, 10, 12, 34, 56, 851, DateTimeKind.Local).AddTicks(1108),
+                            IsActive = true,
+                            IsDeleted = false,
+                            LockupCategoryId = 1,
+                            Name = "Deleted"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            CreatedAt = new DateTime(2026, 5, 10, 12, 34, 56, 851, DateTimeKind.Local).AddTicks(1109),
+                            IsActive = true,
+                            IsDeleted = false,
+                            LockupCategoryId = 1,
+                            Name = "Under Moderation"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            CreatedAt = new DateTime(2026, 5, 10, 12, 34, 56, 851, DateTimeKind.Local).AddTicks(1110),
+                            IsActive = true,
+                            IsDeleted = false,
+                            LockupCategoryId = 1,
+                            Name = "Archived"
+                        });
                 });
 
             modelBuilder.Entity("FilmMaker.Entities.Payment", b =>
@@ -988,16 +1037,6 @@ namespace FilmMaker.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Roles");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CreatedAt = new DateTime(2026, 5, 11, 14, 26, 47, 119, DateTimeKind.Local).AddTicks(8132),
-                            IsActive = true,
-                            IsDeleted = false,
-                            Name = "Admin"
-                        });
                 });
 
             modelBuilder.Entity("FilmMaker.Entities.ServiceProviderProfile", b =>
@@ -1106,6 +1145,7 @@ namespace FilmMaker.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("IBAN")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsActive")
@@ -1140,21 +1180,6 @@ namespace FilmMaker.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("Users");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CreatedAt = new DateTime(2026, 5, 11, 14, 26, 47, 119, DateTimeKind.Local).AddTicks(8177),
-                            Email = "alice.johnson@example.com",
-                            IBAN = "US12345678901234567890",
-                            IsActive = true,
-                            IsDeleted = false,
-                            Name = "Alice Johnson",
-                            Password = "HashedPassword123!",
-                            PhoneNumber = "+1-555-0101",
-                            RoleId = 1
-                        });
                 });
 
             modelBuilder.Entity("FilmMaker.Entities.BookingStatusHistory", b =>
@@ -1165,7 +1190,7 @@ namespace FilmMaker.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("FilmMaker.Entities.LookupItem", "FromStatus")
+                    b.HasOne("FilmMaker.Entities.LockupItem", "FromStatus")
                         .WithMany()
                         .HasForeignKey("FromStatusId")
                         .OnDelete(DeleteBehavior.NoAction)
@@ -1177,7 +1202,7 @@ namespace FilmMaker.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("FilmMaker.Entities.LookupItem", "ToStatus")
+                    b.HasOne("FilmMaker.Entities.LockupItem", "ToStatus")
                         .WithMany()
                         .HasForeignKey("ToStatusId")
                         .OnDelete(DeleteBehavior.NoAction)
@@ -1194,7 +1219,7 @@ namespace FilmMaker.Migrations
 
             modelBuilder.Entity("FilmMaker.Entities.DigitalContract", b =>
                 {
-                    b.HasOne("FilmMaker.Entities.LookupItem", "ContractStatus")
+                    b.HasOne("FilmMaker.Entities.LockupItem", "ContractStatus")
                         .WithMany()
                         .HasForeignKey("ContractStatusId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1232,7 +1257,7 @@ namespace FilmMaker.Migrations
 
             modelBuilder.Entity("FilmMaker.Entities.EscrowTransaction", b =>
                 {
-                    b.HasOne("FilmMaker.Entities.LookupItem", "EscrowStatus")
+                    b.HasOne("FilmMaker.Entities.LockupItem", "EscrowStatus")
                         .WithMany()
                         .HasForeignKey("EscrowStatusId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1269,7 +1294,7 @@ namespace FilmMaker.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("FilmMaker.Entities.LookupItem", "LocationStatus")
+                    b.HasOne("FilmMaker.Entities.LockupItem", "LocationStatus")
                         .WithMany()
                         .HasForeignKey("LocationStatusId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1309,7 +1334,7 @@ namespace FilmMaker.Migrations
 
             modelBuilder.Entity("FilmMaker.Entities.LocationBookingRequest", b =>
                 {
-                    b.HasOne("FilmMaker.Entities.LookupItem", "BookingStatus")
+                    b.HasOne("FilmMaker.Entities.LockupItem", "BookingStatus")
                         .WithMany()
                         .HasForeignKey("BookingStatusId")
                         .OnDelete(DeleteBehavior.NoAction)
@@ -1351,7 +1376,7 @@ namespace FilmMaker.Migrations
 
             modelBuilder.Entity("FilmMaker.Entities.LocationManagerCity", b =>
                 {
-                    b.HasOne("FilmMaker.Entities.LookupItem", "City")
+                    b.HasOne("FilmMaker.Entities.LockupItem", "City")
                         .WithMany()
                         .HasForeignKey("CityId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1385,7 +1410,7 @@ namespace FilmMaker.Migrations
                         .WithMany("Media")
                         .HasForeignKey("LocationId");
 
-                    b.HasOne("FilmMaker.Entities.LookupItem", "MediaType")
+                    b.HasOne("FilmMaker.Entities.LockupItem", "MediaType")
                         .WithMany()
                         .HasForeignKey("MediaTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1426,15 +1451,15 @@ namespace FilmMaker.Migrations
                     b.Navigation("Location");
                 });
 
-            modelBuilder.Entity("FilmMaker.Entities.LookupItem", b =>
+            modelBuilder.Entity("FilmMaker.Entities.LockupItem", b =>
                 {
-                    b.HasOne("FilmMaker.Entities.LookupCategory", "LookupCategory")
-                        .WithMany("LookupItems")
-                        .HasForeignKey("LookupCategoryId")
+                    b.HasOne("FilmMaker.Entities.LockupCategory", "LockupCategory")
+                        .WithMany()
+                        .HasForeignKey("LockupCategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("LookupCategory");
+                    b.Navigation("LockupCategory");
                 });
 
             modelBuilder.Entity("FilmMaker.Entities.Payment", b =>
@@ -1451,13 +1476,13 @@ namespace FilmMaker.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("FilmMaker.Entities.LookupItem", "PaymentStatus")
+                    b.HasOne("FilmMaker.Entities.LockupItem", "PaymentStatus")
                         .WithMany()
                         .HasForeignKey("PaymentStatusId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("FilmMaker.Entities.LookupItem", "PaymentType")
+                    b.HasOne("FilmMaker.Entities.LockupItem", "PaymentType")
                         .WithMany()
                         .HasForeignKey("PaymentTypeId")
                         .OnDelete(DeleteBehavior.NoAction)
@@ -1491,7 +1516,7 @@ namespace FilmMaker.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("FilmMaker.Entities.LookupItem", "ProductionType")
+                    b.HasOne("FilmMaker.Entities.LockupItem", "ProductionType")
                         .WithMany()
                         .HasForeignKey("ProductionTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1532,7 +1557,7 @@ namespace FilmMaker.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("FilmMaker.Entities.LookupItem", "ServiceType")
+                    b.HasOne("FilmMaker.Entities.LockupItem", "ServiceType")
                         .WithMany()
                         .HasForeignKey("ServiceTypeId");
 
@@ -1576,11 +1601,6 @@ namespace FilmMaker.Migrations
                     b.Navigation("Cities");
 
                     b.Navigation("PreviousProjects");
-                });
-
-            modelBuilder.Entity("FilmMaker.Entities.LookupCategory", b =>
-                {
-                    b.Navigation("LookupItems");
                 });
 
             modelBuilder.Entity("FilmMaker.Entities.ProductionCompanyProfile", b =>

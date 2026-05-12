@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using FilmMaker.DataSeed;
+using Microsoft.EntityFrameworkCore;
 
 namespace FilmMaker.Entities
 {
@@ -54,6 +55,7 @@ namespace FilmMaker.Entities
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Seed();
 
             modelBuilder.Entity<LocationArchiveHistory>()
                 .HasOne(x => x.Location)

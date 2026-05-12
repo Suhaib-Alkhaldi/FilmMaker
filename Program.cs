@@ -18,6 +18,8 @@ Log.Logger = new LoggerConfiguration()
 
 builder.Host.UseSerilog();
 
+builder.Services.AddScoped<ILocationService, LocationService>();
+
 // Add services to the container.
 
 builder.Services.AddControllers();
