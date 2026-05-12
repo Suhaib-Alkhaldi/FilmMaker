@@ -89,6 +89,27 @@ namespace FilmMaker.Controllers
         }
 
         [AuthorizeLocationManager]
+        [HttpGet("my-requests")]
+        public async Task<ActionResult<ApiResponse<List<ManagementRequestResponseDto>>>> GetMyRequests()
+        {
+            var currentUserId = GetCurrentUserId();
+
+            if (currentUserId == null)
+                return Unauthorized(
+                    ApiResponse<List<ManagementRequestResponseDto>>.FailureResponse(
+                        "Unauthorized.",
+                        "غير مصرح."
+                    ));
+
+            var result = await _locationManagementService.GetMyRequestsAsync(currentUserId.Value);
+
+            if (!result.Success)
+                return BadRequest(result);
+
+            return Ok(result);
+        }
+
+        [AuthorizeLocationManager]
         [HttpPost("send-request")]
         public async Task<ActionResult<ApiResponse<ManagementRequestResponseDto>>> SendManageRequest(ManagementRequestDto dto)
         {

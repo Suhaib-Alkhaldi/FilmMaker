@@ -8,6 +8,7 @@ namespace FilmMaker.Services.Interface
         Task<ApiResponse<List<LocationSummaryDto>>> GetLocationsAsync(LocationFilterDto dto);
         Task<ApiResponse<LocationSummaryDto>> GetLocationByIdAsync(int locationId);
         Task<ApiResponse<List<LocationSummaryDto>>> GetManagedLocationsAsync(int managerId);
+        Task<ApiResponse<List<ManagementRequestResponseDto>>> GetMyRequestsAsync(int userId);
         Task<ApiResponse<ManagementRequestResponseDto>> SendManageRequestAsync(int managerProfileId, ManagementRequestDto dto);
     }
 }

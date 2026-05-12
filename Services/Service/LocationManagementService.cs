@@ -168,6 +168,55 @@ namespace FilmMaker.Services.Service
             }
         }
 
+        public async Task<ApiResponse<List<ManagementRequestResponseDto>>> GetMyRequestsAsync(int userId)
+        {
+            try
+            {
+                var managerProfileId = await _context.Users
+                    .Where(u => u.Id == userId)
+                    .Select(u => u.LocationManagerProfile.Id)
+                    .FirstOrDefaultAsync();
+
+                if (managerProfileId == 0)
+                {
+                    return ApiResponse<List<ManagementRequestResponseDto>>.FailureResponse(
+                        "Manager profile not found.",
+                        "لم يتم العثور على ملف المدير."
+                    );
+                }
+
+                var requests = await _context.LocationManagementRequests
+                    .Include(r => r.Location)
+                    .Where(r => r.LocationManagerProfileId == managerProfileId)
+                    .Select(r => new ManagementRequestResponseDto
+                    {
+                        Id = r.Id,
+                        LocationId = r.LocationId,
+                        LocationName = r.Location.LocationName,
+                        City = r.Location.City,
+                        Message = r.Message,
+                        Status = r.Status,
+                        CreatedAt = r.CreatedAt
+                    })
+                    .ToListAsync();
+
+                return ApiResponse<List<ManagementRequestResponseDto>>.SuccessResponse(
+                    requests,
+                    "Requests retrieved successfully.",
+                    "تم جلب الطلبات بنجاح."
+                );
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while getting manager requests for user {UserId}", userId);
+
+                return ApiResponse<List<ManagementRequestResponseDto>>.FailureResponse(
+                    "Failed to retrieve requests.",
+                    "حدث خطأ أثناء جلب الطلبات."
+                );
+            }
+        }
+
         public async Task<ApiResponse<ManagementRequestResponseDto>> SendManageRequestAsync(
             int managerProfileId,
             ManagementRequestDto dto)
