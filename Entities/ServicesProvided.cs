@@ -9,7 +9,7 @@ namespace FilmMaker.Entities
         public string Description { get; set; }
 
         [Column(TypeName = "smallmoney")]
-        public decimal Price { get; set; }
+        public decimal DailyPrice { get; set; }
 
         public int ServiceTypeId { get; set; }
 

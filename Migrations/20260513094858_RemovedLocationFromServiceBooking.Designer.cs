@@ -4,6 +4,7 @@ using FilmMaker.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FilmMaker.Migrations
 {
     [DbContext(typeof(FilmMakerDbContext))]
-    partial class FilmMakerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260513094858_RemovedLocationFromServiceBooking")]
+    partial class RemovedLocationFromServiceBooking
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -996,9 +999,6 @@ namespace FilmMaker.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<int?>("LocationId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Notes")
                         .HasColumnType("nvarchar(max)");
 
@@ -1024,8 +1024,6 @@ namespace FilmMaker.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("LocationId");
 
                     b.HasIndex("RequesterId");
 
@@ -1699,10 +1697,6 @@ namespace FilmMaker.Migrations
 
             modelBuilder.Entity("FilmMaker.Entities.ServiceBooking", b =>
                 {
-                    b.HasOne("FilmMaker.Entities.Location", "Location")
-                        .WithMany()
-                        .HasForeignKey("LocationId");
-
                     b.HasOne("FilmMaker.Entities.User", "Requester")
                         .WithMany()
                         .HasForeignKey("RequesterId")
@@ -1720,8 +1714,6 @@ namespace FilmMaker.Migrations
                         .HasForeignKey("StatusId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Location");
 
                     b.Navigation("Requester");
 

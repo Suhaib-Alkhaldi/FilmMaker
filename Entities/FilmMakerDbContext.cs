@@ -16,6 +16,7 @@ namespace FilmMaker.Entities
         public DbSet<LocationManagerProfile> LocationManagerProfiles { get; set; }
         public DbSet<LocationManagerCity> LocationManagerCities { get; set; }
         public DbSet<PreviousProject> PreviousProjects { get; set; }
+        public DbSet<ServiceBooking> ServiceBookings { get; set; }
 
         public DbSet<ServicesProvided> ServicesProvided { get; set; }
 
@@ -90,6 +91,18 @@ namespace FilmMaker.Entities
                 .WithMany()
                 .HasForeignKey(x => x.LocationOwnerId)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<ServiceBooking>()
+            .HasOne(x => x.Service)
+            .WithMany()
+            .HasForeignKey(x => x.ServiceId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Location>()
+             .HasOne(x => x.City)
+             .WithMany()
+             .HasForeignKey(x => x.CityId)
+             .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<LocationBookingRequest>()
                 .HasOne(x => x.LocationManager)
