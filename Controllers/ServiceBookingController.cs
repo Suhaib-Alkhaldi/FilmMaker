@@ -156,6 +156,18 @@ namespace FilmMaker.Controllers
             return result.Success ? Ok(result) : BadRequest(result);
         }
 
+        [HttpGet("provider/all/by-date")]
+        public async Task<IActionResult> GetProviderBookingsByDate(DateTime start,DateTime end)
+        {
+            var currentUserId = GetCurrentUserId();
+            if (currentUserId == 0)
+                return Unauthorized(new { MessageEn = "Invalid token", MessageAr = "رمز غير صالح" });
+
+            var result = await _serviceBookingService.GetProviderBookingsByDate(start, end,currentUserId);
+            return result.Success ? Ok(result) : BadRequest(result);
+        }
+
+
         [HttpGet("provider/received")]
         [AuthorizeServiceProvider]
         public async Task<IActionResult> GetReceivedBookings()
