@@ -3,6 +3,7 @@ using FilmMaker.DTO.ServiceBooking;
 using FilmMaker.Entities;
 using FilmMaker.Services.Interface;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace FilmMaker.Services.Service
 {
@@ -91,8 +92,15 @@ namespace FilmMaker.Services.Service
             LocationName = booking.Location?.LocationName,
             LocationCity = booking.Location?.City?.Name,
             LocationAddress = booking.Location?.Address,
-            Latitude = booking.Location?.Latitude,
-            Longitude = booking.Location?.Longitude,
+
+            Latitude = booking.LocationId == null
+                                                  ? booking.Latitude
+                                                  : booking.Location?.Latitude,
+
+            Longitude = booking.LocationId == null
+                                                    ? booking.Longitude
+                                                    : booking.Location?.Longitude,
+            LocationOnGoogleMaps = booking.Location?.LocationOnGoogleMaps == null ? booking.LocationOnGoogleMaps : booking.Location.LocationOnGoogleMaps
         };
 
         private IQueryable<ServiceBooking> BookingsWithIncludes() =>
@@ -171,7 +179,31 @@ namespace FilmMaker.Services.Service
                     CreatedBy = currentUserId.ToString(),
                     IsActive = true,
                     IsDeleted = false
+                    
                 };
+                if(!dto.LocationId.HasValue)
+                {
+                    if(dto.Latitude != 0 && dto.Longitude != 0)
+                    {
+                        booking.Latitude = dto.Latitude;
+                        booking.Longitude = dto.Longitude;
+                        if (dto.LocationOnGoogleMaps.IsNullOrEmpty())
+                        {
+                            booking.LocationOnGoogleMaps = $"https://www.google.com/maps/search/?api=1&query={dto.Latitude},{dto.Longitude}";
+                        }
+                        else
+                        {
+                            booking.LocationOnGoogleMaps = dto.LocationOnGoogleMaps;
+                        }
+                    }
+                    else
+                    {
+                        return ApiResponse<CreateServiceBookingDTO>.FailureResponse(
+                       "location or latitude and longitude is required",
+                       "الموقع أو خط العرض وخط الطول مطلوبان"
+                   );
+                    }
+                }
 
                 await _context.ServiceBookings.AddAsync(booking);
                 await _context.SaveChangesAsync();
