@@ -1,4 +1,5 @@
-﻿using FilmMaker.DTO.ServiceProvider;
+﻿using FilmMaker.Attribute;
+using FilmMaker.DTO.ServiceProvider;
 using FilmMaker.Services.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -39,6 +40,7 @@ namespace FilmMaker.Controllers
         }
 
         [HttpPost]
+        [AuthorizeServiceProvider]
         public async Task<IActionResult> AddService([FromBody] CreateServiceDTO serviceDto)
         {
             var currentUserId = GetCurrentUserId();
@@ -51,6 +53,8 @@ namespace FilmMaker.Controllers
 
         
         [HttpPut]
+        [AuthorizeServiceProvider]
+
         public async Task<IActionResult> UpdateService([FromBody] UpdateServiceDTO serviceDto)
         {
             var currentUserId = GetCurrentUserId();
@@ -63,6 +67,8 @@ namespace FilmMaker.Controllers
 
       
         [HttpDelete("{serviceId:int}")]
+        [AuthorizeServiceProvider]
+
         public async Task<IActionResult> DeleteService(int serviceId)
         {
             var currentUserId = GetCurrentUserId();
@@ -74,6 +80,8 @@ namespace FilmMaker.Controllers
         }
 
         [HttpDelete("restore/{serviceId:int}")]
+        [AuthorizeServiceProvider]
+
         public async Task<IActionResult> RestoreDeleteService(int serviceId)
         {
             var currentUserId = GetCurrentUserId();
@@ -86,6 +94,7 @@ namespace FilmMaker.Controllers
 
 
         [HttpPatch("activate")]
+        [AuthorizeServiceProvider]
         public async Task<IActionResult> SetServiceActive(int ServiceId)
         {
             var currentUserId = GetCurrentUserId();
@@ -97,6 +106,7 @@ namespace FilmMaker.Controllers
         }
 
         [HttpPatch("deactivate")]
+        [AuthorizeServiceProvider]
         public async Task<IActionResult> SetServiceInactive(int ServiceId)
         {
             var currentUserId = GetCurrentUserId();
@@ -127,6 +137,8 @@ namespace FilmMaker.Controllers
         }
 
         [HttpGet("my-services")]
+        [AuthorizeServiceProvider]
+
         public async Task<IActionResult> GetMyServices()
         {
             var currentUserId = GetCurrentUserId();
