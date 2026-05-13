@@ -183,6 +183,7 @@ namespace FilmMaker.Services.Service
                 };
                 if(!dto.LocationId.HasValue)
                 {
+
                     if(dto.Latitude != 0 && dto.Longitude != 0)
                     {
                         booking.Latitude = dto.Latitude;
@@ -196,6 +197,10 @@ namespace FilmMaker.Services.Service
                             booking.LocationOnGoogleMaps = dto.LocationOnGoogleMaps;
                         }
                     }
+                    else if (!dto.LocationOnGoogleMaps.IsNullOrEmpty())
+                    {
+                        booking.LocationOnGoogleMaps = dto.LocationOnGoogleMaps;
+                    }
                     else
                     {
                         return ApiResponse<CreateServiceBookingDTO>.FailureResponse(
@@ -203,7 +208,14 @@ namespace FilmMaker.Services.Service
                        "الموقع أو خط العرض وخط الطول مطلوبان"
                    );
                     }
-                }
+                }else if (!await _context.Locations
+                                        .AnyAsync(l => l.Id == dto.LocationId))
+                                    {
+                                        return ApiResponse<CreateServiceBookingDTO>.FailureResponse(
+                                            "Location not found",
+                                            "الموقع غير موجود"
+                                        );
+}
 
                 await _context.ServiceBookings.AddAsync(booking);
                 await _context.SaveChangesAsync();
