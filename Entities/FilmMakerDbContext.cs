@@ -1,5 +1,4 @@
-﻿using FilmMaker.DataSeed;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace FilmMaker.Entities
 {
@@ -18,7 +17,14 @@ namespace FilmMaker.Entities
         public DbSet<LocationManagerCity> LocationManagerCities { get; set; }
         public DbSet<PreviousProject> PreviousProjects { get; set; }
 
+        public DbSet<ServicesProvided> ServicesProvided { get; set; }
+
+        public DbSet<ServicesProvidedMedia> ServicesProvidedMedia { get; set; }
+
+        public DbSet<ServiceProviderCities> ServiceProviderCities { get; set; }
+
         public DbSet<ProductionCompanyProfile> ProductionCompanyProfiles { get; set; }
+
         public DbSet<ProductionCompanyProductionType> ProductionCompanyProductionTypes { get; set; }
 
         public DbSet<ServiceProviderProfile> ServiceProviderProfiles { get; set; }
@@ -48,14 +54,11 @@ namespace FilmMaker.Entities
         }
 
 
-
-
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Seed();
+            
 
             modelBuilder.Entity<LocationArchiveHistory>()
                 .HasOne(x => x.Location)

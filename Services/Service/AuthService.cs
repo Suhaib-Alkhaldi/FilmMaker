@@ -443,6 +443,21 @@ namespace FilmMaker.Services.Service
                 _context.ServiceProviderProfiles.Add(profile);
                 await _context.SaveChangesAsync();
 
+                
+
+                var cities = request.CitiesIds == null
+                    ? new List<ServiceProviderCities>()
+                    : request.CitiesIds
+                        .Distinct()
+                        .Select(cityId => new ServiceProviderCities
+                        {
+                            ServiceProviderId = profile.Id,
+                            CityId = cityId,
+                            IsActive = true,
+                            IsDeleted = false
+                        })
+                        .ToList();
+
                 var selectedServiceTypes = request.ServiceTypeIds == null
                     ? new List<ServiceProviderServiceType>()
                     : request.ServiceTypeIds
@@ -480,6 +495,12 @@ namespace FilmMaker.Services.Service
                 if (allServiceTypes.Any())
                 {
                     _context.ServiceProviderServiceTypes.AddRange(allServiceTypes);
+                    await _context.SaveChangesAsync();
+                }
+
+                if (cities.Any())
+                {
+                    _context.ServiceProviderCities.AddRange(cities);
                     await _context.SaveChangesAsync();
                 }
 

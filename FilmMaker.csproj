@@ -24,6 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="DataSeed\" />
     <Folder Include="Helper\Enum\" />
   </ItemGroup>
 
