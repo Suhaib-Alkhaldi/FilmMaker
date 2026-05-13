@@ -8,7 +8,7 @@
     {
       "id": 2,
       "key": "LocationStatus",
-      "name": "Location Status"
+      "name": "LocationStatus"
     },
     {
       "id": 3,
@@ -18,32 +18,32 @@
     {
       "id": 4,
       "key": "BookingStatus",
-      "name": "Booking Status"
+      "name": "BookingStatus"
     },
     {
       "id": 5,
       "key": "ContractStatus",
-      "name": "Contract Status"
+      "name": "ContractStatus"
     },
     {
       "id": 6,
       "key": "PaymentType",
-      "name": "Payment Type"
+      "name": "PaymentType"
     },
     {
       "id": 7,
       "key": "EscrowStatus",
-      "name": "Escrow Status"
+      "name": "EscrowStatus"
     },
     {
       "id": 8,
       "key": "ProductionType",
-      "name": "Production Type"
+      "name": "ProductionType"
     },
     {
       "id": 9,
       "key": "ServiceType",
-      "name": "Service Type"
+      "name": "ServiceType"
     },
     {
       "id": 10,

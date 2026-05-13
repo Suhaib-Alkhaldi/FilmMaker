@@ -16,12 +16,12 @@ namespace FilmMaker.Entities
         public string RequestDetails { get; set; } = string.Empty;
         public int LocationOwnerId { get; set; }
 
-        [ForeignKey(nameof(LocationOwnerId))]
+        [ForeignKey("LocationOwnerId")]
         public LocationOwnerProfile LocationOwner { get; set; } = null!;
 
         public int? LocationManagerId { get; set; }
 
-        [ForeignKey(nameof(LocationManagerId))]
+        [ForeignKey("LocationManagerId")]
         public LocationManagerProfile? LocationManager { get; set; }
 
         public int ProductionCompanyId { get; set; }

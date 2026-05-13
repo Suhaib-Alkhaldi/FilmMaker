@@ -23,6 +23,8 @@ namespace FilmMaker.Entities
         public DbSet<ServiceProviderProfile> ServiceProviderProfiles { get; set; }
         public DbSet<ServiceProviderServiceType> ServiceProviderServiceTypes { get; set; }
 
+        public DbSet<Media> Media { get; set; }
+
         // Locations
         public DbSet<Location> Locations { get; set; }
         public DbSet<LocationMedia> LocationMedia { get; set; }
@@ -154,6 +156,41 @@ namespace FilmMaker.Entities
                 .HasOne(x => x.PaymentType)
                 .WithMany()
                 .HasForeignKey(x => x.PaymentTypeId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+
+
+            modelBuilder.Entity<LocationMedia>()
+                .HasOne(x => x.Media)
+                .WithMany()
+                .HasForeignKey(x => x.MediaId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<LocationMedia>()
+                .HasOne(x => x.Location)
+                .WithMany(x => x.Media)
+                .HasForeignKey(x => x.LocationId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Media>()
+                .HasOne(x => x.UploadedByUser)
+                .WithMany()
+                .HasForeignKey(x => x.UploadedByUserId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+
+
+            modelBuilder.Entity<Location>()
+                .HasOne(x => x.LocationType)
+                .WithMany()
+                .HasForeignKey(x => x.LocationTypeId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+
+            modelBuilder.Entity<Location>()
+                .HasOne(x => x.LocationStatus)
+                .WithMany()
+                .HasForeignKey(x => x.LocationStatusId)
                 .OnDelete(DeleteBehavior.NoAction);
         }
     }

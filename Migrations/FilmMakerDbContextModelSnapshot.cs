@@ -254,6 +254,10 @@ namespace FilmMaker.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Country")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -261,6 +265,12 @@ namespace FilmMaker.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("DailyPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("FacilitiesDescription")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("HourlyPrice")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<bool>("IsActive")
@@ -292,6 +302,9 @@ namespace FilmMaker.Migrations
                     b.Property<int>("LocationStatusId")
                         .HasColumnType("int");
 
+                    b.Property<int>("LocationTypeId")
+                        .HasColumnType("int");
+
                     b.Property<decimal?>("Longitude")
                         .HasColumnType("decimal(18,2)");
 
@@ -308,6 +321,8 @@ namespace FilmMaker.Migrations
                     b.HasIndex("LocationOwnerId");
 
                     b.HasIndex("LocationStatusId");
+
+                    b.HasIndex("LocationTypeId");
 
                     b.ToTable("Locations");
                 });
@@ -537,22 +552,10 @@ namespace FilmMaker.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("ContentType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FileName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FileUrl")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsActive")
@@ -561,14 +564,11 @@ namespace FilmMaker.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<int?>("LocationId")
+                    b.Property<int>("LocationId")
                         .HasColumnType("int");
 
-                    b.Property<int>("MediaTypeId")
+                    b.Property<int>("MediaId")
                         .HasColumnType("int");
-
-                    b.Property<long>("SizeInBytes")
-                        .HasColumnType("bigint");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -576,16 +576,11 @@ namespace FilmMaker.Migrations
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UploadedByUserId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("LocationId");
 
-                    b.HasIndex("MediaTypeId");
-
-                    b.HasIndex("UploadedByUserId");
+                    b.HasIndex("MediaId");
 
                     b.ToTable("LocationMedia");
                 });
@@ -746,6 +741,66 @@ namespace FilmMaker.Migrations
                     b.HasIndex("LookupCategoryId");
 
                     b.ToTable("LookupItems");
+                });
+
+            modelBuilder.Entity("FilmMaker.Entities.Media", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FileUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("MediaTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("OriginalFileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("SizeInBytes")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UploadedByUserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MediaTypeId");
+
+                    b.HasIndex("UploadedByUserId");
+
+                    b.ToTable("Media");
                 });
 
             modelBuilder.Entity("FilmMaker.Entities.Payment", b =>
@@ -1232,7 +1287,13 @@ namespace FilmMaker.Migrations
                     b.HasOne("FilmMaker.Entities.LookupItem", "LocationStatus")
                         .WithMany()
                         .HasForeignKey("LocationStatusId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("FilmMaker.Entities.LookupItem", "LocationType")
+                        .WithMany()
+                        .HasForeignKey("LocationTypeId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("LocationManager");
@@ -1240,6 +1301,8 @@ namespace FilmMaker.Migrations
                     b.Navigation("LocationOwner");
 
                     b.Navigation("LocationStatus");
+
+                    b.Navigation("LocationType");
                 });
 
             modelBuilder.Entity("FilmMaker.Entities.LocationArchiveHistory", b =>
@@ -1344,25 +1407,19 @@ namespace FilmMaker.Migrations
                 {
                     b.HasOne("FilmMaker.Entities.Location", "Location")
                         .WithMany("Media")
-                        .HasForeignKey("LocationId");
-
-                    b.HasOne("FilmMaker.Entities.LookupItem", "MediaType")
-                        .WithMany()
-                        .HasForeignKey("MediaTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("LocationId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("FilmMaker.Entities.User", "UploadedByUser")
+                    b.HasOne("FilmMaker.Entities.Media", "Media")
                         .WithMany()
-                        .HasForeignKey("UploadedByUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("MediaId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Location");
 
-                    b.Navigation("MediaType");
-
-                    b.Navigation("UploadedByUser");
+                    b.Navigation("Media");
                 });
 
             modelBuilder.Entity("FilmMaker.Entities.LocationOwnerProfile", b =>
@@ -1396,6 +1453,25 @@ namespace FilmMaker.Migrations
                         .IsRequired();
 
                     b.Navigation("LookupCategory");
+                });
+
+            modelBuilder.Entity("FilmMaker.Entities.Media", b =>
+                {
+                    b.HasOne("FilmMaker.Entities.LookupItem", "MediaType")
+                        .WithMany()
+                        .HasForeignKey("MediaTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FilmMaker.Entities.User", "UploadedByUser")
+                        .WithMany()
+                        .HasForeignKey("UploadedByUserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("MediaType");
+
+                    b.Navigation("UploadedByUser");
                 });
 
             modelBuilder.Entity("FilmMaker.Entities.Payment", b =>
