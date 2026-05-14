@@ -24,7 +24,6 @@ namespace FilmMaker.Services.Service
         {
             try
             {
-                // Validate dates
                 if (dto.StartDateTime >= dto.EndDateTime)
                 {
                     return ApiResponse<BookingRequestResponseDto>.FailureResponse(
@@ -41,7 +40,6 @@ namespace FilmMaker.Services.Service
                     );
                 }
 
-                // Get location
                 var location = await _context.Locations
                     .FirstOrDefaultAsync(l =>
                         l.Id == dto.LocationId &&
@@ -56,7 +54,6 @@ namespace FilmMaker.Services.Service
                     );
                 }
 
-                // Time Conflict check
                 var isFullDay = (dto.EndDateTime - dto.StartDateTime).TotalHours >= 4;
                 var bookingDate = dto.StartDateTime.Date;
 
@@ -91,7 +88,12 @@ namespace FilmMaker.Services.Service
                 }
 
                 var pendingStatus = await _context.LookupItems
-                    .FirstOrDefaultAsync(l => l.Name == "Pending");
+                    .Include(l => l.LookupCategory)
+                    .FirstOrDefaultAsync(l =>
+                        l.Name == "Pending" &&
+                        l.LookupCategory.Name == "BookingStatus" &&
+                        l.IsActive &&
+                        !l.IsDeleted);
 
                 if (pendingStatus == null)
                 {
@@ -101,18 +103,19 @@ namespace FilmMaker.Services.Service
                     );
                 }
 
-                var locationManagerId = location.LocationManagerId;
-                var locationOwnerId = location.LocationOwnerId;
+                var totalPrice = CalculateTotalPrice(location, dto.StartDateTime, dto.EndDateTime, isFullDay);
 
                 var booking = new LocationBookingRequest
                 {
                     LocationId = dto.LocationId,
                     StartDateTime = dto.StartDateTime,
                     EndDateTime = dto.EndDateTime,
+                    Message = dto.Message,
                     ProductionCompanyId = productionCompanyProfileId,
-                    LocationOwnerId = locationOwnerId,
-                    LocationManagerId = locationManagerId, 
+                    LocationOwnerId = location.LocationOwnerId,
+                    LocationManagerId = location.LocationManagerId,
                     BookingStatusId = pendingStatus.Id,
+                    TotalPrice = totalPrice,
                     CreatedAt = DateTime.UtcNow
                 };
 
@@ -124,21 +127,8 @@ namespace FilmMaker.Services.Service
                     dto.LocationId, productionCompanyProfileId
                 );
 
-                var response = new BookingRequestResponseDto
-                {
-                    Id = booking.Id,
-                    LocationId = booking.LocationId,
-                    LocationName = location.LocationName,
-                    City = location.City,
-                    StartDateTime = booking.StartDateTime,
-                    EndDateTime = booking.EndDateTime,
-                    IsFullDay = isFullDay,
-                    Status = "Pending",
-                    CreatedAt = booking.CreatedAt
-                };
-
                 return ApiResponse<BookingRequestResponseDto>.SuccessResponse(
-                    response,
+                    MapToDto(booking, location, isFullDay, pendingStatus.Name),
                     "Booking request sent successfully.",
                     "تم إرسال طلب الحجز بنجاح."
                 );
@@ -168,6 +158,7 @@ namespace FilmMaker.Services.Service
                         b.LocationManagerId == managerProfileId &&
                         b.IsActive &&
                         !b.IsDeleted)
+                    .OrderByDescending(b => b.CreatedAt)
                     .Select(b => new BookingRequestResponseDto
                     {
                         Id = b.Id,
@@ -178,6 +169,10 @@ namespace FilmMaker.Services.Service
                         EndDateTime = b.EndDateTime,
                         IsFullDay = (b.EndDateTime - b.StartDateTime).TotalHours >= 4,
                         Status = b.BookingStatus.Name,
+                        Message = b.Message,
+                        TotalPrice = b.TotalPrice,
+                        LocationOwnerId = b.LocationOwnerId,
+                        LocationManagerId = b.LocationManagerId,
                         CreatedAt = b.CreatedAt
                     })
                     .ToListAsync();
@@ -223,21 +218,8 @@ namespace FilmMaker.Services.Service
                     );
                 }
 
-                var response = new BookingRequestResponseDto
-                {
-                    Id = request.Id,
-                    LocationId = request.LocationId,
-                    LocationName = request.Location.LocationName,
-                    City = request.Location.City,
-                    StartDateTime = request.StartDateTime,
-                    EndDateTime = request.EndDateTime,
-                    IsFullDay = (request.EndDateTime - request.StartDateTime).TotalHours >= 4,
-                    Status = request.BookingStatus.Name,
-                    CreatedAt = request.CreatedAt
-                };
-
                 return ApiResponse<BookingRequestResponseDto>.SuccessResponse(
-                    response,
+                    MapToDto(request, request.Location),
                     "Booking request retrieved successfully.",
                     "تم جلب طلب الحجز بنجاح."
                 );
@@ -344,27 +326,17 @@ namespace FilmMaker.Services.Service
                 if (dto.Message is not null)
                     request.Message = dto.Message;
 
+                if (dto.StartDateTime.HasValue || dto.EndDateTime.HasValue)
+                    request.TotalPrice = CalculateTotalPrice(request.Location, finalStart, finalEnd, isFullDay);
+
                 request.UpdatedAt = DateTime.UtcNow;
 
                 await _context.SaveChangesAsync();
 
                 _logger.LogInformation("Booking request {RequestId} updated", requestId);
 
-                var response = new BookingRequestResponseDto
-                {
-                    Id = request.Id,
-                    LocationId = request.LocationId,
-                    LocationName = request.Location.LocationName,
-                    City = request.Location.City,
-                    StartDateTime = request.StartDateTime,
-                    EndDateTime = request.EndDateTime,
-                    IsFullDay = isFullDay,
-                    Status = request.BookingStatus.Name,
-                    CreatedAt = request.CreatedAt
-                };
-
                 return ApiResponse<BookingRequestResponseDto>.SuccessResponse(
-                    response,
+                    MapToDto(request, request.Location, isFullDay),
                     "Booking request updated successfully.",
                     "تم تعديل طلب الحجز بنجاح."
                 );
@@ -403,8 +375,8 @@ namespace FilmMaker.Services.Service
                 if (request.BookingStatus.Name != "Pending")
                 {
                     return ApiResponse<bool>.FailureResponse(
-                        "Only pending requests can be deleted.",
-                        "يمكن حذف الطلبات المعلقة فقط."
+                        "Only pending requests can be cancelled.",
+                        "يمكن إلغاء الطلبات المعلقة فقط."
                     );
                 }
 
@@ -414,10 +386,7 @@ namespace FilmMaker.Services.Service
 
                 await _context.SaveChangesAsync();
 
-                _logger.LogInformation(
-                    "Booking request {RequestId} deleted",
-                    requestId
-                );
+                _logger.LogInformation("Booking request {RequestId} cancelled", requestId);
 
                 return ApiResponse<bool>.SuccessResponse(
                     true,
@@ -427,16 +396,48 @@ namespace FilmMaker.Services.Service
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex,
-                    "Error deleting booking request {RequestId} ",
-                    requestId
-                );
+                _logger.LogError(ex, "Error cancelling booking request {RequestId}", requestId);
 
                 return ApiResponse<bool>.FailureResponse(
-                    "An error occurred while deleting the booking request.",
-                    "حدث خطأ أثناء حذف طلب الحجز."
+                    "An error occurred while cancelling the booking request.",
+                    "حدث خطأ أثناء إلغاء طلب الحجز."
                 );
             }
+        }
+
+        private static decimal CalculateTotalPrice(Location location, DateTime start, DateTime end, bool isFullDay)
+        {
+            if (isFullDay)
+                return location.DailyPrice;
+
+            var hours = (decimal)(end - start).TotalHours;
+            return hours * (location.HourlyPrice ?? location.DailyPrice);
+        }
+
+        private static BookingRequestResponseDto MapToDto(
+            LocationBookingRequest request,
+            Location location,
+            bool? isFullDay = null,
+            string? statusName = null)
+        {
+            var fullDay = isFullDay ?? (request.EndDateTime - request.StartDateTime).TotalHours >= 4;
+
+            return new BookingRequestResponseDto
+            {
+                Id = request.Id,
+                LocationId = request.LocationId,
+                LocationName = location.LocationName,
+                City = location.City,
+                StartDateTime = request.StartDateTime,
+                EndDateTime = request.EndDateTime,
+                IsFullDay = fullDay,
+                Status = statusName ?? request.BookingStatus?.Name ?? string.Empty,
+                Message = request.Message,
+                TotalPrice = request.TotalPrice,
+                LocationOwnerId = request.LocationOwnerId,
+                LocationManagerId = request.LocationManagerId,
+                CreatedAt = request.CreatedAt
+            };
         }
     }
 }

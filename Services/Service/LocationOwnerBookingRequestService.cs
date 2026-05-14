@@ -35,7 +35,7 @@ namespace FilmMaker.Services.Service
                     .Where(x =>
                         x.LocationOwnerId == locationOwnerId.Value &&
                         !x.IsDeleted)
-                    .OrderByDescending(x => x.RequestedAtUtc)
+                    .OrderByDescending(x => x.CreatedAt)
                     .Select(x => new BookingRequestResponseDto
                     {
                         BookingRequestId = x.Id,
@@ -69,11 +69,8 @@ namespace FilmMaker.Services.Service
                         BookingStatusId = x.BookingStatusId,
                         BookingStatus = x.BookingStatus.Name,
 
-                        ShootingDate = x.ShootingDate,
-                        RequestDetails = x.RequestDetails,
+                        Message = x.Message,
                         TotalPrice = x.TotalPrice,
-
-                        RequestedAtUtc = x.RequestedAtUtc,
                         CreatedAt = x.CreatedAt
                     })
                     .ToListAsync();
@@ -160,11 +157,10 @@ namespace FilmMaker.Services.Service
                         BookingStatusId = x.BookingStatusId,
                         BookingStatus = x.BookingStatus.Name,
 
-                        ShootingDate = x.ShootingDate,
-                        RequestDetails = x.RequestDetails,
+                        StartDateTime = x.StartDateTime,
+                        EndDateTime = x.EndDateTime,
+                        IsFullDay = (x.EndDateTime - x.StartDateTime).TotalHours >= 4,
                         TotalPrice = x.TotalPrice,
-
-                        RequestedAtUtc = x.RequestedAtUtc,
                         CreatedAt = x.CreatedAt
                     }).FirstOrDefaultAsync();
 

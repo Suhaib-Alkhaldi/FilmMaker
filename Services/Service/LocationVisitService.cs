@@ -19,7 +19,9 @@ namespace FilmMaker.Services.Service
             _logger = logger;
         }
 
-        public async Task<ApiResponse<VisitRequestResponseDto>> CreateVisitRequestAsync(int managerProfileId, CreateVisitRequestDto dto)
+        public async Task<ApiResponse<VisitRequestResponseDto>> CreateVisitRequestAsync(
+            int managerProfileId,
+            CreateVisitRequestDto dto)
         {
             try
             {
@@ -113,6 +115,9 @@ namespace FilmMaker.Services.Service
                     RequestedVisitDateUtc = dto.RequestedVisitDate,
                     RequestMessage = dto.RequestMessage,
                     VisitStatusId = pendingStatus.Id,
+                    CreatedAt = DateTime.UtcNow,
+                    IsActive = true,
+                    IsDeleted = false
                 };
 
                 _context.LocationVisitRequests.Add(visitRequest);
@@ -120,10 +125,15 @@ namespace FilmMaker.Services.Service
 
                 _logger.LogInformation(
                     "Visit request created. ManagerProfileId: {ManagerProfileId}, LocationId: {LocationId}",
-                    managerProfileId, dto.LocationId
+                    managerProfileId,
+                    dto.LocationId
                 );
 
-                var response = MapToDto(visitRequest, location, pendingStatus.Name);
+                var response = MapToDto(
+                    visitRequest,
+                    location,
+                    pendingStatus.Name
+                );
 
                 return ApiResponse<VisitRequestResponseDto>.SuccessResponse(
                     response,
@@ -133,7 +143,8 @@ namespace FilmMaker.Services.Service
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex,
+                _logger.LogError(
+                    ex,
                     "Error creating visit request. ManagerProfileId: {ManagerProfileId}",
                     managerProfileId
                 );
@@ -145,7 +156,8 @@ namespace FilmMaker.Services.Service
             }
         }
 
-        public async Task<ApiResponse<List<VisitRequestResponseDto>>> GetVisitRequestsAsync(int managerProfileId)
+        public async Task<ApiResponse<List<VisitRequestResponseDto>>> GetVisitRequestsAsync(
+            int managerProfileId)
         {
             try
             {
@@ -156,6 +168,7 @@ namespace FilmMaker.Services.Service
                         v.LocationManagerId == managerProfileId &&
                         v.IsActive &&
                         !v.IsDeleted)
+                    .OrderByDescending(v => v.CreatedAt)
                     .Select(v => new VisitRequestResponseDto
                     {
                         Id = v.Id,
@@ -181,7 +194,8 @@ namespace FilmMaker.Services.Service
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex,
+                _logger.LogError(
+                    ex,
                     "Error getting visit requests for manager {ManagerProfileId}",
                     managerProfileId
                 );
@@ -193,7 +207,9 @@ namespace FilmMaker.Services.Service
             }
         }
 
-        public async Task<ApiResponse<VisitRequestResponseDto>> GetVisitRequestByIdAsync(int requestId, int managerProfileId)
+        public async Task<ApiResponse<VisitRequestResponseDto>> GetVisitRequestByIdAsync(
+            int requestId,
+            int managerProfileId)
         {
             try
             {
@@ -214,7 +230,11 @@ namespace FilmMaker.Services.Service
                     );
                 }
 
-                var response = MapToDto(request, request.Location, request.VisitStatus.Name);
+                var response = MapToDto(
+                    request,
+                    request.Location,
+                    request.VisitStatus.Name
+                );
 
                 return ApiResponse<VisitRequestResponseDto>.SuccessResponse(
                     response,
@@ -224,7 +244,11 @@ namespace FilmMaker.Services.Service
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting visit request {RequestId}", requestId);
+                _logger.LogError(
+                    ex,
+                    "Error getting visit request {RequestId}",
+                    requestId
+                );
 
                 return ApiResponse<VisitRequestResponseDto>.FailureResponse(
                     "An error occurred while retrieving the visit request.",
@@ -233,11 +257,15 @@ namespace FilmMaker.Services.Service
             }
         }
 
-        public async Task<ApiResponse<VisitRequestResponseDto>> UpdateVisitRequestAsync(int requestId, int managerProfileId, UpdateVisitRequestDto dto)
+        public async Task<ApiResponse<VisitRequestResponseDto>> UpdateVisitRequestAsync(
+            int requestId,
+            int managerProfileId,
+            UpdateVisitRequestDto dto)
         {
             try
             {
-                if (dto.RequestedVisitDateUtc.HasValue && dto.RequestedVisitDateUtc < DateTime.UtcNow)
+                if (dto.RequestedVisitDateUtc.HasValue &&
+                    dto.RequestedVisitDateUtc < DateTime.UtcNow)
                 {
                     return ApiResponse<VisitRequestResponseDto>.FailureResponse(
                         "Visit date cannot be in the past.",
@@ -271,18 +299,30 @@ namespace FilmMaker.Services.Service
                 }
 
                 if (dto.RequestedVisitDateUtc.HasValue)
-                    request.RequestedVisitDateUtc = dto.RequestedVisitDateUtc.Value;
+                {
+                    request.RequestedVisitDateUtc =
+                        dto.RequestedVisitDateUtc.Value;
+                }
 
                 if (dto.RequestMessage is not null)
+                {
                     request.RequestMessage = dto.RequestMessage;
+                }
 
                 request.UpdatedAt = DateTime.UtcNow;
 
                 await _context.SaveChangesAsync();
 
-                _logger.LogInformation("Visit request {RequestId} updated", requestId);
+                _logger.LogInformation(
+                    "Visit request {RequestId} updated",
+                    requestId
+                );
 
-                var response = MapToDto(request, request.Location, request.VisitStatus.Name);
+                var response = MapToDto(
+                    request,
+                    request.Location,
+                    request.VisitStatus.Name
+                );
 
                 return ApiResponse<VisitRequestResponseDto>.SuccessResponse(
                     response,
@@ -292,7 +332,12 @@ namespace FilmMaker.Services.Service
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error updating visit request {RequestId}", requestId);
+                _logger.LogError(
+                    ex,
+                    "Error updating visit request {RequestId}",
+                    requestId
+                );
+
                 return ApiResponse<VisitRequestResponseDto>.FailureResponse(
                     "An error occurred while updating the visit request.",
                     "حدث خطأ أثناء تعديل طلب الزيارة."
@@ -300,7 +345,9 @@ namespace FilmMaker.Services.Service
             }
         }
 
-        public async Task<ApiResponse<bool>> CancelVisitRequestAsync(int requestId, int managerProfileId)
+        public async Task<ApiResponse<bool>> CancelVisitRequestAsync(
+            int requestId,
+            int managerProfileId)
         {
             try
             {
@@ -336,7 +383,8 @@ namespace FilmMaker.Services.Service
 
                 _logger.LogInformation(
                     "Visit request {RequestId} cancelled by manager {ManagerProfileId}",
-                    requestId, managerProfileId
+                    requestId,
+                    managerProfileId
                 );
 
                 return ApiResponse<bool>.SuccessResponse(
@@ -347,7 +395,8 @@ namespace FilmMaker.Services.Service
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex,
+                _logger.LogError(
+                    ex,
                     "Error cancelling visit request {RequestId}",
                     requestId
                 );
@@ -359,7 +408,10 @@ namespace FilmMaker.Services.Service
             }
         }
 
-        private static VisitRequestResponseDto MapToDto(LocationVisitRequest request, Location location, string statusName)
+        private static VisitRequestResponseDto MapToDto(
+            LocationVisitRequest request,
+            Location location,
+            string statusName)
         {
             return new VisitRequestResponseDto
             {

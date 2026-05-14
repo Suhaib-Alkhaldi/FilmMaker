@@ -189,7 +189,7 @@ namespace FilmMaker.Entities
             modelBuilder.Entity<LocationVisitRequest>()
                 .HasOne(v => v.RespondedByUser)
                 .WithMany()
-                .HasForeignKey(v => v.RespondedByUserId)
+                .HasForeignKey(v => v.RespondedByUserId);
 
 
             modelBuilder.Entity<LocationMedia>()
@@ -224,11 +224,6 @@ namespace FilmMaker.Entities
                 .WithMany()
                 .HasForeignKey(x => x.LocationStatusId)
                 .OnDelete(DeleteBehavior.NoAction);
-
-
-
-
-
             
         }
     }

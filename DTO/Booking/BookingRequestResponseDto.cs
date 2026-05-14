@@ -15,8 +15,10 @@
         public string RequestedByName { get; set; } = string.Empty;
         public int BookingStatusId { get; set; }
         public string BookingStatus { get; set; } = string.Empty;
-        public DateTime ShootingDate { get; set; }
-        public string RequestDetails { get; set; } = string.Empty;
+        public DateTime StartDateTime { get; set; }
+        public DateTime EndDateTime { get; set; }
+        public bool IsFullDay { get; set; }
+        public string Message { get; set; } = string.Empty;
         public decimal TotalPrice { get; set; }
         public DateTime RequestedAtUtc { get; set; }
         public DateTime CreatedAt { get; set; }
