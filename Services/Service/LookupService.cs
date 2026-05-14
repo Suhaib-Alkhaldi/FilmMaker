@@ -25,6 +25,7 @@ namespace FilmMaker.Services.Service
                 var query = _context.Locations
                     .Include(l => l.LocationStatus)
                     .Include(l => l.Media)
+                    .ThenInclude(m => m.Media)
                     .Where(l => l.IsActive && !l.IsDeleted)
                     .AsQueryable();
 
@@ -59,7 +60,7 @@ namespace FilmMaker.Services.Service
                         DailyPrice = l.DailyPrice,
                         LocationStatus = l.LocationStatus.Name,
                         MediaUrl = l.Media.FirstOrDefault() != null
-                            ? l.Media.First().FileUrl
+                            ? l.Media.First().Media.FileUrl
                             : null
                     })
                     .ToListAsync();

@@ -419,9 +419,11 @@ namespace FilmMaker.Migrations
 
                     b.Property<int>("LocationOwnerId")
                         .HasColumnType("int");
+                
 
 
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("LocationManagerId")
+                    .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ProductionCompanyId")
                         .HasColumnType("int");
