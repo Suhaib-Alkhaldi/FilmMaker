@@ -24,10 +24,10 @@ namespace FilmMaker.Entities
         [ForeignKey("LocationManagerId")]
         public LocationManagerProfile? LocationManager { get; set; }
 
-        public int ProductionCompanyId { get; set; }
+        public int? ProductionCompanyId { get; set; }
 
         [ForeignKey("ProductionCompanyId")]
-        public ProductionCompanyProfile ProductionCompany { get; set; } = null!;
+        public ProductionCompanyProfile? ProductionCompany { get; set; } = null!;
 
         public decimal TotalPrice { get; set; }
 

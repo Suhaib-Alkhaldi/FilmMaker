@@ -191,6 +191,18 @@ namespace FilmMaker.Common.SeedData
                     new() {Name = "Restaurant"},
                     new() {Name = "Cafe"},
                 }
+            },
+
+            new LookupCategory
+            {
+                Name = "VisitStatus",
+                LookupItems = new List<LookupItem>
+                {
+                    new() {Name = "Pending"},
+                    new() {Name = "Accepted"},
+                    new() {Name = "Rejected"},
+                    new() {Name = "Cancelled"}
+                }
             }
         };
 

@@ -34,6 +34,7 @@ namespace FilmMaker.Entities
         // Booking
         public DbSet<LocationBookingRequest> LocationBookingRequests { get; set; }
         public DbSet<BookingStatusHistory> BookingStatusHistories { get; set; }
+        public DbSet<LocationVisitRequest> LocationVisitRequests { get; set; }
 
         // Contract
         public DbSet<DigitalContract> DigitalContracts { get; set; }
@@ -191,6 +192,40 @@ namespace FilmMaker.Entities
                 .HasOne(x => x.LocationStatus)
                 .WithMany()
                 .HasForeignKey(x => x.LocationStatusId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+
+
+
+
+            modelBuilder.Entity<LocationVisitRequest>()
+                .HasOne(x => x.Location)
+                .WithMany()
+                .HasForeignKey(x => x.LocationId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<LocationVisitRequest>()
+                .HasOne(x => x.LocationOwner)
+                .WithMany()
+                .HasForeignKey(x => x.LocationOwnerId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<LocationVisitRequest>()
+                .HasOne(x => x.LocationManager)
+                .WithMany()
+                .HasForeignKey(x => x.LocationManagerId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<LocationVisitRequest>()
+                .HasOne(x => x.VisitStatus)
+                .WithMany()
+                .HasForeignKey(x => x.VisitStatusId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<LocationVisitRequest>()
+                .HasOne(x => x.RespondedByUser)
+                .WithMany()
+                .HasForeignKey(x => x.RespondedByUserId)
                 .OnDelete(DeleteBehavior.NoAction);
         }
     }

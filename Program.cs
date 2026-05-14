@@ -61,6 +61,8 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<IMediaService, MediaService>();
 builder.Services.AddScoped<ILocationService, LocationService>();
+builder.Services.AddScoped<ILocationOwnerVisitRequestService, LocationOwnerVisitRequestService>();
+builder.Services.AddScoped<ILocationOwnerBookingRequestService, LocationOwnerBookingRequestService>();
 
 
 builder.Services.AddAuthentication(options =>
