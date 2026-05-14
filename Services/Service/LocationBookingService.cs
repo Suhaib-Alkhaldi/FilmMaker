@@ -158,6 +158,7 @@ namespace FilmMaker.Services.Service
                         b.LocationManagerId == managerProfileId &&
                         b.IsActive &&
                         !b.IsDeleted)
+                    .OrderByDescending(b => b.CreatedAt)
                     .Select(b => new BookingRequestResponseDto
                     {
                         Id = b.Id,
@@ -404,15 +405,13 @@ namespace FilmMaker.Services.Service
             }
         }
 
-
-        // Helper Methods
         private static decimal CalculateTotalPrice(Location location, DateTime start, DateTime end, bool isFullDay)
         {
             if (isFullDay)
                 return location.DailyPrice;
 
             var hours = (decimal)(end - start).TotalHours;
-            return hours * (location.HourlyPrice ?? 0m);
+            return hours * (location.HourlyPrice ?? location.DailyPrice);
         }
 
         private static BookingRequestResponseDto MapToDto(
