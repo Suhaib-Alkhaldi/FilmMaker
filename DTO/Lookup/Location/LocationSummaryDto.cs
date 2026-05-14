@@ -1,4 +1,4 @@
-﻿namespace FilmMaker.DTO.LocationManager
+﻿namespace FilmMaker.DTO.Lookup.Location
 {
     public class LocationSummaryDto
     {
@@ -9,6 +9,5 @@
         public decimal DailyPrice { get; set; }
         public string LocationStatus { get; set; } = string.Empty;
         public string? MediaUrl { get; set; }
-        public bool HasManager { get; set; }
     }
 }

@@ -59,7 +59,8 @@ builder.Services.AddDbContext<FilmMakerDbContext>(options =>
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
-builder.Services.AddScoped<ILocationManagementServicee, LocationManagementService>();
+builder.Services.AddScoped<ILocationVisitService, LocationVisitService>();
+builder.Services.AddScoped<ILocationBookingService, LocationBookingService>();
 
 
 builder.Services.AddAuthentication(options =>

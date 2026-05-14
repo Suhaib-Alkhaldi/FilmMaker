@@ -54,6 +54,11 @@
       "id": 11,
       "key": "Country",
       "name": "Country"
+    },
+    {
+      "id": 12,
+      "key": "VisitStatus",
+      "name": "Visit Status"
     }
   ]
 }

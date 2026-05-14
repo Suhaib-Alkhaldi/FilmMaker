@@ -12,8 +12,11 @@ namespace FilmMaker.Entities
 
         [ForeignKey("BookingStatusId")]
         public LookupItem BookingStatus { get; set; } = null!;
-        public DateTime ShootingDate { get; set; }
-        public string RequestDetails { get; set; } = string.Empty;
+        public DateTime StartDateTime { get; set; }
+        public DateTime EndDateTime { get; set; }
+
+        [NotMapped]
+        public bool IsFullDay => (EndDateTime - StartDateTime).TotalHours >= 4;
         public int LocationOwnerId { get; set; }
 
         [ForeignKey(nameof(LocationOwnerId))]
@@ -28,11 +31,14 @@ namespace FilmMaker.Entities
 
         [ForeignKey("ProductionCompanyId")]
         public ProductionCompanyProfile ProductionCompany { get; set; } = null!;
+        public string? Message { get; set; }
 
         public decimal TotalPrice { get; set; }
 
-        public DateTime RequestedAtUtc { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public ICollection<BookingStatusHistory> StatusHistories { get; set; }
+
+        public ICollection<LocationVisitRequest> VisitRequests { get; set; }
     }
 }

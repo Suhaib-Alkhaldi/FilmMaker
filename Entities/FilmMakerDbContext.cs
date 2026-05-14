@@ -29,6 +29,7 @@ namespace FilmMaker.Entities
         public DbSet<LocationTermsOfUse> LocationTermsOfUse { get; set; }
         public DbSet<LocationArchiveHistory> LocationArchiveHistories { get; set; }
         public DbSet<LocationManagementRequest> LocationManagementRequests { get; set; }
+        public DbSet<LocationVisitRequest> LocationVisitRequests { get; set; }
 
         // Booking
         public DbSet<LocationBookingRequest> LocationBookingRequests { get; set; }
@@ -167,6 +168,36 @@ namespace FilmMaker.Entities
                 .HasOne(x => x.LocationManagerProfile)
                 .WithMany()
                 .HasForeignKey(x => x.LocationManagerProfileId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<LocationVisitRequest>()
+                .HasOne(v => v.Location)
+                .WithMany()
+                .HasForeignKey(v => v.LocationId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<LocationVisitRequest>()
+                .HasOne(v => v.LocationOwner)
+                .WithMany()
+                .HasForeignKey(v => v.LocationOwnerId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<LocationVisitRequest>()
+                .HasOne(v => v.LocationManager)
+                .WithMany()
+                .HasForeignKey(v => v.LocationManagerId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<LocationVisitRequest>()
+                .HasOne(v => v.VisitStatus)
+                .WithMany()
+                .HasForeignKey(v => v.VisitStatusId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<LocationVisitRequest>()
+                .HasOne(v => v.RespondedByUser)
+                .WithMany()
+                .HasForeignKey(v => v.RespondedByUserId)
                 .OnDelete(DeleteBehavior.NoAction);
         }
     }
