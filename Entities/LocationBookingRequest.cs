@@ -19,19 +19,22 @@ namespace FilmMaker.Entities
         public bool IsFullDay => (EndDateTime - StartDateTime).TotalHours >= 4;
         public int LocationOwnerId { get; set; }
 
-        [ForeignKey(nameof(LocationOwnerId))]
+        [ForeignKey("LocationOwnerId")]
         public LocationOwnerProfile LocationOwner { get; set; } = null!;
 
         public int? LocationManagerId { get; set; }
 
-        [ForeignKey(nameof(LocationManagerId))]
+        [ForeignKey("LocationManagerId")]
         public LocationManagerProfile? LocationManager { get; set; }
 
-        public int ProductionCompanyId { get; set; }
+        public int? ProductionCompanyId { get; set; }
 
         [ForeignKey("ProductionCompanyId")]
+
         public ProductionCompanyProfile ProductionCompany { get; set; } = null!;
         public string? Message { get; set; }
+
+      
 
         public decimal TotalPrice { get; set; }
 

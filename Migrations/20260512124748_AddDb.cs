@@ -85,7 +85,7 @@ namespace FilmMaker.Migrations
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IBAN = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IBAN = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     RoleId = table.Column<int>(type: "int", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -161,12 +161,47 @@ namespace FilmMaker.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Media",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UploadedByUserId = table.Column<int>(type: "int", nullable: false),
+                    FileName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    OriginalFileName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FileUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ContentType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SizeInBytes = table.Column<long>(type: "bigint", nullable: false),
+                    MediaTypeId = table.Column<int>(type: "int", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Media", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Media_LookupItems_MediaTypeId",
+                        column: x => x.MediaTypeId,
+                        principalTable: "LookupItems",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Media_Users_UploadedByUserId",
+                        column: x => x.UploadedByUserId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ProductionCompanyProfiles",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    CompanyName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Country = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     City = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Bio = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -288,6 +323,7 @@ namespace FilmMaker.Migrations
                     LocationOwnerId = table.Column<int>(type: "int", nullable: false),
                     LocationManagerId = table.Column<int>(type: "int", nullable: true),
                     LocationStatusId = table.Column<int>(type: "int", nullable: false),
+                    LocationTypeId = table.Column<int>(type: "int", nullable: false),
                     LocationOnGoogleMaps = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Latitude = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     Longitude = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
@@ -316,8 +352,12 @@ namespace FilmMaker.Migrations
                         name: "FK_Locations_LookupItems_LocationStatusId",
                         column: x => x.LocationStatusId,
                         principalTable: "LookupItems",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Locations_LookupItems_LocationTypeId",
+                        column: x => x.LocationTypeId,
+                        principalTable: "LookupItems",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -486,13 +526,8 @@ namespace FilmMaker.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UploadedByUserId = table.Column<int>(type: "int", nullable: false),
-                    LocationId = table.Column<int>(type: "int", nullable: true),
-                    FileName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    FileUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ContentType = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    SizeInBytes = table.Column<long>(type: "bigint", nullable: false),
-                    MediaTypeId = table.Column<int>(type: "int", nullable: false),
+                    LocationId = table.Column<int>(type: "int", nullable: false),
+                    MediaId = table.Column<int>(type: "int", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -509,17 +544,10 @@ namespace FilmMaker.Migrations
                         principalTable: "Locations",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_LocationMedia_LookupItems_MediaTypeId",
-                        column: x => x.MediaTypeId,
-                        principalTable: "LookupItems",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_LocationMedia_Users_UploadedByUserId",
-                        column: x => x.UploadedByUserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        name: "FK_LocationMedia_Media_MediaId",
+                        column: x => x.MediaId,
+                        principalTable: "Media",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -868,14 +896,9 @@ namespace FilmMaker.Migrations
                 column: "LocationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_LocationMedia_MediaTypeId",
+                name: "IX_LocationMedia_MediaId",
                 table: "LocationMedia",
-                column: "MediaTypeId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_LocationMedia_UploadedByUserId",
-                table: "LocationMedia",
-                column: "UploadedByUserId");
+                column: "MediaId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_LocationOwnerProfiles_UserId",
@@ -899,6 +922,11 @@ namespace FilmMaker.Migrations
                 column: "LocationStatusId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Locations_LocationTypeId",
+                table: "Locations",
+                column: "LocationTypeId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_LocationTermsOfUse_LocationId",
                 table: "LocationTermsOfUse",
                 column: "LocationId");
@@ -907,6 +935,16 @@ namespace FilmMaker.Migrations
                 name: "IX_LookupItems_LookupCategoryId",
                 table: "LookupItems",
                 column: "LookupCategoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Media_MediaTypeId",
+                table: "Media",
+                column: "MediaTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Media_UploadedByUserId",
+                table: "Media",
+                column: "UploadedByUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Payments_DigitalContractId",
@@ -1006,6 +1044,9 @@ namespace FilmMaker.Migrations
 
             migrationBuilder.DropTable(
                 name: "Payments");
+
+            migrationBuilder.DropTable(
+                name: "Media");
 
             migrationBuilder.DropTable(
                 name: "ServiceProviderProfiles");

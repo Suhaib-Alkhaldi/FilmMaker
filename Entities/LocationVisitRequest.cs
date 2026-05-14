@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+
 namespace FilmMaker.Entities
 {
     public class LocationVisitRequest : SharedEntity
@@ -28,4 +29,4 @@ namespace FilmMaker.Entities
         [ForeignKey("RespondedByUserId")]
         public User? RespondedByUser { get; set; }
     }
-}
+
