@@ -43,6 +43,8 @@ namespace FilmMaker.Entities
         // Payment / Escrow
         public DbSet<Payment> Payments { get; set; }
         public DbSet<EscrowTransaction> EscrowTransactions { get; set; }
+        
+        public DbSet<ServiceMedia> ServiceMedias { get; set; }
 
         public FilmMakerDbContext(DbContextOptions<FilmMakerDbContext> options)
         : base(options)
