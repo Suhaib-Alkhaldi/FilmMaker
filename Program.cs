@@ -9,6 +9,8 @@ using Microsoft.OpenApi.Models;
 using Serilog;
 using System;
 using System.Text;
+using FilmMaker.Services;
+using FilmMaker.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 Log.Logger = new LoggerConfiguration()
@@ -59,6 +61,8 @@ builder.Services.AddDbContext<FilmMakerDbContext>(options =>
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
+builder.Services.AddScoped<IProductionCompanyService, ProductionCompanyService>();
+
 
 builder.Services.AddScoped<ILocationVisitService, LocationVisitService>();
 builder.Services.AddScoped<ILocationBookingService, LocationBookingService>();
