@@ -29,4 +29,4 @@ namespace FilmMaker.Entities
         [ForeignKey("RespondedByUserId")]
         public User? RespondedByUser { get; set; }
     }
-}
+

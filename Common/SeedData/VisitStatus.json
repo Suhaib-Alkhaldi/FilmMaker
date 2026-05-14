@@ -1,0 +1,24 @@
+{
+  "VisitStatus": [
+    {
+      "id": 1,
+      "lookupCategoryId": 12,
+      "name": "Pending"
+    },
+    {
+      "id": 2,
+      "lookupCategoryId": 12,
+      "name": "Accepted"
+    },
+    {
+      "id": 3,
+      "lookupCategoryId": 12,
+      "name": "Rejected"
+    },
+    {
+      "id": 4,
+      "lookupCategoryId": 12,
+      "name": "Cancelled"
+    }
+  ]
+}
