@@ -39,7 +39,7 @@ namespace FilmMaker.Services.Service
                     );
                 }
 
-                var pendingStatusId = await GetStatusId("VisitRequestStatus", "Pending");
+                var pendingStatusId = await GetStatusId("VisitStatus", "Pending");
 
                 if (pendingStatusId == null)
                 {
@@ -51,7 +51,7 @@ namespace FilmMaker.Services.Service
 
                 var targetStatusName = request.IsAccepted ? "Accepted" : "Rejected";
 
-                var targetStatusId = await GetStatusId("VisitRequestStatus", targetStatusName);
+                var targetStatusId = await GetStatusId("VisitStatus", targetStatusName);
 
                 if (targetStatusId == null)
                 {
@@ -63,14 +63,12 @@ namespace FilmMaker.Services.Service
 
                 var visitRequest = await _context.LocationVisitRequests
                     .Include(x => x.Location)
-                    .Include(x => x.LocationOwner)
-                        .ThenInclude(x => x.User)
                     .Include(x => x.LocationManager)
                         .ThenInclude(x => x.User)
                     .Include(x => x.VisitStatus)
                     .Where(x =>
                         x.Id == request.VisitRequestId &&
-                        x.LocationOwnerId == locationOwnerId.Value &&
+                        x.Location.LocationOwnerId == locationOwnerId.Value &&
                         !x.IsDeleted)
                     .FirstOrDefaultAsync();
 
@@ -152,7 +150,7 @@ namespace FilmMaker.Services.Service
                 var visitRequest = await _context.LocationVisitRequests
                     .Where(x =>
                         x.Id == visitRequestId &&
-                        x.LocationOwnerId == locationOwnerId.Value &&
+                        x.Location.LocationOwnerId == locationOwnerId.Value &&
                         !x.IsDeleted)
                     .Select(x => new LocationVisitRequestResponseDto
                     {
@@ -161,8 +159,8 @@ namespace FilmMaker.Services.Service
                         LocationId = x.LocationId,
                         LocationName = x.Location.LocationName,
 
-                        LocationOwnerId = x.LocationOwnerId,
-                        LocationOwnerName = x.LocationOwner.User.Name,
+                        LocationOwnerId = x.Location.LocationOwnerId,
+                        LocationOwnerName = x.Location.LocationOwner.User.Name,
 
                         LocationManagerId = x.LocationManagerId,
                         LocationManagerName = x.LocationManager.User.Name,
@@ -226,7 +224,7 @@ namespace FilmMaker.Services.Service
 
                 var requests = await _context.LocationVisitRequests
                     .Where(x =>
-                        x.LocationOwnerId == locationOwnerId.Value &&
+                        x.Location.LocationOwnerId == locationOwnerId.Value &&
                         !x.IsDeleted)
                     .OrderByDescending(x => x.CreatedAt)
                     .Select(x => new LocationVisitRequestResponseDto
@@ -236,8 +234,8 @@ namespace FilmMaker.Services.Service
                         LocationId = x.LocationId,
                         LocationName = x.Location.LocationName,
 
-                        LocationOwnerId = x.LocationOwnerId,
-                        LocationOwnerName = x.LocationOwner.User.Name,
+                        LocationOwnerId = x.Location.LocationOwnerId,
+                        LocationOwnerName = x.Location.LocationOwner.User.Name,
 
                         LocationManagerId = x.LocationManagerId,
                         LocationManagerName = x.LocationManager.User.Name,

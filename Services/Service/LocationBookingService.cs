@@ -20,13 +20,21 @@ namespace FilmMaker.Services.Service
             _logger = logger;
         }
 
-        public async Task<ApiResponse<BookingRequestResponseDto>> CreateBookingRequestAsync(int productionCompanyProfileId, CreateBookingRequestDto dto)
+        public async Task<ApiResponse<BookingRequestDto>> CreateBookingRequestAsync(int currentUserId,CreateBookingRequestDto dto)
         {
             try
             {
+                if (dto == null)
+                {
+                    return ApiResponse<BookingRequestDto>.FailureResponse(
+                        "Invalid request.",
+                        "الطلب غير صحيح."
+                    );
+                }
+
                 if (dto.StartDateTime >= dto.EndDateTime)
                 {
-                    return ApiResponse<BookingRequestResponseDto>.FailureResponse(
+                    return ApiResponse<BookingRequestDto>.FailureResponse(
                         "Start time must be before end time.",
                         "وقت البداية يجب أن يكون قبل وقت النهاية."
                     );
@@ -34,56 +42,66 @@ namespace FilmMaker.Services.Service
 
                 if (dto.StartDateTime < DateTime.UtcNow)
                 {
-                    return ApiResponse<BookingRequestResponseDto>.FailureResponse(
+                    return ApiResponse<BookingRequestDto>.FailureResponse(
                         "Cannot book in the past.",
                         "لا يمكن الحجز في تاريخ ماضٍ."
                     );
                 }
 
+                var productionCompanyProfileId = await _context.ProductionCompanyProfiles
+                    .Where(x =>
+                        x.UserId == currentUserId &&
+                        x.IsActive &&
+                        !x.IsDeleted)
+                    .Select(x => (int?)x.Id)
+                    .FirstOrDefaultAsync();
+
+                var locationManagerProfileId = await _context.LocationManagerProfiles
+                    .Where(x =>
+                        x.UserId == currentUserId &&
+                        x.IsActive &&
+                        !x.IsDeleted)
+                    .Select(x => (int?)x.Id)
+                    .FirstOrDefaultAsync();
+
+                var isProductionCompany = productionCompanyProfileId.HasValue;
+                var isLocationManager = locationManagerProfileId.HasValue;
+
+                if (isProductionCompany == isLocationManager)
+                {
+                    return ApiResponse<BookingRequestDto>.FailureResponse(
+                        "User must be either a production company or a location manager to create a booking request.",
+                        "يجب أن يكون المستخدم شركة إنتاج أو مدير موقع لإنشاء طلب حجز."
+                    );
+                }
+
                 var location = await _context.Locations
-                    .FirstOrDefaultAsync(l =>
+                    .Where(l =>
                         l.Id == dto.LocationId &&
                         l.IsActive &&
-                        !l.IsDeleted);
+                        !l.IsDeleted).FirstOrDefaultAsync();
 
                 if (location == null)
                 {
-                    return ApiResponse<BookingRequestResponseDto>.FailureResponse(
+                    return ApiResponse<BookingRequestDto>.FailureResponse(
                         "Location not found or inactive.",
                         "الموقع غير موجود أو غير نشط."
                     );
                 }
 
                 var isFullDay = (dto.EndDateTime - dto.StartDateTime).TotalHours >= 4;
-                var bookingDate = dto.StartDateTime.Date;
 
-                var hasConflict = await _context.LocationBookingRequests
-                    .Where(b =>
-                        b.LocationId == dto.LocationId &&
-                        b.IsActive &&
-                        !b.IsDeleted &&
-                        (b.BookingStatus.Name == "Pending" ||
-                         b.BookingStatus.Name == "Accepted" ||
-                         b.BookingStatus.Name == "Contract Created" ||
-                         b.BookingStatus.Name == "Awaiting Contract Approval" ||
-                         b.BookingStatus.Name == "Contract Signed" ||
-                         b.BookingStatus.Name == "Payment Pending" ||
-                         b.BookingStatus.Name == "Confirmed"))
-                    .AnyAsync(b =>
-                        (isFullDay && b.StartDateTime.Date == bookingDate) ||
-                        (!isFullDay && b.StartDateTime.Date == bookingDate &&
-                         (b.EndDateTime - b.StartDateTime).TotalHours >= 4) ||
-                        (!isFullDay &&
-                         b.StartDateTime.Date == bookingDate &&
-                         b.StartDateTime < dto.EndDateTime &&
-                         b.EndDateTime > dto.StartDateTime)
-                    );
+                var availability = await CheckBookingAvailabilityForCreate(
+                    location.Id,
+                    dto.StartDateTime,
+                    dto.EndDateTime
+                );
 
-                if (hasConflict)
+                if (!availability.CanCreateRequest)
                 {
-                    return ApiResponse<BookingRequestResponseDto>.FailureResponse(
-                        "This location is already booked for the selected time.",
-                        "الموقع محجوز مسبقاً في هذا الوقت."
+                    return ApiResponse<BookingRequestDto>.FailureResponse(
+                        availability.MessageEn,
+                        availability.MessageAr
                     );
                 }
 
@@ -97,87 +115,200 @@ namespace FilmMaker.Services.Service
 
                 if (pendingStatus == null)
                 {
-                    return ApiResponse<BookingRequestResponseDto>.FailureResponse(
-                        "System error: status not found.",
-                        "خطأ في النظام: الحالة غير موجودة."
+                    return ApiResponse<BookingRequestDto>.FailureResponse(
+                        "System error: pending booking status was not found.",
+                        "خطأ في النظام: حالة الحجز قيد الانتظار غير موجودة."
                     );
                 }
 
-                var totalPrice = CalculateTotalPrice(location, dto.StartDateTime, dto.EndDateTime, isFullDay);
+                var totalPrice = CalculateTotalPrice(
+                    location,
+                    dto.StartDateTime,
+                    dto.EndDateTime,
+                    isFullDay
+                );
 
                 var booking = new LocationBookingRequest
                 {
-                    LocationId = dto.LocationId,
+                    LocationId = location.Id,
+
                     StartDateTime = dto.StartDateTime,
                     EndDateTime = dto.EndDateTime,
-                    Message = dto.Message,
-                    ProductionCompanyId = productionCompanyProfileId,
+
+                    Message = string.IsNullOrWhiteSpace(dto.Message)
+                        ? null
+                        : dto.Message.Trim(),
+
                     LocationOwnerId = location.LocationOwnerId,
-                    LocationManagerId = location.LocationManagerId,
+
+                    ProductionCompanyId = isProductionCompany
+                        ? productionCompanyProfileId.Value
+                        : null,
+
+                    LocationManagerId = isLocationManager
+                        ? locationManagerProfileId.Value
+                        : null,
+
                     BookingStatusId = pendingStatus.Id,
                     TotalPrice = totalPrice,
-                    CreatedAt = DateTime.UtcNow
+
+                    CreatedAt = DateTime.UtcNow,
+                    CreatedBy = currentUserId.ToString(),
+                    IsActive = true,
+                    IsDeleted = false
                 };
 
                 _context.LocationBookingRequests.Add(booking);
                 await _context.SaveChangesAsync();
 
                 _logger.LogInformation(
-                    "Booking request created. LocationId: {LocationId}, ProductionCompanyId: {ProductionCompanyId}",
-                    dto.LocationId, productionCompanyProfileId
+                    "Booking request created. LocationId: {LocationId}, UserId: {UserId}, ProductionCompanyId: {ProductionCompanyId}, LocationManagerId: {LocationManagerId}, CalendarColorBeforeCreate: {CalendarColor}",
+                    location.Id,
+                    currentUserId,
+                    booking.ProductionCompanyId,
+                    booking.LocationManagerId,
+                    availability.CalendarColor
                 );
 
-                return ApiResponse<BookingRequestResponseDto>.SuccessResponse(
-                    MapToDto(booking, location, isFullDay, pendingStatus.Name),
-                    "Booking request sent successfully.",
-                    "تم إرسال طلب الحجز بنجاح."
+                var createdBooking = await _context.LocationBookingRequests
+    .Include(b => b.Location)
+        .ThenInclude(l => l.LocationOwner)
+            .ThenInclude(o => o.User)
+    .Include(b => b.BookingStatus)
+    .Include(b => b.LocationManager)
+        .ThenInclude(m => m.User)
+    .Include(b => b.ProductionCompany)
+        .ThenInclude(p => p.User)
+    .FirstOrDefaultAsync(b =>
+        b.Id == booking.Id &&
+        b.IsActive &&
+        !b.IsDeleted);
+
+                if (createdBooking == null)
+                {
+                    return ApiResponse<BookingRequestDto>.FailureResponse(
+                        "Booking request was created, but response could not be loaded.",
+                        "تم إنشاء طلب الحجز، لكن تعذر تحميل بيانات الاستجابة."
+                    );
+                }
+
+                return ApiResponse<BookingRequestDto>.SuccessResponse(
+                    MapToDto(
+                        createdBooking,
+                        createdBooking.Location,
+                        isFullDay,
+                        createdBooking.BookingStatus.Name
+                    ),
+                    availability.HasPendingRequest
+                        ? "Booking request sent successfully. This date already has pending requests."
+                        : "Booking request sent successfully.",
+                    availability.HasPendingRequest
+                        ? "تم إرسال طلب الحجز بنجاح. يوجد طلبات أخرى قيد الانتظار على هذا التاريخ."
+                        : "تم إرسال طلب الحجز بنجاح."
                 );
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex,
-                    "Error creating booking request. LocationId: {LocationId}",
-                    dto.LocationId
+                _logger.LogError(
+                    ex,
+                    "Error creating booking request. LocationId: {LocationId}, UserId: {UserId}",
+                    dto?.LocationId,
+                    currentUserId
                 );
 
-                return ApiResponse<BookingRequestResponseDto>.FailureResponse(
+                return ApiResponse<BookingRequestDto>.FailureResponse(
                     "An error occurred while creating the booking request.",
                     "حدث خطأ أثناء إنشاء طلب الحجز."
                 );
             }
         }
 
-        public async Task<ApiResponse<List<BookingRequestResponseDto>>> GetBookingRequestsAsync(int managerProfileId)
+        public async Task<ApiResponse<List<BookingRequestDto>>> GetMyBookingRequestsAsync(int currentUserId)
         {
             try
             {
-                var requests = await _context.LocationBookingRequests
-                    .Include(b => b.Location)
-                    .Include(b => b.BookingStatus)
+                var productionCompanyProfileId = await _context.ProductionCompanyProfiles
+                    .Where(x =>
+                        x.UserId == currentUserId &&
+                        x.IsActive &&
+                        !x.IsDeleted)
+                    .Select(x => (int?)x.Id)
+                    .FirstOrDefaultAsync();
+
+                var locationManagerProfileId = await _context.LocationManagerProfiles
+                    .Where(x =>
+                        x.UserId == currentUserId &&
+                        x.IsActive &&
+                        !x.IsDeleted)
+                    .Select(x => (int?)x.Id)
+                    .FirstOrDefaultAsync();
+
+                var isProductionCompany = productionCompanyProfileId.HasValue;
+                var isLocationManager = locationManagerProfileId.HasValue;
+
+                if (isProductionCompany == isLocationManager)
+                {
+                    return ApiResponse<List<BookingRequestDto>>.FailureResponse(
+                        "User must be either a production company or a location manager.",
+                        "يجب أن يكون المستخدم إما شركة إنتاج أو مدير موقع."
+                    );
+                }
+
+                var query = _context.LocationBookingRequests
                     .Where(b =>
-                        b.LocationManagerId == managerProfileId &&
                         b.IsActive &&
-                        !b.IsDeleted)
+                        !b.IsDeleted);
+
+                if (isProductionCompany)
+                {
+                    query = query.Where(b =>
+                        b.ProductionCompanyId == productionCompanyProfileId.Value);
+                }
+                else
+                {
+                    query = query.Where(b =>
+                        b.LocationManagerId == locationManagerProfileId.Value);
+                }
+
+                var requests = await query
                     .OrderByDescending(b => b.CreatedAt)
-                    .Select(b => new BookingRequestResponseDto
+                    .Select(b => new BookingRequestDto
                     {
                         Id = b.Id,
+
                         LocationId = b.LocationId,
                         LocationName = b.Location.LocationName,
                         City = b.Location.City,
+
                         StartDateTime = b.StartDateTime,
                         EndDateTime = b.EndDateTime,
                         IsFullDay = (b.EndDateTime - b.StartDateTime).TotalHours >= 4,
+
                         Status = b.BookingStatus.Name,
                         Message = b.Message,
                         TotalPrice = b.TotalPrice,
+
                         LocationOwnerId = b.LocationOwnerId,
+                        LocationOwnerName = b.LocationOwner.User.Name,
                         LocationManagerId = b.LocationManagerId,
+                        LocationManagerName = b.LocationManager.User.Name,
+                        ProductionCompanyId = b.ProductionCompanyId,
+                        ProductionCompanyName = b.ProductionCompany.User.Name,
+
                         CreatedAt = b.CreatedAt
                     })
                     .ToListAsync();
 
-                return ApiResponse<List<BookingRequestResponseDto>>.SuccessResponse(
+                if (!requests.Any())
+                { 
+                    return ApiResponse<List<BookingRequestDto>>.SuccessResponse(
+                        requests,
+                        "No booking requests found.",
+                        "لا توجد طلبات حجز."
+                    );
+                }
+
+                return ApiResponse<List<BookingRequestDto>>.SuccessResponse(
                     requests,
                     "Booking requests retrieved successfully.",
                     "تم جلب طلبات الحجز بنجاح."
@@ -185,72 +316,194 @@ namespace FilmMaker.Services.Service
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex,
-                    "Error getting booking requests for manager {ManagerProfileId}",
-                    managerProfileId
+                _logger.LogError(
+                    ex,
+                    "Error getting booking requests for user {UserId}",
+                    currentUserId
                 );
 
-                return ApiResponse<List<BookingRequestResponseDto>>.FailureResponse(
+                return ApiResponse<List<BookingRequestDto>>.FailureResponse(
                     "An error occurred while retrieving booking requests.",
                     "حدث خطأ أثناء جلب طلبات الحجز."
                 );
             }
         }
 
-        public async Task<ApiResponse<BookingRequestResponseDto>> GetBookingRequestByIdAsync(int requestId, int managerProfileId)
+        public async Task<ApiResponse<BookingRequestDto>> GetBookingRequestByIdAsync(int requestId,int currentUserId)
         {
             try
             {
-                var request = await _context.LocationBookingRequests
-                    .Include(b => b.Location)
-                    .Include(b => b.BookingStatus)
-                    .FirstOrDefaultAsync(b =>
+                var productionCompanyProfileId = await _context.ProductionCompanyProfiles
+                    .Where(x =>
+                        x.UserId == currentUserId &&
+                        x.IsActive &&
+                        !x.IsDeleted)
+                    .Select(x => (int?)x.Id)
+                    .FirstOrDefaultAsync();
+
+                var locationManagerProfileId = await _context.LocationManagerProfiles
+                    .Where(x =>
+                        x.UserId == currentUserId &&
+                        x.IsActive &&
+                        !x.IsDeleted)
+                    .Select(x => (int?)x.Id)
+                    .FirstOrDefaultAsync();
+
+                var isProductionCompany = productionCompanyProfileId.HasValue;
+                var isLocationManager = locationManagerProfileId.HasValue;
+
+                if (isProductionCompany == isLocationManager)
+                {
+                    return ApiResponse<BookingRequestDto>.FailureResponse(
+                        "User must be either a production company or a location manager.",
+                        "يجب أن يكون المستخدم إما شركة إنتاج أو مدير موقع."
+                    );
+                }
+
+                var query = _context.LocationBookingRequests
+                    .Where(b =>
                         b.Id == requestId &&
-                        b.LocationManagerId == managerProfileId &&
                         b.IsActive &&
                         !b.IsDeleted);
 
-                if (request == null)
+                if (isProductionCompany)
                 {
-                    return ApiResponse<BookingRequestResponseDto>.FailureResponse(
+                    query = query.Where(b =>
+                        b.ProductionCompanyId == productionCompanyProfileId.Value);
+                }
+                else
+                {
+                    query = query.Where(b =>
+                        b.LocationManagerId == locationManagerProfileId.Value);
+                }
+
+                var response = await query
+                    .Select(b => new BookingRequestDto
+                    {
+                        Id = b.Id,
+
+                        LocationId = b.LocationId,
+                        LocationName = b.Location.LocationName,
+                        City = b.Location.City,
+
+                        StartDateTime = b.StartDateTime,
+                        EndDateTime = b.EndDateTime,
+                        IsFullDay = (b.EndDateTime - b.StartDateTime).TotalHours >= 4,
+
+                        Status = b.BookingStatus.Name,
+                        Message = b.Message,
+                        TotalPrice = b.TotalPrice,
+
+                        LocationOwnerId = b.LocationOwnerId,
+                        LocationOwnerName = b.LocationOwner.User.Name,
+                        LocationManagerId = b.LocationManagerId,
+                        LocationManagerName = b.LocationManager.User.Name,
+                        ProductionCompanyId = b.ProductionCompanyId,
+                        ProductionCompanyName = b.ProductionCompany.User.Name,
+
+                        CreatedAt = b.CreatedAt
+                    })
+                    .FirstOrDefaultAsync();
+
+                if (response == null)
+                {
+                    return ApiResponse<BookingRequestDto>.FailureResponse(
                         "Booking request not found.",
                         "طلب الحجز غير موجود."
                     );
                 }
 
-                return ApiResponse<BookingRequestResponseDto>.SuccessResponse(
-                    MapToDto(request, request.Location),
+                return ApiResponse<BookingRequestDto>.SuccessResponse(
+                    response,
                     "Booking request retrieved successfully.",
                     "تم جلب طلب الحجز بنجاح."
                 );
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting booking request {RequestId}", requestId);
+                _logger.LogError(
+                    ex,
+                    "Error getting booking request {RequestId} for user {UserId}",
+                    requestId,
+                    currentUserId
+                );
 
-                return ApiResponse<BookingRequestResponseDto>.FailureResponse(
+                return ApiResponse<BookingRequestDto>.FailureResponse(
                     "An error occurred while retrieving the booking request.",
                     "حدث خطأ أثناء جلب طلب الحجز."
                 );
             }
         }
 
-        public async Task<ApiResponse<BookingRequestResponseDto>> UpdateBookingRequestAsync(int requestId, int managerProfileId, UpdateBookingRequestDto dto)
+        public async Task<ApiResponse<BookingRequestDto>> UpdateBookingRequestAsync(int currentUserId,UpdateBookingRequestDto dto)
         {
             try
             {
-                var request = await _context.LocationBookingRequests
+                if (dto == null)
+                {
+                    return ApiResponse<BookingRequestDto>.FailureResponse(
+                        "Invalid request.",
+                        "الطلب غير صحيح."
+                    );
+                }
+
+                var productionCompanyProfileId = await _context.ProductionCompanyProfiles
+                    .Where(x =>
+                        x.UserId == currentUserId &&
+                        x.IsActive &&
+                        !x.IsDeleted)
+                    .Select(x => (int?)x.Id)
+                    .FirstOrDefaultAsync();
+
+                var locationManagerProfileId = await _context.LocationManagerProfiles
+                    .Where(x =>
+                        x.UserId == currentUserId &&
+                        x.IsActive &&
+                        !x.IsDeleted)
+                    .Select(x => (int?)x.Id)
+                    .FirstOrDefaultAsync();
+
+                var isProductionCompany = productionCompanyProfileId.HasValue;
+                var isLocationManager = locationManagerProfileId.HasValue;
+
+                if (isProductionCompany == isLocationManager)
+                {
+                    return ApiResponse<BookingRequestDto>.FailureResponse(
+                        "User must be either a production company or a location manager.",
+                        "يجب أن يكون المستخدم إما شركة إنتاج أو مدير موقع."
+                    );
+                }
+
+                var query = _context.LocationBookingRequests
                     .Include(b => b.BookingStatus)
                     .Include(b => b.Location)
-                    .FirstOrDefaultAsync(b =>
-                        b.Id == requestId &&
-                        b.LocationManagerId == managerProfileId &&
+                    .ThenInclude(l => l.LocationOwner)
+                    .ThenInclude(o => o.User)
+                    .Include(b => b.LocationManager)
+                    .ThenInclude(m => m.User)
+                    .Include(b => b.ProductionCompany)
+                    .ThenInclude(p => p.User)
+                    .Where(b =>
+                        b.Id == dto.requestId &&
                         b.IsActive &&
                         !b.IsDeleted);
 
+                if (isProductionCompany)
+                {
+                    query = query.Where(b =>
+                        b.ProductionCompanyId == productionCompanyProfileId.Value);
+                }
+                else
+                {
+                    query = query.Where(b =>
+                        b.LocationManagerId == locationManagerProfileId.Value);
+                }
+
+                var request = await query.FirstOrDefaultAsync();
+
                 if (request == null)
                 {
-                    return ApiResponse<BookingRequestResponseDto>.FailureResponse(
+                    return ApiResponse<BookingRequestDto>.FailureResponse(
                         "Booking request not found.",
                         "طلب الحجز غير موجود."
                     );
@@ -258,7 +511,7 @@ namespace FilmMaker.Services.Service
 
                 if (request.BookingStatus.Name != "Pending")
                 {
-                    return ApiResponse<BookingRequestResponseDto>.FailureResponse(
+                    return ApiResponse<BookingRequestDto>.FailureResponse(
                         "Only pending requests can be updated.",
                         "يمكن تعديل الطلبات المعلقة فقط."
                     );
@@ -269,7 +522,7 @@ namespace FilmMaker.Services.Service
 
                 if (finalStart >= finalEnd)
                 {
-                    return ApiResponse<BookingRequestResponseDto>.FailureResponse(
+                    return ApiResponse<BookingRequestDto>.FailureResponse(
                         "Start time must be before end time.",
                         "وقت البداية يجب أن يكون قبل وقت النهاية."
                     );
@@ -277,92 +530,133 @@ namespace FilmMaker.Services.Service
 
                 if (finalStart < DateTime.UtcNow)
                 {
-                    return ApiResponse<BookingRequestResponseDto>.FailureResponse(
+                    return ApiResponse<BookingRequestDto>.FailureResponse(
                         "Cannot book in the past.",
                         "لا يمكن الحجز في تاريخ ماضٍ."
                     );
                 }
 
                 var isFullDay = (finalEnd - finalStart).TotalHours >= 4;
-                var bookingDate = finalStart.Date;
 
-                var hasConflict = await _context.LocationBookingRequests
-                    .Where(b =>
-                        b.LocationId == request.LocationId &&
-                        b.Id != requestId &&
-                        b.IsActive &&
-                        !b.IsDeleted &&
-                        (b.BookingStatus.Name == "Pending" ||
-                         b.BookingStatus.Name == "Accepted" ||
-                         b.BookingStatus.Name == "Contract Created" ||
-                         b.BookingStatus.Name == "Awaiting Contract Approval" ||
-                         b.BookingStatus.Name == "Contract Signed" ||
-                         b.BookingStatus.Name == "Payment Pending" ||
-                         b.BookingStatus.Name == "Confirmed"))
-                    .AnyAsync(b =>
-                        (isFullDay && b.StartDateTime.Date == bookingDate) ||
-                        (!isFullDay && b.StartDateTime.Date == bookingDate &&
-                         (b.EndDateTime - b.StartDateTime).TotalHours >= 4) ||
-                        (!isFullDay &&
-                         b.StartDateTime.Date == bookingDate &&
-                         b.StartDateTime < finalEnd &&
-                         b.EndDateTime > finalStart)
-                    );
+                var availability = await CheckBookingAvailabilityForUpdate(
+                    request.LocationId,
+                    request.Id,
+                    finalStart,
+                    finalEnd
+                );
 
-                if (hasConflict)
+                if (!availability.CanCreateRequest)
                 {
-                    return ApiResponse<BookingRequestResponseDto>.FailureResponse(
-                        "This location is already booked for the selected time.",
-                        "الموقع محجوز مسبقاً في هذا الوقت."
+                    return ApiResponse<BookingRequestDto>.FailureResponse(
+                        availability.MessageEn,
+                        availability.MessageAr
                     );
                 }
 
-                if (dto.StartDateTime.HasValue)
-                    request.StartDateTime = dto.StartDateTime.Value;
-
-                if (dto.EndDateTime.HasValue)
-                    request.EndDateTime = dto.EndDateTime.Value;
+                request.StartDateTime = finalStart;
+                request.EndDateTime = finalEnd;
 
                 if (dto.Message is not null)
-                    request.Message = dto.Message;
+                {
+                    request.Message = string.IsNullOrWhiteSpace(dto.Message)
+                        ? null
+                        : dto.Message.Trim();
+                }
 
-                if (dto.StartDateTime.HasValue || dto.EndDateTime.HasValue)
-                    request.TotalPrice = CalculateTotalPrice(request.Location, finalStart, finalEnd, isFullDay);
+                request.TotalPrice = CalculateTotalPrice(
+                    request.Location,
+                    finalStart,
+                    finalEnd,
+                    isFullDay
+                );
 
                 request.UpdatedAt = DateTime.UtcNow;
+                request.UpdatedBy = currentUserId.ToString();
 
                 await _context.SaveChangesAsync();
 
-                _logger.LogInformation("Booking request {RequestId} updated", requestId);
+                _logger.LogInformation(
+                    "Booking request {RequestId} updated by UserId {UserId}",
+                    dto.requestId,
+                    currentUserId
+                );
 
-                return ApiResponse<BookingRequestResponseDto>.SuccessResponse(
-                    MapToDto(request, request.Location, isFullDay),
-                    "Booking request updated successfully.",
-                    "تم تعديل طلب الحجز بنجاح."
+                return ApiResponse<BookingRequestDto>.SuccessResponse(
+                    MapToDto(request, request.Location, isFullDay, request.BookingStatus.Name),
+                    availability.HasPendingRequest
+                        ? "Booking request updated successfully. This date already has pending requests."
+                        : "Booking request updated successfully.",
+                    availability.HasPendingRequest
+                        ? "تم تعديل طلب الحجز بنجاح. يوجد طلبات أخرى قيد الانتظار على هذا التاريخ."
+                        : "تم تعديل طلب الحجز بنجاح."
                 );
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error updating booking request {RequestId}", requestId);
+                _logger.LogError(
+                    ex,
+                    "Error updating booking request {RequestId} for UserId {UserId}",
+                    dto.requestId,
+                    currentUserId
+                );
 
-                return ApiResponse<BookingRequestResponseDto>.FailureResponse(
+                return ApiResponse<BookingRequestDto>.FailureResponse(
                     "An error occurred while updating the booking request.",
                     "حدث خطأ أثناء تعديل طلب الحجز."
                 );
             }
         }
 
-        public async Task<ApiResponse<bool>> CancelBookingRequestAsync(int requestId, int managerProfileId)
+        public async Task<ApiResponse<bool>> CancelBookingRequestAsync(int requestId,int currentUserId)
         {
             try
             {
-                var request = await _context.LocationBookingRequests
+                var productionCompanyProfileId = await _context.ProductionCompanyProfiles
+                    .Where(x =>
+                        x.UserId == currentUserId &&
+                        x.IsActive &&
+                        !x.IsDeleted)
+                    .Select(x => (int?)x.Id)
+                    .FirstOrDefaultAsync();
+
+                var locationManagerProfileId = await _context.LocationManagerProfiles
+                    .Where(x =>
+                        x.UserId == currentUserId &&
+                        x.IsActive &&
+                        !x.IsDeleted)
+                    .Select(x => (int?)x.Id)
+                    .FirstOrDefaultAsync();
+
+                var isProductionCompany = productionCompanyProfileId.HasValue;
+                var isLocationManager = locationManagerProfileId.HasValue;
+
+                if (isProductionCompany == isLocationManager)
+                {
+                    return ApiResponse<bool>.FailureResponse(
+                        "User must be either a production company or a location manager.",
+                        "يجب أن يكون المستخدم إما شركة إنتاج أو مدير موقع."
+                    );
+                }
+
+                var query = _context.LocationBookingRequests
                     .Include(b => b.BookingStatus)
-                    .FirstOrDefaultAsync(b =>
+                    .Where(b =>
                         b.Id == requestId &&
-                        b.LocationManagerId == managerProfileId &&
                         b.IsActive &&
                         !b.IsDeleted);
+
+                if (isProductionCompany)
+                {
+                    query = query.Where(b =>
+                        b.ProductionCompanyId == productionCompanyProfileId.Value);
+                }
+                else
+                {
+                    query = query.Where(b =>
+                        b.LocationManagerId == locationManagerProfileId.Value);
+                }
+
+                var request = await query.FirstOrDefaultAsync();
 
                 if (request == null)
                 {
@@ -380,13 +674,35 @@ namespace FilmMaker.Services.Service
                     );
                 }
 
-                request.IsDeleted = true;
+                var cancelledStatus = await _context.LookupItems
+                    .Include(x => x.LookupCategory)
+                    .FirstOrDefaultAsync(x =>
+                        x.Name == "Cancelled" &&
+                        x.LookupCategory.Name == "BookingStatus" &&
+                        x.IsActive &&
+                        !x.IsDeleted);
+
+                if (cancelledStatus == null)
+                {
+                    return ApiResponse<bool>.FailureResponse(
+                        "Cancelled booking status was not found in lookup data.",
+                        "حالة إلغاء الحجز غير موجودة في بيانات النظام."
+                    );
+                }
+
+                request.BookingStatusId = cancelledStatus.Id;
                 request.IsActive = false;
+                request.IsDeleted = true;
                 request.UpdatedAt = DateTime.UtcNow;
+                request.UpdatedBy = currentUserId.ToString();
 
                 await _context.SaveChangesAsync();
 
-                _logger.LogInformation("Booking request {RequestId} cancelled", requestId);
+                _logger.LogInformation(
+                    "Booking request {RequestId} cancelled by UserId {UserId}",
+                    requestId,
+                    currentUserId
+                );
 
                 return ApiResponse<bool>.SuccessResponse(
                     true,
@@ -396,7 +712,12 @@ namespace FilmMaker.Services.Service
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error cancelling booking request {RequestId}", requestId);
+                _logger.LogError(
+                    ex,
+                    "Error cancelling booking request {RequestId} for UserId {UserId}",
+                    requestId,
+                    currentUserId
+                );
 
                 return ApiResponse<bool>.FailureResponse(
                     "An error occurred while cancelling the booking request.",
@@ -405,24 +726,159 @@ namespace FilmMaker.Services.Service
             }
         }
 
-        private static decimal CalculateTotalPrice(Location location, DateTime start, DateTime end, bool isFullDay)
+
+        public async Task<ApiResponse<List<LocationBookingCalendarDayDto>>> GetLocationBookingCalendarAsync(int locationId,DateTime fromDate,DateTime toDate)
+        {
+            try
+            {
+                if (fromDate.Date > toDate.Date)
+                {
+                    return ApiResponse<List<LocationBookingCalendarDayDto>>.FailureResponse(
+                        "From date must be before or equal to to date.",
+                        "تاريخ البداية يجب أن يكون قبل أو يساوي تاريخ النهاية."
+                    );
+                }
+
+                var locationExists = await _context.Locations
+                    .AnyAsync(x =>
+                        x.Id == locationId &&
+                        x.IsActive &&
+                        !x.IsDeleted);
+
+                if (!locationExists)
+                {
+                    return ApiResponse<List<LocationBookingCalendarDayDto>>.FailureResponse(
+                        "Location not found or inactive.",
+                        "الموقع غير موجود أو غير نشط."
+                    );
+                }
+
+                var from = fromDate.Date;
+                var to = toDate.Date;
+
+                var bookedStatuses = new[]
+                {
+                    "Accepted",
+                    "Confirmed",
+                    "Contract Created",
+                    "Awaiting Contract Approval",
+                    "Contract Signed",
+                    "Payment Pending"
+                };
+
+                var bookings = await _context.LocationBookingRequests
+                    .Where(x =>
+                        x.LocationId == locationId &&
+                        x.IsActive &&
+                        !x.IsDeleted &&
+                        x.StartDateTime.Date <= to &&
+                        x.EndDateTime.Date >= from &&
+                        (
+                            x.BookingStatus.Name == "Pending" ||
+                            bookedStatuses.Contains(x.BookingStatus.Name)
+                        ))
+                    .Select(x => new
+                    {
+                        x.Id,
+                        x.StartDateTime,
+                        x.EndDateTime,
+                        StatusName = x.BookingStatus.Name
+                    })
+                    .ToListAsync();
+
+                var result = new List<LocationBookingCalendarDayDto>();
+
+                for (var day = from; day <= to; day = day.AddDays(1))
+                {
+                    var dayBookings = bookings
+                        .Where(x =>
+                            x.StartDateTime.Date <= day &&
+                            x.EndDateTime.Date >= day)
+                        .ToList();
+
+                    var bookedCount = dayBookings.Count(x =>
+                        bookedStatuses.Contains(x.StatusName));
+
+                    var pendingCount = dayBookings.Count(x =>
+                        x.StatusName == "Pending");
+
+                    var isBooked = bookedCount > 0;
+                    var hasPendingRequest = pendingCount > 0;
+                    var isAvailable = !isBooked && !hasPendingRequest;
+
+                    var status = isBooked
+                        ? "Booked"
+                        : hasPendingRequest
+                            ? "Pending"
+                            : "Available";
+
+                    result.Add(new LocationBookingCalendarDayDto
+                    {
+                        Date = day,
+
+                        IsBooked = isBooked,
+                        HasPendingRequest = hasPendingRequest,
+                        IsAvailable = isAvailable,
+
+                        CanRequest = !isBooked,
+
+                        PendingCount = pendingCount,
+                        BookedCount = bookedCount,
+
+                        Status = status
+                    });
+                }
+
+                return ApiResponse<List<LocationBookingCalendarDayDto>>.SuccessResponse(
+                    result,
+                    "Location booking calendar fetched successfully.",
+                    "تم جلب تقويم حجوزات الموقع بنجاح."
+                );
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Error while fetching location booking calendar. LocationId: {LocationId}, FromDate: {FromDate}, ToDate: {ToDate}",
+                    locationId,
+                    fromDate,
+                    toDate
+                );
+
+                return ApiResponse<List<LocationBookingCalendarDayDto>>.FailureResponse(
+                    "An unexpected error occurred while fetching booking calendar.",
+                    "حدث خطأ غير متوقع أثناء جلب تقويم الحجوزات."
+                );
+            }
+        }
+
+
+
+
+        #region Helper Methods
+
+
+        private static decimal CalculateTotalPrice(Location location,DateTime start,DateTime end,bool isFullDay)
         {
             if (isFullDay)
                 return location.DailyPrice;
 
             var hours = (decimal)(end - start).TotalHours;
-            return hours * (location.HourlyPrice ?? location.DailyPrice);
+
+            if (hours <= 0)
+                return 0;
+
+            if (location.HourlyPrice == null || location.HourlyPrice <= 0)
+                return location.DailyPrice;
+
+            return hours * location.HourlyPrice.Value;
         }
 
-        private static BookingRequestResponseDto MapToDto(
-            LocationBookingRequest request,
-            Location location,
-            bool? isFullDay = null,
-            string? statusName = null)
+        private static BookingRequestDto MapToDto(LocationBookingRequest request,Location location,bool? isFullDay = null,string? statusName = null)
         {
             var fullDay = isFullDay ?? (request.EndDateTime - request.StartDateTime).TotalHours >= 4;
 
-            return new BookingRequestResponseDto
+            return new BookingRequestDto
             {
                 Id = request.Id,
                 LocationId = request.LocationId,
@@ -435,9 +891,176 @@ namespace FilmMaker.Services.Service
                 Message = request.Message,
                 TotalPrice = request.TotalPrice,
                 LocationOwnerId = request.LocationOwnerId,
+                LocationOwnerName = location.LocationOwner?.User?.Name ?? string.Empty,
+
                 LocationManagerId = request.LocationManagerId,
+                LocationManagerName = request.LocationManager?.User?.Name,
+
+                ProductionCompanyId = request.ProductionCompanyId,
+                ProductionCompanyName = request.ProductionCompany?.User?.Name,
+
                 CreatedAt = request.CreatedAt
             };
         }
+
+
+        private class BookingAvailabilityCheckResult
+        {
+            public bool CanCreateRequest { get; set; }
+
+            public bool HasBookedConflict { get; set; }
+
+            public bool HasPendingRequest { get; set; }
+
+            public string CalendarColor { get; set; } = "Green";
+
+            public string MessageEn { get; set; } = string.Empty;
+
+            public string MessageAr { get; set; } = string.Empty;
+        }
+
+        private async Task<BookingAvailabilityCheckResult> CheckBookingAvailabilityForCreate(int locationId,DateTime startDateTime,DateTime endDateTime)
+        {
+            var startDate = startDateTime.Date;
+            var endDate = endDateTime.Date;
+
+            var redStatuses = new[]
+            {
+                "Accepted",
+                "Confirmed",
+                "Contract Created",
+                "Awaiting Contract Approval",
+                "Contract Signed",
+                "Payment Pending"
+            };
+
+            var hasBookedConflict = await _context.LocationBookingRequests
+                .AnyAsync(b =>
+                    b.LocationId == locationId &&
+                    b.IsActive &&
+                    !b.IsDeleted &&
+                    redStatuses.Contains(b.BookingStatus.Name) &&
+                    b.StartDateTime.Date <= endDate &&
+                    b.EndDateTime.Date >= startDate);
+
+            if (hasBookedConflict)
+            {
+                return new BookingAvailabilityCheckResult
+                {
+                    CanCreateRequest = false,
+                    HasBookedConflict = true,
+                    HasPendingRequest = false,
+                    CalendarColor = "Red",
+                    MessageEn = "This location is already booked for the selected date.",
+                    MessageAr = "هذا الموقع محجوز في التاريخ المحدد."
+                };
+            }
+
+            var hasPendingRequest = await _context.LocationBookingRequests
+                .AnyAsync(b =>
+                    b.LocationId == locationId &&
+                    b.IsActive &&
+                    !b.IsDeleted &&
+                    b.BookingStatus.Name == "Pending" &&
+                    b.StartDateTime.Date <= endDate &&
+                    b.EndDateTime.Date >= startDate);
+
+            if (hasPendingRequest)
+            {
+                return new BookingAvailabilityCheckResult
+                {
+                    CanCreateRequest = true,
+                    HasBookedConflict = false,
+                    HasPendingRequest = true,
+                    CalendarColor = "Orange",
+                    MessageEn = "This location has pending booking requests, but new requests are allowed.",
+                    MessageAr = "يوجد طلبات حجز قيد الانتظار على هذا الموقع، لكن يمكن إرسال طلب جديد."
+                };
+            }
+
+            return new BookingAvailabilityCheckResult
+            {
+                CanCreateRequest = true,
+                HasBookedConflict = false,
+                HasPendingRequest = false,
+                CalendarColor = "Green",
+                MessageEn = "This location is available.",
+                MessageAr = "هذا الموقع متاح."
+            };
+        }
+
+
+        private async Task<BookingAvailabilityCheckResult> CheckBookingAvailabilityForUpdate(int locationId,int currentBookingRequestId,DateTime startDateTime,DateTime endDateTime)
+        {
+            var startDate = startDateTime.Date;
+            var endDate = endDateTime.Date;
+
+            var redStatuses = new[]
+            {
+                "Accepted",
+                "Confirmed",
+                "Contract Created",
+                "Awaiting Contract Approval",
+                "Contract Signed",
+                "Payment Pending"
+            };
+
+            var hasBookedConflict = await _context.LocationBookingRequests
+                .AnyAsync(b =>
+                    b.Id != currentBookingRequestId &&
+                    b.LocationId == locationId &&
+                    b.IsActive &&
+                    !b.IsDeleted &&
+                    redStatuses.Contains(b.BookingStatus.Name) &&
+                    b.StartDateTime.Date <= endDate &&
+                    b.EndDateTime.Date >= startDate);
+
+            if (hasBookedConflict)
+            {
+                return new BookingAvailabilityCheckResult
+                {
+                    CanCreateRequest = false,
+                    HasBookedConflict = true,
+                    HasPendingRequest = false,
+                    CalendarColor = "Red",
+                    MessageEn = "This location is already booked for the selected date.",
+                    MessageAr = "هذا الموقع محجوز في التاريخ المحدد."
+                };
+            }
+
+            var hasPendingRequest = await _context.LocationBookingRequests
+                .AnyAsync(b =>
+                    b.Id != currentBookingRequestId &&
+                    b.LocationId == locationId &&
+                    b.IsActive &&
+                    !b.IsDeleted &&
+                    b.BookingStatus.Name == "Pending" &&
+                    b.StartDateTime.Date <= endDate &&
+                    b.EndDateTime.Date >= startDate);
+
+            if (hasPendingRequest)
+            {
+                return new BookingAvailabilityCheckResult
+                {
+                    CanCreateRequest = true,
+                    HasBookedConflict = false,
+                    HasPendingRequest = true,
+                    CalendarColor = "Orange",
+                    MessageEn = "This location has pending booking requests, but updates are allowed.",
+                    MessageAr = "يوجد طلبات حجز قيد الانتظار على هذا الموقع، لكن يمكن تعديل الطلب."
+                };
+            }
+
+            return new BookingAvailabilityCheckResult
+            {
+                CanCreateRequest = true,
+                HasBookedConflict = false,
+                HasPendingRequest = false,
+                CalendarColor = "Green",
+                MessageEn = "This location is available.",
+                MessageAr = "هذا الموقع متاح."
+            };
+        }
+        #endregion
     }
 }

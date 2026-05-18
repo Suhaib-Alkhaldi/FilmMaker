@@ -9,6 +9,7 @@
         public DateTime RequestedVisitDateUtc { get; set; }
         public string Status { get; set; } = string.Empty; 
         public int LocationOwnerId { get; set; }
+        public string LocationOwnerName { get; set; }
         public int LocationManagerId { get; set; }
         public string? RequestMessage { get; set; }
         public string? OwnerResponseMessage { get; set; }
