@@ -6,11 +6,7 @@ namespace FilmMaker.Entities
     {
         public string LocationName { get; set; } = string.Empty;
         public string LocationDescription { get; set; } = string.Empty;
-        public int CityId { get; set; }
-
-        [ForeignKey("CityId")]
-        public LookupItem City { get; set; } 
-
+        public string City { get; set; } = string.Empty;
         public string? Address { get; set; }
         public decimal DailyPrice { get; set; }
         public int LocationOwnerId { get; set; }
