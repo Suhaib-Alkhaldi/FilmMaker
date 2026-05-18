@@ -101,11 +101,7 @@ namespace FilmMaker.Entities
             .HasForeignKey(x => x.ServiceId)
             .OnDelete(DeleteBehavior.NoAction);
 
-            modelBuilder.Entity<Location>()
-             .HasOne(x => x.City)
-             .WithMany()
-             .HasForeignKey(x => x.CityId)
-             .OnDelete(DeleteBehavior.NoAction);
+          
 
             modelBuilder.Entity<LocationBookingRequest>()
                 .HasOne(x => x.LocationManager)

@@ -90,7 +90,7 @@ namespace FilmMaker.Services.Service
 
             LocationId = booking.LocationId,
             LocationName = booking.Location?.LocationName,
-            LocationCity = booking.Location?.City?.Name,
+            LocationCity = booking.Location?.City,
             LocationAddress = booking.Location?.Address,
 
             Latitude = booking.LocationId == null
