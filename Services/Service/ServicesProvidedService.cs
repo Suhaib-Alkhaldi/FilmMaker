@@ -285,11 +285,13 @@ namespace FilmMaker.Services.Service
         {
             try
             {
+
+
                 var services = await _context.ServicesProvided
                     .Include(s => s.ServiceType)
                     .Include(s => s.ServiceProvider)
                         .ThenInclude(sp => sp.User)
-                    .Where(s => s.ServiceProviderId == currentUserId && !s.IsDeleted)
+                    .Where(s => s.ServiceProvider.UserId == currentUserId && !s.IsDeleted)
                     .Select(s => MapToDTO(s))
                     .ToListAsync();
 
