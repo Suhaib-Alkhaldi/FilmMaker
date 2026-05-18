@@ -12,9 +12,9 @@ namespace FilmMaker.Services.Service
     public class ProfileService : IProfileService
     {
         private readonly FilmMakerDbContext _context;
-        private readonly ILogger<AuthService> _logger;
+        private readonly ILogger<ProfileService> _logger;
 
-        public ProfileService(FilmMakerDbContext context, ILogger<AuthService> logger)
+        public ProfileService(FilmMakerDbContext context, ILogger<ProfileService> logger)
         {
             _context = context;
             _logger = logger;
@@ -1123,7 +1123,7 @@ namespace FilmMaker.Services.Service
             if (hasInvalidProductionType)
             {
                 return ApiResponse<ProductionCompanyProfileResponseDto>.FailureResponse(
-                    "One or more selected production types are invalid.",
+                    "One or more selected ProductionTypes are invalid.",
                     "واحد أو أكثر من أنواع الإنتاج المحددة غير صحيح."
                 );
             }
@@ -1207,7 +1207,7 @@ namespace FilmMaker.Services.Service
                 request.CustomServiceTypes.Any(x => string.IsNullOrWhiteSpace(x)))
             {
                 return ApiResponse<ServiceProviderProfileResponseDto>.FailureResponse(
-                    "Custom service types cannot contain empty values.",
+                    "Custom ServiceTypes cannot contain empty values.",
                     "أنواع الخدمات المخصصة لا يمكن أن تحتوي على قيم فارغة."
                 );
             }
@@ -1225,7 +1225,7 @@ namespace FilmMaker.Services.Service
             var validServiceTypeIds = await _context.LookupItems
                 .Where(x =>
                     distinctServiceTypeIds.Contains(x.Id) &&
-                    x.LookupCategory.Name == "Service Type" &&
+                    x.LookupCategory.Name == "ServiceType" &&
                     !x.IsDeleted)
                 .Select(x => x.Id)
                 .ToListAsync();
@@ -1236,7 +1236,7 @@ namespace FilmMaker.Services.Service
             if (hasInvalidServiceType)
             {
                 return ApiResponse<ServiceProviderProfileResponseDto>.FailureResponse(
-                    "One or more selected service types are invalid.",
+                    "One or more selected ServiceTypes are invalid.",
                     "واحد أو أكثر من أنواع الخدمات المحددة غير صحيح."
                 );
             }
