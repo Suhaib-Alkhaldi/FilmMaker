@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FilmMaker.Migrations
 {
     [DbContext(typeof(FilmMakerDbContext))]
-    [Migration("20260511095218_AddDb")]
-    partial class AddDb
+    [Migration("20260514082119_AddVisitSeeding")]
+    partial class AddVisitSeeding
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -390,6 +390,9 @@ namespace FilmMaker.Migrations
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("EndDateTime")
+                        .HasColumnType("datetime2");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
@@ -405,17 +408,13 @@ namespace FilmMaker.Migrations
                     b.Property<int>("LocationOwnerId")
                         .HasColumnType("int");
 
+                    b.Property<string>("Message")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("ProductionCompanyId")
                         .HasColumnType("int");
 
-                    b.Property<string>("RequestDetails")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("RequestedAtUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("ShootingDate")
+                    b.Property<DateTime>("StartDateTime")
                         .HasColumnType("datetime2");
 
                     b.Property<decimal>("TotalPrice")
@@ -440,6 +439,54 @@ namespace FilmMaker.Migrations
                     b.HasIndex("ProductionCompanyId");
 
                     b.ToTable("LocationBookingRequests");
+                });
+
+            modelBuilder.Entity("FilmMaker.Entities.LocationManagementRequest", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("LocationId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LocationManagerProfileId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Message")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LocationId");
+
+                    b.HasIndex("LocationManagerProfileId");
+
+                    b.ToTable("LocationManagementRequests");
                 });
 
             modelBuilder.Entity("FilmMaker.Entities.LocationManagerCity", b =>
@@ -676,6 +723,65 @@ namespace FilmMaker.Migrations
                     b.ToTable("LocationTermsOfUse");
                 });
 
+            modelBuilder.Entity("FilmMaker.Entities.LocationVisitRequest", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("DurationMinutes")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("LocationBookingRequestId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LocationId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Message")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("RequestedById")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("VisitDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LocationBookingRequestId");
+
+                    b.HasIndex("LocationId");
+
+                    b.HasIndex("RequestedById");
+
+                    b.ToTable("LocationVisitRequests");
+                });
+
             modelBuilder.Entity("FilmMaker.Entities.LookupCategory", b =>
                 {
                     b.Property<int>("Id")
@@ -907,10 +1013,6 @@ namespace FilmMaker.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("CompanyName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Country")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -1088,7 +1190,6 @@ namespace FilmMaker.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("IBAN")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsActive")
@@ -1318,6 +1419,25 @@ namespace FilmMaker.Migrations
                     b.Navigation("ProductionCompany");
                 });
 
+            modelBuilder.Entity("FilmMaker.Entities.LocationManagementRequest", b =>
+                {
+                    b.HasOne("FilmMaker.Entities.Location", "Location")
+                        .WithMany()
+                        .HasForeignKey("LocationId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("FilmMaker.Entities.LocationManagerProfile", "LocationManagerProfile")
+                        .WithMany()
+                        .HasForeignKey("LocationManagerProfileId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Location");
+
+                    b.Navigation("LocationManagerProfile");
+                });
+
             modelBuilder.Entity("FilmMaker.Entities.LocationManagerCity", b =>
                 {
                     b.HasOne("FilmMaker.Entities.LookupItem", "City")
@@ -1393,6 +1513,33 @@ namespace FilmMaker.Migrations
                         .IsRequired();
 
                     b.Navigation("Location");
+                });
+
+            modelBuilder.Entity("FilmMaker.Entities.LocationVisitRequest", b =>
+                {
+                    b.HasOne("FilmMaker.Entities.LocationBookingRequest", "BookingRequest")
+                        .WithMany("VisitRequests")
+                        .HasForeignKey("LocationBookingRequestId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("FilmMaker.Entities.Location", "Location")
+                        .WithMany()
+                        .HasForeignKey("LocationId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("FilmMaker.Entities.LocationManagerProfile", "RequestedBy")
+                        .WithMany()
+                        .HasForeignKey("RequestedById")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("BookingRequest");
+
+                    b.Navigation("Location");
+
+                    b.Navigation("RequestedBy");
                 });
 
             modelBuilder.Entity("FilmMaker.Entities.LookupItem", b =>
@@ -1538,6 +1685,8 @@ namespace FilmMaker.Migrations
             modelBuilder.Entity("FilmMaker.Entities.LocationBookingRequest", b =>
                 {
                     b.Navigation("StatusHistories");
+
+                    b.Navigation("VisitRequests");
                 });
 
             modelBuilder.Entity("FilmMaker.Entities.LocationManagerProfile", b =>

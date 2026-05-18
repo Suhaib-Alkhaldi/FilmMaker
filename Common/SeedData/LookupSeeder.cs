@@ -13,7 +13,7 @@ namespace FilmMaker.Common.SeedData
         {
             new LookupCategory
             {
-                Name = "Location Status",
+                Name = "LocationStatus",
                 LookupItems = new List<LookupItem>
                 {
                     new() { Name = "Active" },
@@ -25,7 +25,7 @@ namespace FilmMaker.Common.SeedData
 
             new LookupCategory
             {
-                Name = "Location Media",
+                Name = "MediaType",
                 LookupItems = new List<LookupItem>
                 {
                     new() { Name = "Image" },
@@ -35,7 +35,7 @@ namespace FilmMaker.Common.SeedData
 
             new LookupCategory
             {
-                Name = "Booking Status",
+                Name = "BookingStatus",
                 LookupItems = new List<LookupItem>
                 {
                     new() { Name = "Pending" },
@@ -53,7 +53,7 @@ namespace FilmMaker.Common.SeedData
 
             new LookupCategory
             {
-                Name = "Contract Status",
+                Name = "ContractStatus",
                 LookupItems = new List<LookupItem>
                 {
                     new() { Name = "Pending" },
@@ -67,7 +67,7 @@ namespace FilmMaker.Common.SeedData
 
             new LookupCategory
             {
-                Name = "Payment Type",
+                Name = "PaymentType",
                 LookupItems = new List<LookupItem>
                 {
                     new() { Name = "Advance Payment" },
@@ -80,7 +80,7 @@ namespace FilmMaker.Common.SeedData
 
             new LookupCategory
             {
-                Name = "Escrow Status",
+                Name = "EscrowStatus",
                 LookupItems = new List<LookupItem>
                 {
                     new() { Name = "Held" },
@@ -93,7 +93,7 @@ namespace FilmMaker.Common.SeedData
 
             new LookupCategory
             {
-                Name = "Production Type",
+                Name = "ProductionType",
                 LookupItems = new List<LookupItem>
                 {
                     new() { Name = "Film" },
@@ -110,7 +110,7 @@ namespace FilmMaker.Common.SeedData
 
             new LookupCategory
             {
-                Name = "Service Type",
+                Name = "ServiceType",
                 LookupItems = new List<LookupItem>
                 {
                     new() { Name = "Equipment" },
@@ -171,6 +171,37 @@ namespace FilmMaker.Common.SeedData
                     new() { Name = "Egypt" },
                     new() { Name = "Lebanon" },
                     new() { Name = "Other" }
+                }
+            },
+
+            new LookupCategory
+            {
+                Name = "LocationType",
+                LookupItems = new List <LookupItem>
+                {
+                    new() {Name = "House"},
+                    new() {Name = "Apartment"},
+                    new() {Name = "Villa"},
+                    new() {Name = "Shop"},
+                    new() {Name = "Land"},
+                    new() {Name = "Farm"},
+                    new() {Name = "Office"},
+                    new() {Name = "Studio"},
+                    new() {Name = "Warehouse"},
+                    new() {Name = "Restaurant"},
+                    new() {Name = "Cafe"},
+                }
+            },
+
+            new LookupCategory
+            {
+                Name = "VisitStatus",
+                LookupItems = new List<LookupItem>
+                {
+                    new() {Name = "Pending"},
+                    new() {Name = "Accepted"},
+                    new() {Name = "Rejected"},
+                    new() {Name = "Cancelled"}
                 }
             }
         };
