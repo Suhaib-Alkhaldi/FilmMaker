@@ -499,7 +499,7 @@ namespace FilmMaker.Services.Service
             try
             {
                 var service = await _context.ServicesProvided.Include(s => s.ServiceProvider)
-                    .FirstOrDefaultAsync(s => s.Id == serviceId && !s.IsDeleted);
+                    .FirstOrDefaultAsync(s => s.Id == serviceId && s.IsDeleted);
 
                 if (service == null)
                     return ApiResponse<bool>.FailureResponse(
