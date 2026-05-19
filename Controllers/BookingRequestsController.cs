@@ -1,4 +1,5 @@
-﻿using FilmMaker.Common;
+﻿using FilmMaker.Attribute;
+using FilmMaker.Common;
 using FilmMaker.DTO.Booking;
 using FilmMaker.Services.Interface;
 using Microsoft.AspNetCore.Http;
@@ -6,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FilmMaker.Controllers
 {
+    [AuthorizeLocationOwner]
     [Route("api/[controller]")]
     [ApiController]
     public class BookingRequestsController : ControllerBase

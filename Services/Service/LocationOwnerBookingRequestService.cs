@@ -171,6 +171,11 @@ namespace FilmMaker.Services.Service
                         BookingStatusId = x.BookingStatusId,
                         BookingStatus = x.BookingStatus.Name,
 
+                        IsFullDay = x.IsFullDay,
+                        StartDateTime = x.StartDateTime,
+                        EndDateTime = x.StartDateTime,
+                        
+
                         Message = x.Message,
                         TotalPrice = x.TotalPrice,
                         CreatedAt = x.CreatedAt

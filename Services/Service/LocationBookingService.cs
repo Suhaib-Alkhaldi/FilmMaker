@@ -151,7 +151,7 @@ namespace FilmMaker.Services.Service
 
                     BookingStatusId = pendingStatus.Id,
                     TotalPrice = totalPrice,
-
+                    
                     CreatedAt = DateTime.UtcNow,
                     CreatedBy = currentUserId.ToString(),
                     IsActive = true,
@@ -170,21 +170,46 @@ namespace FilmMaker.Services.Service
                     availability.CalendarColor
                 );
 
-                var createdBooking = await _context.LocationBookingRequests
-    .Include(b => b.Location)
-        .ThenInclude(l => l.LocationOwner)
-            .ThenInclude(o => o.User)
-    .Include(b => b.BookingStatus)
-    .Include(b => b.LocationManager)
-        .ThenInclude(m => m.User)
-    .Include(b => b.ProductionCompany)
-        .ThenInclude(p => p.User)
-    .FirstOrDefaultAsync(b =>
-        b.Id == booking.Id &&
-        b.IsActive &&
-        !b.IsDeleted);
+                var response = await _context.LocationBookingRequests
+                                .Where(b =>
+                                        b.Id == booking.Id &&
+                                        b.IsActive &&
+                                        !b.IsDeleted)
+                                .Select(b => new BookingRequestDto
+                                {
+                                    Id = b.Id,
 
-                if (createdBooking == null)
+                                    LocationId = b.LocationId,
+                                    LocationName = b.Location.LocationName,
+                                    City = b.Location.City,
+
+                                    StartDateTime = b.StartDateTime,
+                                    EndDateTime = b.EndDateTime,
+                                    IsFullDay = (b.EndDateTime - b.StartDateTime).TotalHours >= 4,
+
+                                    Status = b.BookingStatus.Name,
+
+                                    Message = b.Message,
+                                    TotalPrice = b.TotalPrice,
+
+                                    LocationOwnerId = b.LocationOwnerId,
+                                    LocationOwnerName = b.Location.LocationOwner.User.Name,
+
+                                    LocationManagerId = b.LocationManagerId,
+                                    LocationManagerName = b.LocationManager != null
+                                        ? b.LocationManager.User.Name
+                                        : null,
+
+                                    ProductionCompanyId = b.ProductionCompanyId,
+                                    ProductionCompanyName = b.ProductionCompany != null
+                                        ? b.ProductionCompany.User.Name
+                                        : null,
+
+                                    CreatedAt = b.CreatedAt
+                                })
+                                .FirstOrDefaultAsync();
+
+                if (response == null)
                 {
                     return ApiResponse<BookingRequestDto>.FailureResponse(
                         "Booking request was created, but response could not be loaded.",
@@ -193,12 +218,7 @@ namespace FilmMaker.Services.Service
                 }
 
                 return ApiResponse<BookingRequestDto>.SuccessResponse(
-                    MapToDto(
-                        createdBooking,
-                        createdBooking.Location,
-                        isFullDay,
-                        createdBooking.BookingStatus.Name
-                    ),
+                    response,
                     availability.HasPendingRequest
                         ? "Booking request sent successfully. This date already has pending requests."
                         : "Booking request sent successfully.",
@@ -474,15 +494,17 @@ namespace FilmMaker.Services.Service
                     );
                 }
 
+                var pendingStatusId = await GetStatus("BookingStatus", "Pending");
+
+                if (pendingStatusId == null)
+                {
+                    return ApiResponse<BookingRequestDto>.FailureResponse(
+                        "Pending booking status was not found in lookup data.",
+                        "حالة الحجز قيد الانتظار غير موجودة في بيانات النظام."
+                    );
+                }
+
                 var query = _context.LocationBookingRequests
-                    .Include(b => b.BookingStatus)
-                    .Include(b => b.Location)
-                    .ThenInclude(l => l.LocationOwner)
-                    .ThenInclude(o => o.User)
-                    .Include(b => b.LocationManager)
-                    .ThenInclude(m => m.User)
-                    .Include(b => b.ProductionCompany)
-                    .ThenInclude(p => p.User)
                     .Where(b =>
                         b.Id == dto.requestId &&
                         b.IsActive &&
@@ -509,7 +531,7 @@ namespace FilmMaker.Services.Service
                     );
                 }
 
-                if (request.BookingStatus.Name != "Pending")
+                if (request.BookingStatusId != pendingStatusId.Value)
                 {
                     return ApiResponse<BookingRequestDto>.FailureResponse(
                         "Only pending requests can be updated.",
@@ -553,6 +575,20 @@ namespace FilmMaker.Services.Service
                     );
                 }
 
+                var location = await _context.Locations
+                    .FirstOrDefaultAsync(l =>
+                        l.Id == request.LocationId &&
+                        l.IsActive &&
+                        !l.IsDeleted);
+
+                if (location == null)
+                {
+                    return ApiResponse<BookingRequestDto>.FailureResponse(
+                        "Location not found or inactive.",
+                        "الموقع غير موجود أو غير نشط."
+                    );
+                }
+
                 request.StartDateTime = finalStart;
                 request.EndDateTime = finalEnd;
 
@@ -564,7 +600,7 @@ namespace FilmMaker.Services.Service
                 }
 
                 request.TotalPrice = CalculateTotalPrice(
-                    request.Location,
+                    location,
                     finalStart,
                     finalEnd,
                     isFullDay
@@ -575,6 +611,55 @@ namespace FilmMaker.Services.Service
 
                 await _context.SaveChangesAsync();
 
+                var response = await _context.LocationBookingRequests
+                    .Where(b =>
+                        b.Id == request.Id &&
+                        b.IsActive &&
+                        !b.IsDeleted)
+                    .Select(b => new BookingRequestDto
+                    {
+                        Id = b.Id,
+
+                        LocationId = b.LocationId,
+                        LocationName = b.Location.LocationName,
+                        City = b.Location.City,
+
+                        StartDateTime = b.StartDateTime,
+                        EndDateTime = b.EndDateTime,
+                        IsFullDay = (b.EndDateTime - b.StartDateTime).TotalHours >= 4,
+
+                        Status = b.BookingStatus.Name,
+
+                        Message = b.Message,
+                        TotalPrice = b.TotalPrice,
+
+                        LocationOwnerId = b.LocationOwnerId,
+                        LocationOwnerName = b.Location.LocationOwner != null
+                            ? b.Location.LocationOwner.User.Name
+                            : string.Empty,
+
+                        LocationManagerId = b.LocationManagerId,
+                        LocationManagerName = b.LocationManager != null
+                            ? b.LocationManager.User.Name
+                            : null,
+
+                        ProductionCompanyId = b.ProductionCompanyId,
+                        ProductionCompanyName = b.ProductionCompany != null
+                            ? b.ProductionCompany.User.Name
+                            : null,
+
+                        CreatedAt = b.CreatedAt
+                    })
+                    .FirstOrDefaultAsync();
+
+                if (response == null)
+                {
+                    return ApiResponse<BookingRequestDto>.FailureResponse(
+                        "Booking request was updated, but response could not be loaded.",
+                        "تم تعديل طلب الحجز، لكن تعذر تحميل بيانات الاستجابة."
+                    );
+                }
+
                 _logger.LogInformation(
                     "Booking request {RequestId} updated by UserId {UserId}",
                     dto.requestId,
@@ -582,7 +667,7 @@ namespace FilmMaker.Services.Service
                 );
 
                 return ApiResponse<BookingRequestDto>.SuccessResponse(
-                    MapToDto(request, request.Location, isFullDay, request.BookingStatus.Name),
+                    response,
                     availability.HasPendingRequest
                         ? "Booking request updated successfully. This date already has pending requests."
                         : "Booking request updated successfully.",
@@ -595,8 +680,7 @@ namespace FilmMaker.Services.Service
             {
                 _logger.LogError(
                     ex,
-                    "Error updating booking request {RequestId} for UserId {UserId}",
-                    dto.requestId,
+                    "Error updating booking request for UserId {UserId}",
                     currentUserId
                 );
 
@@ -638,8 +722,27 @@ namespace FilmMaker.Services.Service
                     );
                 }
 
+                var pendingStatusId = await GetStatus("BookingStatus", "Pending");
+
+                if (pendingStatusId == null)
+                {
+                    return ApiResponse<bool>.FailureResponse(
+                        "Pending booking status was not found in lookup data.",
+                        "حالة الحجز قيد الانتظار غير موجودة في بيانات النظام."
+                    );
+                }
+
+                var cancelledStatusId = await GetStatus("BookingStatus", "Cancelled");
+
+                if (cancelledStatusId == null)
+                {
+                    return ApiResponse<bool>.FailureResponse(
+                        "Cancelled booking status was not found in lookup data.",
+                        "حالة إلغاء الحجز غير موجودة في بيانات النظام."
+                    );
+                }
+
                 var query = _context.LocationBookingRequests
-                    .Include(b => b.BookingStatus)
                     .Where(b =>
                         b.Id == requestId &&
                         b.IsActive &&
@@ -666,7 +769,7 @@ namespace FilmMaker.Services.Service
                     );
                 }
 
-                if (request.BookingStatus.Name != "Pending")
+                if (request.BookingStatusId != pendingStatusId.Value)
                 {
                     return ApiResponse<bool>.FailureResponse(
                         "Only pending requests can be cancelled.",
@@ -674,25 +777,7 @@ namespace FilmMaker.Services.Service
                     );
                 }
 
-                var cancelledStatus = await _context.LookupItems
-                    .Include(x => x.LookupCategory)
-                    .FirstOrDefaultAsync(x =>
-                        x.Name == "Cancelled" &&
-                        x.LookupCategory.Name == "BookingStatus" &&
-                        x.IsActive &&
-                        !x.IsDeleted);
-
-                if (cancelledStatus == null)
-                {
-                    return ApiResponse<bool>.FailureResponse(
-                        "Cancelled booking status was not found in lookup data.",
-                        "حالة إلغاء الحجز غير موجودة في بيانات النظام."
-                    );
-                }
-
-                request.BookingStatusId = cancelledStatus.Id;
-                request.IsActive = false;
-                request.IsDeleted = true;
+                request.BookingStatusId = cancelledStatusId.Value;
                 request.UpdatedAt = DateTime.UtcNow;
                 request.UpdatedBy = currentUserId.ToString();
 
@@ -727,11 +812,57 @@ namespace FilmMaker.Services.Service
         }
 
 
-        public async Task<ApiResponse<List<LocationBookingCalendarDayDto>>> GetLocationBookingCalendarAsync(int locationId,DateTime fromDate,DateTime toDate)
+        public async Task<ApiResponse<List<LocationBookingCalendarDayDto>>> GetLocationBookingCalendarAsync(int currentUserId,int locationId,DateTime? fromDate,DateTime? toDate)
         {
             try
             {
-                if (fromDate.Date > toDate.Date)
+                if (!fromDate.HasValue || !toDate.HasValue)
+                {
+                    return ApiResponse<List<LocationBookingCalendarDayDto>>.FailureResponse(
+                        "From date and to date are required.",
+                        "تاريخ البداية وتاريخ النهاية مطلوبان."
+                    );
+                }
+
+                if(fromDate < DateTime.Now)
+                {
+                    return ApiResponse<List<LocationBookingCalendarDayDto>>.FailureResponse(
+                        "Start Date cannot be in the past",
+                        "لا يمكن لتاريخ البداية ان يكون في الماضي"
+                    );
+                }
+
+                var productionCompanyProfileId = await _context.ProductionCompanyProfiles
+                    .Where(x =>
+                        x.UserId == currentUserId &&
+                        x.IsActive &&
+                        !x.IsDeleted)
+                    .Select(x => (int?)x.Id)
+                    .FirstOrDefaultAsync();
+
+                var locationManagerProfileId = await _context.LocationManagerProfiles
+                    .Where(x =>
+                        x.UserId == currentUserId &&
+                        x.IsActive &&
+                        !x.IsDeleted)
+                    .Select(x => (int?)x.Id)
+                    .FirstOrDefaultAsync();
+
+                var isProductionCompany = productionCompanyProfileId.HasValue;
+                var isLocationManager = locationManagerProfileId.HasValue;
+
+                if (isProductionCompany == isLocationManager)
+                {
+                    return ApiResponse<List<LocationBookingCalendarDayDto>>.FailureResponse(
+                        "User must be either a production company or a location manager.",
+                        "يجب أن يكون المستخدم إما شركة إنتاج أو مدير موقع."
+                    );
+                }
+
+                var from = fromDate.Value.Date;
+                var to = toDate.Value.Date;
+
+                if (from > to)
                 {
                     return ApiResponse<List<LocationBookingCalendarDayDto>>.FailureResponse(
                         "From date must be before or equal to to date.",
@@ -752,9 +883,6 @@ namespace FilmMaker.Services.Service
                         "الموقع غير موجود أو غير نشط."
                     );
                 }
-
-                var from = fromDate.Date;
-                var to = toDate.Date;
 
                 var bookedStatuses = new[]
                 {
@@ -815,16 +943,12 @@ namespace FilmMaker.Services.Service
                     result.Add(new LocationBookingCalendarDayDto
                     {
                         Date = day,
-
                         IsBooked = isBooked,
                         HasPendingRequest = hasPendingRequest,
                         IsAvailable = isAvailable,
-
                         CanRequest = !isBooked,
-
                         PendingCount = pendingCount,
                         BookedCount = bookedCount,
-
                         Status = status
                     });
                 }
@@ -839,7 +963,8 @@ namespace FilmMaker.Services.Service
             {
                 _logger.LogError(
                     ex,
-                    "Error while fetching location booking calendar. LocationId: {LocationId}, FromDate: {FromDate}, ToDate: {ToDate}",
+                    "Error while fetching location booking calendar. UserId: {UserId}, LocationId: {LocationId}, FromDate: {FromDate}, ToDate: {ToDate}",
+                    currentUserId,
                     locationId,
                     fromDate,
                     toDate
@@ -857,7 +982,16 @@ namespace FilmMaker.Services.Service
 
         #region Helper Methods
 
-
+        private async Task<int?> GetStatus(string categoryName, string statusName)
+        {
+            return await _context.LookupItems
+                .Where(x =>
+                    x.Name == statusName &&
+                    x.LookupCategory.Name == categoryName &&
+                    !x.IsDeleted)
+                .Select(x => (int?)x.Id)
+                .FirstOrDefaultAsync();
+        }
         private static decimal CalculateTotalPrice(Location location,DateTime start,DateTime end,bool isFullDay)
         {
             if (isFullDay)

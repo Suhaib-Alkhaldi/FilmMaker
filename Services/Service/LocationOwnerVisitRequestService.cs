@@ -17,7 +17,7 @@ namespace FilmMaker.Services.Service
             _logger = logger;
         }
 
-        public async Task<ApiResponse<LocationVisitRequestResponseDto>> RespondVisitRequest(RespondLocationVisitRequestDto request, int currentUserId)
+        public async Task<ApiResponse<LocationVisitRequestResponseDto>> RespondVisitRequest(RespondLocationVisitRequestDto request,int currentUserId)
         {
             if (request == null)
             {
@@ -62,13 +62,10 @@ namespace FilmMaker.Services.Service
                 }
 
                 var visitRequest = await _context.LocationVisitRequests
-                    .Include(x => x.Location)
-                    .Include(x => x.LocationManager)
-                        .ThenInclude(x => x.User)
-                    .Include(x => x.VisitStatus)
                     .Where(x =>
                         x.Id == request.VisitRequestId &&
                         x.Location.LocationOwnerId == locationOwnerId.Value &&
+                        x.IsActive &&
                         !x.IsDeleted)
                     .FirstOrDefaultAsync();
 
@@ -100,10 +97,7 @@ namespace FilmMaker.Services.Service
 
                 await _context.SaveChangesAsync();
 
-                var response = await GetReceivedVisitRequestById(
-                    request.VisitRequestId,
-                    currentUserId
-                );
+                var response = await GetReceivedVisitRequestByIdAnyStatus(request.VisitRequestId,currentUserId);
 
                 if (!response.Success)
                     return response;
@@ -133,7 +127,8 @@ namespace FilmMaker.Services.Service
                 );
             }
         }
-        public async Task<ApiResponse<LocationVisitRequestResponseDto>> GetReceivedVisitRequestById(int visitRequestId, int currentUserId)
+
+        public async Task<ApiResponse<LocationVisitRequestResponseDto>> GetReceivedVisitRequestByIdAnyStatus(int visitRequestId,int currentUserId)
         {
             try
             {
@@ -151,6 +146,101 @@ namespace FilmMaker.Services.Service
                     .Where(x =>
                         x.Id == visitRequestId &&
                         x.Location.LocationOwnerId == locationOwnerId.Value &&
+                        x.IsActive &&
+                        !x.IsDeleted)
+                    .Select(x => new LocationVisitRequestResponseDto
+                    {
+                        VisitRequestId = x.Id,
+
+                        LocationId = x.LocationId,
+                        LocationName = x.Location.LocationName,
+
+                        LocationOwnerId = x.Location.LocationOwnerId,
+                        LocationOwnerName = x.Location.LocationOwner != null
+                            ? x.Location.LocationOwner.User.Name
+                            : string.Empty,
+
+                        LocationManagerId = x.LocationManagerId,
+                        LocationManagerName = x.LocationManager != null
+                            ? x.LocationManager.User.Name
+                            : string.Empty,
+
+                        RequestedVisitDateUtc = x.RequestedVisitDateUtc,
+                        RequestMessage = x.RequestMessage,
+
+                        VisitStatusId = x.VisitStatusId,
+                        VisitStatus = x.VisitStatus.Name,
+
+                        OwnerResponseMessage = x.OwnerResponseMessage,
+                        RespondedAtUtc = x.RespondedAtUtc,
+                        RespondedByUserId = x.RespondedByUserId,
+
+                        CreatedAt = x.CreatedAt
+                    })
+                    .FirstOrDefaultAsync();
+
+                if (visitRequest == null)
+                {
+                    return ApiResponse<LocationVisitRequestResponseDto>.FailureResponse(
+                        "Visit request was not found.",
+                        "لم يتم العثور على طلب الزيارة."
+                    );
+                }
+
+                return ApiResponse<LocationVisitRequestResponseDto>.SuccessResponse(
+                    visitRequest,
+                    "Visit request fetched successfully.",
+                    "تم جلب طلب الزيارة بنجاح."
+                );
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Error while fetching visit request by id. VisitRequestId: {VisitRequestId}, UserId: {UserId}",
+                    visitRequestId,
+                    currentUserId
+                );
+
+                return ApiResponse<LocationVisitRequestResponseDto>.FailureResponse(
+                    "An unexpected error occurred while fetching the visit request.",
+                    "حدث خطأ غير متوقع أثناء جلب طلب الزيارة."
+                );
+            }
+        }
+        public async Task<ApiResponse<LocationVisitRequestResponseDto>> GetReceivedVisitRequestById(int visitRequestId, int currentUserId)
+        {
+            try
+            {
+                var locationOwnerId = await GetLocationOwnerIdByUserId(currentUserId);
+
+                if (locationOwnerId == null)
+                {
+                    return ApiResponse<LocationVisitRequestResponseDto>.FailureResponse(
+                        "Location owner profile was not found.",
+                        "لم يتم العثور على ملف صاحب الموقع."
+                    );
+                }
+
+
+                var pendingStatusId = await GetStatusId("VisitStatus", "Pending");
+
+                if (pendingStatusId == null)
+                {
+                    return ApiResponse<LocationVisitRequestResponseDto>.FailureResponse(
+                        "Pending visit status was not found in lookup data.",
+                        "حالة طلب الزيارة قيد الانتظار غير موجودة في بيانات النظام."
+                    );
+                }
+
+
+
+                var visitRequest = await _context.LocationVisitRequests
+                    .Where(x =>
+                        x.Id == visitRequestId &&
+                        x.Location.LocationOwnerId == locationOwnerId.Value &&
+                        x.VisitStatusId == pendingStatusId.Value &&
+                        x.IsActive &&
                         !x.IsDeleted)
                     .Select(x => new LocationVisitRequestResponseDto
                     {
@@ -222,9 +312,26 @@ namespace FilmMaker.Services.Service
                     );
                 }
 
+
+
+                var pendingStatusId = await GetStatusId("VisitStatus", "Pending");
+
+                if (pendingStatusId == null)
+                {
+                    return ApiResponse<List<LocationVisitRequestResponseDto>>.FailureResponse(
+                        "Pending visit status was not found in lookup data.",
+                        "حالة طلب الزيارة قيد الانتظار غير موجودة في بيانات النظام."
+                    );
+                }
+
+
+
+
                 var requests = await _context.LocationVisitRequests
                     .Where(x =>
                         x.Location.LocationOwnerId == locationOwnerId.Value &&
+                        x.VisitStatusId == pendingStatusId.Value &&
+                        x.IsActive &&
                         !x.IsDeleted)
                     .OrderByDescending(x => x.CreatedAt)
                     .Select(x => new LocationVisitRequestResponseDto
