@@ -8,10 +8,6 @@ namespace FilmMaker.Entities
 
         [ForeignKey("LocationId")]
         public Location Location { get; set; } = null!;
-        public int LocationOwnerId { get; set; }
-
-        [ForeignKey("LocationOwnerId")]
-        public LocationOwnerProfile LocationOwner { get; set; } = null!;
         public int LocationManagerId { get; set; }
 
         [ForeignKey("LocationManagerId")]

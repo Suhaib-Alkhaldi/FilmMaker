@@ -68,7 +68,7 @@ namespace FilmMaker.Services.Service
                 {
                     ServiceName = serviceDto.ServiceName,
                     Description = serviceDto.Description,
-                    DailyPrice = serviceDto.Price,
+                    Price = serviceDto.Price,
                     ServiceTypeId = serviceDto.ServiceTypeId,
                     ServiceProviderId = currentUserId,
                     CreatedAt = DateTime.UtcNow,
@@ -153,7 +153,7 @@ namespace FilmMaker.Services.Service
 
                 service.ServiceName = serviceDto.ServiceName;
                 service.Description = serviceDto.Description;
-                service.DailyPrice = serviceDto.Price;
+                service.Price = serviceDto.Price;
                 service.ServiceTypeId = serviceDto.ServiceTypeId;
                 service.UpdatedAt = DateTime.UtcNow;
                 service.UpdatedBy = currentUserId.ToString();
@@ -285,8 +285,6 @@ namespace FilmMaker.Services.Service
         {
             try
             {
-
-
                 var services = await _context.ServicesProvided
                     .Include(s => s.ServiceType)
                     .Include(s => s.ServiceProvider)
@@ -488,7 +486,7 @@ namespace FilmMaker.Services.Service
             Id = service.Id,
             ServiceName = service.ServiceName,
             Description = service.Description,
-            Price = service.DailyPrice,
+            Price = service.Price,
             ServiceTypeId = service.ServiceTypeId,
             ServiceTypeName = service.ServiceType?.Name ?? string.Empty,
             ServiceProviderId = service.ServiceProviderId,
@@ -501,7 +499,7 @@ namespace FilmMaker.Services.Service
             try
             {
                 var service = await _context.ServicesProvided.Include(s => s.ServiceProvider)
-                    .FirstOrDefaultAsync(s => s.Id == serviceId && s.IsDeleted);
+                    .FirstOrDefaultAsync(s => s.Id == serviceId && !s.IsDeleted);
 
                 if (service == null)
                     return ApiResponse<bool>.FailureResponse(
@@ -536,62 +534,6 @@ namespace FilmMaker.Services.Service
                 return ApiResponse<bool>.FailureResponse(
                     "An error occurred while deleting the service",
                     "حدث خطأ أثناء حذف الخدمة"
-                );
-            }
-        }
-
-        public async Task<ApiResponse<List<GetServiceDTO>>> SearchServices(string searchTerm)
-        {
-            try
-            {
-                var services = await _context.ServicesProvided
-                    .Include(s => s.ServiceType)
-                    .Include(s => s.ServiceProvider)
-                        .ThenInclude(sp => sp.User)
-                    .Where(s => s.IsActive && !s.IsDeleted && s.ServiceName.Contains(searchTerm))
-                    .Select(s => MapToDTO(s))
-                    .ToListAsync();
-
-                return ApiResponse<List<GetServiceDTO>>.SuccessResponse(
-                    services,
-                    "Services retrieved successfully",
-                    "تم استرجاع الخدمات بنجاح"
-                );
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error retrieving all services");
-                return ApiResponse<List<GetServiceDTO>>.FailureResponse(
-                    "An error occurred while retrieving services",
-                    "حدث خطأ أثناء استرجاع الخدمات"
-                );
-            }
-        }
-
-        public async Task<ApiResponse<List<GetServiceDTO>>> SearchServicesByServiceType(int serviceTypeId, string searchTerm)
-        {
-            try
-            {
-                var services = await _context.ServicesProvided
-                    .Include(s => s.ServiceType)
-                    .Include(s => s.ServiceProvider)
-                    .ThenInclude(sp => sp.User)
-                    .Where(s => s.ServiceTypeId == serviceTypeId && s.IsActive && !s.IsDeleted && s.ServiceName.Contains(searchTerm))
-                    .Select(s => MapToDTO(s))
-                    .ToListAsync();
-
-                return ApiResponse<List<GetServiceDTO>>.SuccessResponse(
-                    services,
-                    "Services retrieved successfully",
-                    "تم استرجاع الخدمات بنجاح"
-                );
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error retrieving services for type {ServiceTypeId}", serviceTypeId);
-                return ApiResponse<List<GetServiceDTO>>.FailureResponse(
-                    "An error occurred while retrieving services by type",
-                    "حدث خطأ أثناء استرجاع الخدمات حسب النوع"
                 );
             }
         }
