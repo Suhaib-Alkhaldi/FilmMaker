@@ -289,6 +289,12 @@ namespace FilmMaker.Services.Service
                             _configuration);
 
 
+            user.LastLogin = DateTime.UtcNow;
+
+            _context.Users.Update(user);
+
+            _context.SaveChanges();
+
             var response = new LoginResponseDTO
             {
                 Token = token,

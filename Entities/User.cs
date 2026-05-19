@@ -16,5 +16,7 @@ namespace FilmMaker.Entities
         public LocationManagerProfile? LocationManagerProfile { get; set; }
         public ProductionCompanyProfile? ProductionCompanyProfile { get; set; }
         public ServiceProviderProfile? ServiceProviderProfile { get; set; }
+
+        public DateTime? LastLogin { get; set; }
     }
 }
