@@ -32,6 +32,23 @@ namespace FilmMaker.Controllers
             return userNameClaim;
         }
 
+        private int? GetCurrentUserId()
+        {
+            var userIdClaim = User.FindFirst("UserId")?.Value;
+
+            if (string.IsNullOrWhiteSpace(userIdClaim))
+            {
+                return null;
+            }
+
+            if (!int.TryParse(userIdClaim, out var userId))
+            {
+                return null;
+            }
+
+            return userId;
+        }
+
         [HttpPost("register-location-owner")]
         public async Task<IActionResult> RegisterLocationOwner(RegisterLocationOwnerRequestDto request)
         {
@@ -125,6 +142,60 @@ namespace FilmMaker.Controllers
                 return BadRequest(result);
             return Ok(result);
 
+        }
+
+        [HttpPost("verify-email")]
+        [Authorize]
+        public async Task<IActionResult> VerifyEmail([FromBody] VerifyOtpRequest request)
+        {
+            var currentUserId = GetCurrentUserId();
+
+            if (currentUserId == null)
+                return Unauthorized(new ApiResponse<object>
+                {
+                    Success = false,
+                    MessageEn = "Unauthorized.",
+                    MessageAr = "غير مصرح.",
+                    Data = null
+                });
+
+            var result = await _authService.VerifyEmail(request, GetCurrentUserId()!.Value);
+
+            return Ok(result);
+        }
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
+        {
+            var result = await _authService.ForgotPassword(request);
+
+            return Ok(result);
+
+        }
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
+        {
+            var result = await _authService.ResetPassword(request);
+            return Ok(result);
+        }
+
+        [HttpPost("send-verification")]
+        [Authorize]  
+        public async Task<IActionResult> SendVerificationOtp()
+        {
+            var currentUserId = GetCurrentUserId();
+
+            if (currentUserId == null)
+                return Unauthorized(new ApiResponse<object>
+                {
+                    Success = false,
+                    MessageEn = "Unauthorized.",
+                    MessageAr = "غير مصرح.",
+                    Data = null
+                });
+            var result = await _authService.SendVerificationOtp(currentUserId.Value);
+
+            return Ok(result);
         }
     }
 }

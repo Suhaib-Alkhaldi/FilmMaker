@@ -57,6 +57,9 @@ builder.Services.AddDbContext<FilmMakerDbContext>(options =>
 
 
 
+builder.Services.AddScoped<IOtpService, OtpService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
 

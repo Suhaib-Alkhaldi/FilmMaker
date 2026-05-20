@@ -7,6 +7,7 @@ namespace FilmMaker.Entities
 
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
+        public DbSet<OtpCode> OtpCodes { get; set; }
 
         public DbSet<LookupCategory> LookupCategories { get; set; }
         public DbSet<LookupItem> LookupItems { get; set; }
@@ -22,6 +23,7 @@ namespace FilmMaker.Entities
 
         public DbSet<ServiceProviderProfile> ServiceProviderProfiles { get; set; }
         public DbSet<ServiceProviderServiceType> ServiceProviderServiceTypes { get; set; }
+
 
         public DbSet<Media> Media { get; set; }
 
