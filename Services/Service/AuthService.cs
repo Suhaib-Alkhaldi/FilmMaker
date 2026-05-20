@@ -1,4 +1,5 @@
-﻿using FilmMaker.Common;
+﻿using Azure.Core;
+using FilmMaker.Common;
 using FilmMaker.DTO.Auth.Request;
 using FilmMaker.DTO.Auth.Response;
 using FilmMaker.Entities;
@@ -16,12 +17,19 @@ namespace FilmMaker.Services.Service
         private readonly FilmMakerDbContext _context;
         private readonly IConfiguration _configuration;
         private readonly ILogger<AuthService> _logger;
+        private readonly ITokenService _tokenService;
+        private readonly IEmailService _emailService;
+        private readonly IOtpService _otpService;
 
-        public AuthService(FilmMakerDbContext context, IConfiguration configuration , ILogger<AuthService> logger)
+        public AuthService(FilmMakerDbContext context, IConfiguration configuration , ILogger<AuthService> logger
+            , ITokenService tokenService, IEmailService emailService, IOtpService otpService)
         {
             _context = context;
             _configuration = configuration;
             _logger = logger;
+            _tokenService = tokenService;
+            _emailService = emailService;
+            _otpService = otpService;
         }
         public async Task<ApiResponse<RegisterResponseDto>> RegisterLocationOwner(RegisterLocationOwnerRequestDto request)
         {
@@ -282,17 +290,23 @@ namespace FilmMaker.Services.Service
 
             var roleName = user.Roles.Name;
 
-            var token = TokenHelper.GenerateJWTToken(
-                            user.Id,
-                            user.Name,
-                            user.Roles.Name,
-                            _configuration);
+            var accessToken = _tokenService.GenerateAccessToken(user.Id, user.Name, roleName);
+            var refreshToken = _tokenService.GenerateRefreshToken();
 
+            await _tokenService.SaveRefreshTokenAsync(user.Id, refreshToken);
+
+
+            user.LastLogin = DateTime.UtcNow;
+
+            _context.Users.Update(user);
+
+            _context.SaveChanges();
 
             var response = new LoginResponseDTO
             {
-                Token = token,
-                Expiration = DateTime.Now.AddHours(2)
+                AccessToken = accessToken,
+                RefreshToken = refreshToken,
+                Expiration = DateTime.Now.AddMinutes(15)
             };
 
             return ApiResponse<LoginResponseDTO>.SuccessResponse(
@@ -505,8 +519,6 @@ namespace FilmMaker.Services.Service
                 );
             }
         }
-
-
         private ApiResponse<RegisterResponseDto>? ValidateBasicRegisterRequest(BaseRegisterDto request)
         {
             if (request == null)
@@ -692,7 +704,172 @@ namespace FilmMaker.Services.Service
                 Role = roleName
             };
         }
+        public async Task<ApiResponse<object>> RefreshToken(string refreshToken)
+        {
+            var stored = await _tokenService.GetRefreshTokenAsync(refreshToken);
 
-        
+            if (stored is null)
+                return new ApiResponse<object>
+                {
+                    Data = null,
+                    Success = false,
+                    MessageEn =  "Invalid refresh token.",
+                    MessageAr = "رمز التحديث غير صالح."
+                };
+
+            if (stored.ExpiresAt < DateTime.UtcNow)
+                return new ApiResponse<object> { Data = null, Success = false, MessageEn = "Refresh token has expired.", MessageAr = "رمز التحديث غير صالح." };
+
+            await _tokenService.RevokeRefreshTokenAsync(refreshToken);
+
+            var newAccessToken = _tokenService.GenerateAccessToken(stored.UserId, stored.User.Name, stored.User.Roles.Name);
+
+            var newRefreshToken = _tokenService.GenerateRefreshToken();
+
+            await _tokenService.SaveRefreshTokenAsync(stored.UserId, newRefreshToken);
+
+            return new ApiResponse<object>
+            {
+                Success = true,
+                MessageEn = "Token refreshed successfully.",
+                MessageAr = "تم تحديث الرمز بنجاح.",
+                Data = new
+                {
+                    AccessToken = newAccessToken,
+                    RefreshToken = newRefreshToken,
+                }
+             };
+
+        }
+
+        public async Task<ApiResponse<object>> VerifyEmail(VerifyOtpRequest request, int currentUserId)
+        {
+            var otp = await _otpService.ValidateOtpAsync(currentUserId, request.Code, OtpPurpose.EmailVerification);
+
+            if(otp == null)
+            {
+                return new ApiResponse<object>
+                {
+                    Success = false,
+                    MessageEn = "Invalid or expired OTP code.",
+                    MessageAr = "رمز OTP غير صالح أو منتهي الصلاحية.",
+                    Data = null
+                };
+            }
+
+            var user = await _context.Users.FindAsync(currentUserId);
+            user!.IsEmailVerified = true;
+            user.EmailVerifiedAt = DateTime.Now;
+            await _context.SaveChangesAsync();
+
+            return ApiResponse<object>.SuccessResponse(
+                null,
+                "Email verified successfully.",
+                "تم التحقق من البريد الإلكتروني بنجاح."
+            );
+
+        }
+
+        public async Task<ApiResponse<object>> SendVerificationOtp(int currentUserId)
+        {
+            var user = await _context.Users.FindAsync(currentUserId);
+
+            if(user == null)
+            {
+                return new ApiResponse<object>
+                {
+                    Success = false,
+                    MessageEn = "User not found.",
+                    MessageAr = "المستخدم غير موجود.",
+                    Data = null
+                };
+            }
+
+            if (user.IsEmailVerified)
+            {
+                return new ApiResponse<object>
+                {
+                    Success = false,
+                    MessageEn = "Email is already verified.",
+                    MessageAr = "البريد الإلكتروني تم التحقق منه مسبقًا.",
+                    Data = null
+                };
+            }
+
+            var code = await _otpService.GenerateAndSaveOtpAsync(user.Id, OtpPurpose.EmailVerification);
+            await _emailService.SendOtpAsync(user.Email, code, OtpPurpose.EmailVerification);
+
+            return ApiResponse<object>.SuccessResponse(
+                null,
+                "Verification OTP sent to email successfully.",
+                "تم إرسال رمز التحقق إلى البريد الإلكتروني بنجاح."
+            );  
+        }
+
+        public async Task<ApiResponse<object>> ForgotPassword(ForgotPasswordRequest request)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+
+            if (user is null) 
+                return
+                    new ApiResponse<object>
+                    {
+                        Success = true,
+                        MessageEn = "If that email exists, a code has been sent.",
+                        MessageAr = "إذا كان هذا البريد الإلكتروني موجودًا، فقد تم إرسال رمز.",
+                        Data = null
+                    };
+
+            var code = await _otpService.GenerateAndSaveOtpAsync(user.Id, OtpPurpose.PasswordReset);
+            await _emailService.SendOtpAsync(user.Email, code, OtpPurpose.PasswordReset);
+
+            return new ApiResponse<object> 
+            { Success = true, 
+                MessageEn = "If that email exists, a code has been sent.", 
+                MessageAr = "إذا كان هذا البريد الإلكتروني موجودًا، فقد تم إرسال رمز.",
+                Data = null 
+            };
+        }
+
+        public async Task<ApiResponse<object>> ResetPassword(ResetPasswordRequest request)
+        {
+
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+
+            var otp = await _otpService.ValidateOtpAsync(user.Id, request.Code, OtpPurpose.PasswordReset);
+            if (otp == null)
+            {
+                return new ApiResponse<object>
+                {
+                    Success = false,
+                    MessageEn = "Invalid or expired OTP code.",
+                    MessageAr = "رمز OTP غير صالح أو منتهي الصلاحية.",
+                    Data = null
+                };
+            }
+
+            if(request.NewPassword != request.ConfirmNewPassword)
+            {
+                return new ApiResponse<object>
+                {
+                    Success = false,
+                    MessageEn = "New password and confirm password do not match.",
+                    MessageAr = "كلمة المرور الجديدة وتأكيد كلمة المرور غير متطابقين.",
+                    Data = null
+                };
+            }
+
+            var hashedPassword = HashingHelper.HashValueWith384(request.NewPassword);
+
+            user.Password = hashedPassword;
+
+            await _context.SaveChangesAsync();
+
+            return ApiResponse<object>.SuccessResponse(
+                null,
+                "Password reset successfully.",
+                "تم إعادة تعيين كلمة المرور بنجاح."
+            );
+        }
     }
 }
