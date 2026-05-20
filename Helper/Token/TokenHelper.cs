@@ -25,7 +25,7 @@ namespace FilmMaker.Helper.Token
                 new Claim("FirstName", firstName),
                 new Claim(ClaimTypes.Role, role)
                 }),
-                Expires = DateTime.UtcNow.AddHours(2),
+                Expires = DateTime.UtcNow.AddMinutes(15),
                 Issuer = config["Jwt:Issuer"],
                 Audience = config["Jwt:Audience"],
                 SigningCredentials = new SigningCredentials(

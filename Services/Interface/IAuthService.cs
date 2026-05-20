@@ -13,5 +13,7 @@ namespace FilmMaker.Services.Interface
         Task<ApiResponse<RegisterResponseDto>> RegisterProductionCompany(RegisterProductionCompanyRequestDto request);
         Task<ApiResponse<RegisterResponseDto>> RegisterServiceProvider(RegisterServiceProviderRequestDto request);
         Task<ApiResponse<LoginResponseDTO>> Login(LoginRequestDto request );
+
+        Task<ApiResponse<object>> RefreshToken(string refreshToken);
     }
 }

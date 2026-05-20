@@ -1,4 +1,5 @@
-﻿using FilmMaker.Common;
+﻿using Azure.Core;
+using FilmMaker.Common;
 using FilmMaker.DTO.Auth.Request;
 using FilmMaker.DTO.Auth.Response;
 using FilmMaker.Entities;
@@ -16,12 +17,14 @@ namespace FilmMaker.Services.Service
         private readonly FilmMakerDbContext _context;
         private readonly IConfiguration _configuration;
         private readonly ILogger<AuthService> _logger;
+        private readonly ITokenService _tokenService;
 
-        public AuthService(FilmMakerDbContext context, IConfiguration configuration , ILogger<AuthService> logger)
+        public AuthService(FilmMakerDbContext context, IConfiguration configuration , ILogger<AuthService> logger, ITokenService tokenService)
         {
             _context = context;
             _configuration = configuration;
             _logger = logger;
+            _tokenService = tokenService;
         }
         public async Task<ApiResponse<RegisterResponseDto>> RegisterLocationOwner(RegisterLocationOwnerRequestDto request)
         {
@@ -282,11 +285,10 @@ namespace FilmMaker.Services.Service
 
             var roleName = user.Roles.Name;
 
-            var token = TokenHelper.GenerateJWTToken(
-                            user.Id,
-                            user.Name,
-                            user.Roles.Name,
-                            _configuration);
+            var accessToken = _tokenService.GenerateAccessToken(user.Id, user.Name, roleName);
+            var refreshToken = _tokenService.GenerateRefreshToken();
+
+            await _tokenService.SaveRefreshTokenAsync(user.Id, refreshToken);
 
 
             user.LastLogin = DateTime.UtcNow;
@@ -297,8 +299,9 @@ namespace FilmMaker.Services.Service
 
             var response = new LoginResponseDTO
             {
-                Token = token,
-                Expiration = DateTime.Now.AddHours(2)
+                AccessToken = accessToken,
+                RefreshToken = refreshToken,
+                Expiration = DateTime.Now.AddMinutes(15)
             };
 
             return ApiResponse<LoginResponseDTO>.SuccessResponse(
@@ -512,7 +515,6 @@ namespace FilmMaker.Services.Service
             }
         }
 
-
         private ApiResponse<RegisterResponseDto>? ValidateBasicRegisterRequest(BaseRegisterDto request)
         {
             if (request == null)
@@ -699,6 +701,42 @@ namespace FilmMaker.Services.Service
             };
         }
 
-        
+        public async Task<ApiResponse<object>> RefreshToken(string refreshToken)
+        {
+            var stored = await _tokenService.GetRefreshTokenAsync(refreshToken);
+
+            if (stored is null)
+                return new ApiResponse<object>
+                {
+                    Data = null,
+                    Success = false,
+                    MessageEn =  "Invalid refresh token.",
+                    MessageAr = "رمز التحديث غير صالح."
+                };
+
+            if (stored.ExpiresAt < DateTime.UtcNow)
+                return new ApiResponse<object> { Data = null, Success = false, MessageEn = "Refresh token has expired.", MessageAr = "رمز التحديث غير صالح." };
+
+            await _tokenService.RevokeRefreshTokenAsync(refreshToken);
+
+            var newAccessToken = _tokenService.GenerateAccessToken(stored.UserId, stored.User.Name, stored.User.Roles.Name);
+
+            var newRefreshToken = _tokenService.GenerateRefreshToken();
+
+            await _tokenService.SaveRefreshTokenAsync(stored.UserId, newRefreshToken);
+
+            return new ApiResponse<object>
+            {
+                Success = true,
+                MessageEn = "Token refreshed successfully.",
+                MessageAr = "تم تحديث الرمز بنجاح.",
+                Data = new
+                {
+                    AccessToken = newAccessToken,
+                    RefreshToken = newRefreshToken,
+                }
+             };
+
+        }
     }
 }

@@ -16,7 +16,7 @@ namespace FilmMaker.Entities
         public DbSet<LocationManagerProfile> LocationManagerProfiles { get; set; }
         public DbSet<LocationManagerCity> LocationManagerCities { get; set; }
         public DbSet<PreviousProject> PreviousProjects { get; set; }
-
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<ProductionCompanyProfile> ProductionCompanyProfiles { get; set; }
         public DbSet<ProductionCompanyProductionType> ProductionCompanyProductionTypes { get; set; }
 
