@@ -12,5 +12,7 @@ namespace FilmMaker.Entities
         public LookupCategory LookupCategory { get; set; }
 
         public ICollection<ServicesProvided> ServicesProvided { get; set; }
+
+        public ICollection<RequestToLocationManagerToBookService> RequestToLocationManagers { get; set; }
     }
 }

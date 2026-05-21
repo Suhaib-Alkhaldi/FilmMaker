@@ -20,6 +20,7 @@ namespace FilmMaker.Entities
 
         public DbSet<ServicesProvided> ServicesProvided { get; set; }
 
+        public DbSet<RequestToLocationManagerToBookService> RequestToLocationManagerToBookService { get; set; }
         public DbSet<ServicesProvidedMedia> ServicesProvidedMedia { get; set; }
 
         public DbSet<ServiceProviderCities> ServiceProviderCities { get; set; }

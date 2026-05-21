@@ -16,7 +16,7 @@ namespace FilmMaker.Services.Interface
         Task<ApiResponse<List<GetServiceDTO>>> GetAllServices();
         Task<ApiResponse<List<GetServiceDTO>>> SearchServices(string searchTerm);
 
-        Task<ApiResponse<List<GetServiceDTO>>> GetMyServicesByProvider(int currentUserId);
+        Task<ApiResponse<List<GetServiceDTO>>> GetMyServicesByProvider(int currentUserId , bool includeDeleted = false);
         Task<ApiResponse<List<GetServiceDTO>>> GetServicesByProvider(int currentUserId);
         Task<ApiResponse<List<GetServiceDTO>>> GetServicesByServiceType(int serviceTypeId);
         Task<ApiResponse<List<GetServiceDTO>>> SearchServicesByServiceType(int serviceTypeId, string searchTerm);

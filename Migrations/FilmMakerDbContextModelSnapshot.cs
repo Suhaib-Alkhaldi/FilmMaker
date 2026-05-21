@@ -250,8 +250,9 @@ namespace FilmMaker.Migrations
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("CityId")
-                        .HasColumnType("int");
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Country")
                         .IsRequired()
@@ -314,8 +315,6 @@ namespace FilmMaker.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CityId");
 
                     b.HasIndex("LocationManagerId");
 
@@ -1058,6 +1057,70 @@ namespace FilmMaker.Migrations
                     b.ToTable("ProductionCompanyProfiles");
                 });
 
+            modelBuilder.Entity("FilmMaker.Entities.RequestToLocationManagerToBookService", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal?>("Latitude")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("LocationBookingId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("LocationOnGoogleMaps")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("Longitude")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ProductionCompanyId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ServiceTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LocationBookingId");
+
+                    b.HasIndex("ProductionCompanyId");
+
+                    b.HasIndex("ServiceTypeId");
+
+                    b.ToTable("RequestToLocationManagerToBookService");
+                });
+
             modelBuilder.Entity("FilmMaker.Entities.Role", b =>
                 {
                     b.Property<int>("Id")
@@ -1560,12 +1623,6 @@ namespace FilmMaker.Migrations
 
             modelBuilder.Entity("FilmMaker.Entities.Location", b =>
                 {
-                    b.HasOne("FilmMaker.Entities.LookupItem", "City")
-                        .WithMany()
-                        .HasForeignKey("CityId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
                     b.HasOne("FilmMaker.Entities.LocationManagerProfile", "LocationManager")
                         .WithMany()
                         .HasForeignKey("LocationManagerId");
@@ -1587,8 +1644,6 @@ namespace FilmMaker.Migrations
                         .HasForeignKey("LocationTypeId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
-
-                    b.Navigation("City");
 
                     b.Navigation("LocationManager");
 
@@ -1876,6 +1931,33 @@ namespace FilmMaker.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("FilmMaker.Entities.RequestToLocationManagerToBookService", b =>
+                {
+                    b.HasOne("FilmMaker.Entities.LocationBookingRequest", "LocationBooking")
+                        .WithMany("ServiceBookingRequests")
+                        .HasForeignKey("LocationBookingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FilmMaker.Entities.ProductionCompanyProfile", "ProductionCompany")
+                        .WithMany("ServiceBookingRequests")
+                        .HasForeignKey("ProductionCompanyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FilmMaker.Entities.LookupItem", "ServiceType")
+                        .WithMany("RequestToLocationManagers")
+                        .HasForeignKey("ServiceTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("LocationBooking");
+
+                    b.Navigation("ProductionCompany");
+
+                    b.Navigation("ServiceType");
+                });
+
             modelBuilder.Entity("FilmMaker.Entities.ServiceBooking", b =>
                 {
                     b.HasOne("FilmMaker.Entities.Location", "Location")
@@ -2027,6 +2109,8 @@ namespace FilmMaker.Migrations
 
             modelBuilder.Entity("FilmMaker.Entities.LocationBookingRequest", b =>
                 {
+                    b.Navigation("ServiceBookingRequests");
+
                     b.Navigation("StatusHistories");
                 });
 
@@ -2044,12 +2128,16 @@ namespace FilmMaker.Migrations
 
             modelBuilder.Entity("FilmMaker.Entities.LookupItem", b =>
                 {
+                    b.Navigation("RequestToLocationManagers");
+
                     b.Navigation("ServicesProvided");
                 });
 
             modelBuilder.Entity("FilmMaker.Entities.ProductionCompanyProfile", b =>
                 {
                     b.Navigation("ProductionTypes");
+
+                    b.Navigation("ServiceBookingRequests");
                 });
 
             modelBuilder.Entity("FilmMaker.Entities.ServiceProviderProfile", b =>

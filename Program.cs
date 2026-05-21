@@ -57,7 +57,7 @@ builder.Services.AddDbContext<FilmMakerDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")));
 
-
+builder.Services.AddScoped<IRequestToLocationManagerToBookServiceService, RequestToLocationManagerToBookServiceService>();
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IProfileService, ProfileService>();

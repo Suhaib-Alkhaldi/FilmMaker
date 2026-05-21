@@ -68,7 +68,7 @@ namespace FilmMaker.Services.Service
             Notes = booking.Notes,
             BookingStartDate = booking.bookingStartDate,
             BookingEndDate = booking.bookingEndDate,
-            TotalDays = (booking.bookingEndDate - booking.bookingStartDate).Days,
+            TotalDays = (booking.bookingEndDate - booking.bookingStartDate).Days ,
             TotalPrice = (booking.bookingEndDate - booking.bookingStartDate).Days
                                     * (booking.Service?.DailyPrice ?? 0),
             CreatedAt = booking.CreatedAt,
@@ -108,17 +108,24 @@ namespace FilmMaker.Services.Service
                 .Include(b => b.Status)
                 .Include(b => b.Requester)
                 .Include(b => b.Location)
-                    .ThenInclude(l => l.City)
                 .Include(b => b.Service)
                     .ThenInclude(s => s.ServiceType)
                 .Include(b => b.Service)
                     .ThenInclude(s => s.ServiceProvider)
                         .ThenInclude(sp => sp.User);
 
-
+        private async Task<bool> IsManagerOfTheLocationAsync(int userId, int locationId)
+        {
+            return await _context.Locations
+                .AnyAsync(l =>
+                    l.Id == locationId &&
+                    !l.IsDeleted &&
+                    l.LocationManager != null &&
+                    l.LocationManager.UserId == userId);
+        }
         // the actual code
         public async Task<ApiResponse<CreateServiceBookingDTO>> CreateBookingRequest(
-            CreateServiceBookingDTO dto, int currentUserId)
+            CreateServiceBookingDTO dto, int currentUserId, bool isLocationManager)
         {
             try
             {
@@ -181,10 +188,10 @@ namespace FilmMaker.Services.Service
                     IsDeleted = false
                     
                 };
-                if(!dto.LocationId.HasValue)
+                if (!dto.LocationId.HasValue)
                 {
 
-                    if(dto.Latitude != 0 && dto.Longitude != 0)
+                    if (dto.Latitude != 0 && dto.Longitude != 0)
                     {
                         booking.Latitude = dto.Latitude;
                         booking.Longitude = dto.Longitude;
@@ -208,14 +215,35 @@ namespace FilmMaker.Services.Service
                        "الموقع أو خط العرض وخط الطول مطلوبان"
                    );
                     }
-                }else if (!await _context.Locations
-                                        .AnyAsync(l => l.Id == dto.LocationId))
-                                    {
-                                        return ApiResponse<CreateServiceBookingDTO>.FailureResponse(
-                                            "Location not found",
-                                            "الموقع غير موجود"
-                                        );
-}
+                }
+                else if (!await _context.Locations.AnyAsync(l => l.Id == dto.LocationId))
+                {
+                    return ApiResponse<CreateServiceBookingDTO>.FailureResponse(
+                        "Location not found",
+                        "الموقع غير موجود"
+                );
+                }
+                else if (isLocationManager)
+                {
+                    if (await IsManagerOfTheLocationAsync(currentUserId, dto.LocationId.Value))
+
+                    booking.LocationId = dto.LocationId;
+
+                    else
+                    {
+                        return ApiResponse<CreateServiceBookingDTO>.FailureResponse(
+                            "You are not the manager of the selected location",
+                            "أنت لست مدير الموقع المحدد"
+                        );
+                    }
+                }
+                else if(dto.LocationId != null)
+                {
+                    return ApiResponse<CreateServiceBookingDTO>.FailureResponse(
+                            "only location manager can request service to locations",
+                            "فقط مدير الموقع يمكنه حجز خدمة للموقع"
+                            );
+                }
 
                 await _context.ServiceBookings.AddAsync(booking);
                 await _context.SaveChangesAsync();

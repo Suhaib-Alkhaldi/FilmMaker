@@ -7,7 +7,7 @@ namespace FilmMaker.Services.Interface
     {
         Task<ApiResponse<CreateServiceBookingDTO>> CreateBookingRequest(
           CreateServiceBookingDTO dto,
-          int currentUserId);
+          int currentUserId, bool isLocationManager);
 
         
         Task<ApiResponse<GetServiceBookingDTO>> GetBookingById(

@@ -26,6 +26,7 @@
   <ItemGroup>
     <Folder Include="DataSeed\" />
     <Folder Include="Helper\Enum\" />
+    <Folder Include="Migrations\" />
   </ItemGroup>
 
 </Project>

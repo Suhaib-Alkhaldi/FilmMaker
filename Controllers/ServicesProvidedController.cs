@@ -79,7 +79,7 @@ namespace FilmMaker.Controllers
             return result.Success ? Ok(result) : BadRequest(result);
         }
 
-        [HttpDelete("restore/{serviceId:int}")]
+        [HttpPatch("restore/{serviceId:int}")]
         [AuthorizeServiceProvider]
 
         public async Task<IActionResult> RestoreDeleteService(int serviceId)
@@ -127,6 +127,15 @@ namespace FilmMaker.Controllers
             return result.Success ? Ok(result) : BadRequest(result);
         }
 
+
+        [HttpGet("search")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetAllServicesByName([FromQuery] string searchTerm)
+        {
+            var result = await _servicesProvidedService.SearchServices(searchTerm );
+            return result.Success ? Ok(result) : BadRequest(result);
+        }
+
         [HttpGet("{serviceId:int}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetServiceById(int serviceId)
@@ -149,6 +158,19 @@ namespace FilmMaker.Controllers
             return result.Success ? Ok(result) : BadRequest(result);
         }
 
+        [HttpGet("my-services/deleted")]
+        [AuthorizeServiceProvider]
+
+        public async Task<IActionResult> GetMyDeletedServices()
+        {
+            var currentUserId = GetCurrentUserId();
+            if (currentUserId == 0)
+                return Unauthorized(new { MessageEn = "Invalid token", MessageAr = "رمز غير صالح" });
+
+            var result = await _servicesProvidedService.GetMyServicesByProvider(currentUserId, includeDeleted: true);
+            return result.Success ? Ok(result) : BadRequest(result);
+        }
+
         [HttpGet("by-provider/{providerId:int}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetServicesByProvider(int providerId)
@@ -162,6 +184,14 @@ namespace FilmMaker.Controllers
         public async Task<IActionResult> GetServicesByServiceType(int serviceTypeId)
         {
             var result = await _servicesProvidedService.GetServicesByServiceType(serviceTypeId);
+            return result.Success ? Ok(result) : BadRequest(result);
+        }
+
+        [HttpGet("by-type/{serviceTypeId:int}/search")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetServicesByServiceTypeAndByName(int serviceTypeId, [FromQuery] string searchTerm)
+        {
+            var result = await _servicesProvidedService.SearchServicesByServiceType(serviceTypeId, searchTerm);
             return result.Success ? Ok(result) : BadRequest(result);
         }
     }

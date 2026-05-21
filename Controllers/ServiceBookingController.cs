@@ -42,16 +42,35 @@ namespace FilmMaker.Controllers
             return userId;
         }
 
+        private string GetCurrentUserRole()
+        {
+            var role = User.FindFirst(ClaimTypes.Role)?.Value;
+
+            if (string.IsNullOrEmpty(role))
+            {
+                return "";
+            }
+
+            return role;
+        }
+
 
         [HttpPost]
         [Authorize(Roles = "Location Manager,Production Company")]
         public async Task<IActionResult> CreateBookingRequest([FromBody] CreateServiceBookingDTO dto)
         {
             var currentUserId = GetCurrentUserId();
+            var isLocationManager = false;
+
             if (currentUserId == 0)
                 return Unauthorized(new { MessageEn = "Invalid token", MessageAr = "رمز غير صالح" ,Success = false});
 
-            var result = await _serviceBookingService.CreateBookingRequest(dto, currentUserId);
+            var userRole = GetCurrentUserRole();
+
+            if (userRole == "Location Manager")
+                 isLocationManager = true;
+
+            var result = await _serviceBookingService.CreateBookingRequest(dto, currentUserId, isLocationManager);
             return result.Success ? Ok(result) : BadRequest(result);
         }
 
