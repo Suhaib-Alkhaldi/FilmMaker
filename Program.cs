@@ -18,6 +18,8 @@ Log.Logger = new LoggerConfiguration()
 
 builder.Host.UseSerilog();
 
+builder.Services.AddScoped<ILocationService, LocationService>();
+
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -55,10 +57,12 @@ builder.Services.AddDbContext<FilmMakerDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")));
 
-
+builder.Services.AddScoped<IRequestToLocationManagerToBookServiceService, RequestToLocationManagerToBookServiceService>();
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
+builder.Services.AddScoped<IServicesProvidedService, ServicesProvidedService>();
+builder.Services.AddScoped<IServiceBookingService, ServiceBookingService>();
 
 builder.Services.AddScoped<ILocationVisitService, LocationVisitService>();
 builder.Services.AddScoped<ILocationBookingService, LocationBookingService>();

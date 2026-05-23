@@ -521,6 +521,7 @@ namespace FilmMaker.Services.Service
             var profile = await _context.ServiceProviderProfiles
                 .Include(x => x.User)
                 .Include(x => x.ServiceTypes)
+                .Include(x => x.Cities)
                 .Where(x => x.UserId == currentUserId &&!x.IsDeleted)
                 .FirstOrDefaultAsync();
 
@@ -569,6 +570,11 @@ namespace FilmMaker.Services.Service
                         request.ServiceTypeIds,
                         currentUserId
                     );
+                }
+
+                if(request.CitiesIds != null)
+                {
+                    UpdateServiceProviderCities(profile, request.CitiesIds, currentUserId);
                 }
 
                 if (request.CustomServiceTypes != null)
@@ -1276,6 +1282,48 @@ namespace FilmMaker.Services.Service
                     ServiceProviderId = profile.Id,
                     ServiceTypeId = serviceTypeId,
                     IsCustom = false,
+                    IsActive = true,
+                    IsDeleted = false,
+                    CreatedBy = currentUserId.ToString(),
+                    CreatedAt = DateTime.UtcNow
+                });
+            }
+        }
+
+        private static void UpdateServiceProviderCities(ServiceProviderProfile profile,List<int> cityIds,int currentUserId)
+        {
+            var requestedCityIds = cityIds
+                .Distinct()
+                .ToList();
+
+            var activeCities = profile.Cities
+                .Where(x => !x.IsDeleted)
+                .ToList();
+
+            foreach (var existingCity in activeCities)
+            {
+                if (!requestedCityIds.Contains(existingCity.CityId))
+                {
+                    existingCity.IsDeleted = true;
+                    existingCity.IsActive = false;
+                    existingCity.UpdatedBy = currentUserId.ToString();
+                    existingCity.UpdatedAt = DateTime.UtcNow;
+                }
+            }
+            var existingActiveCityIds = profile.Cities
+                .Where(x => !x.IsDeleted)
+                .Select(x => x.CityId)
+                .ToHashSet();
+            var newCityIds = requestedCityIds
+                .Where(cityId => !existingActiveCityIds.Contains(cityId))
+                .ToList();
+
+            foreach (var cityId in newCityIds)
+            {
+                profile.Cities.Add(new ServiceProviderCities
+                {
+                    ServiceProviderId = profile.Id,
+                    CityId = cityId,
                     IsActive = true,
                     IsDeleted = false,
                     CreatedBy = currentUserId.ToString(),

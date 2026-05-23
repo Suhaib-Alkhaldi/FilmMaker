@@ -12,5 +12,7 @@ namespace FilmMaker.Entities
         public virtual User User { get; set; }
         public DateTime RegisterDate { get; set; } = DateTime.UtcNow;
         public ICollection<ProductionCompanyProductionType> ProductionTypes { get; set; }
+
+        public ICollection<RequestToLocationManagerToBookService> ServiceBookingRequests { get; set; }
     }
 }
