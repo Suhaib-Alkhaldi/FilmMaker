@@ -1,4 +1,5 @@
-﻿using FilmMaker.Common;
+﻿using FilmMaker.Attribute;
+using FilmMaker.Common;
 using FilmMaker.DTO.Booking;
 using FilmMaker.Services.Interface;
 using Microsoft.AspNetCore.Http;
@@ -6,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FilmMaker.Controllers
 {
+    [AuthorizeLocationOwner]
     [Route("api/[controller]")]
     [ApiController]
     public class BookingRequestsController : ControllerBase
@@ -16,15 +18,69 @@ namespace FilmMaker.Controllers
             _locationOwnerBookingRequestService = locationOwnerBookingRequestService;
         }
 
-        [HttpGet("GetReceivedBookingRequests")]
-        public async Task<ActionResult<ApiResponse<List<BookingRequestResponseDto>>>> GetReceivedBookingRequests()
+        //[HttpGet("GetReceivedBookingRequests")]
+        //public async Task<ActionResult<ApiResponse<List<BookingRequestResponseDto>>>> GetReceivedBookingRequests()
+        //{
+        //    var currentUserId = GetCurrentUserId();
+
+        //    if (currentUserId == null)
+        //        return Unauthorized();
+
+        //    var result = await _locationOwnerBookingRequestService.GetReceivedBookingRequests(currentUserId.Value);
+
+        //    if (!result.Success)
+        //        return BadRequest(result);
+
+        //    return Ok(result);
+        //}
+
+        [HttpGet("received/pending")]
+        public async Task<ActionResult<ApiResponse<List<BookingRequestResponseDto>>>> GetReceivedPendingBookingRequests()
         {
             var currentUserId = GetCurrentUserId();
 
             if (currentUserId == null)
                 return Unauthorized();
 
-            var result = await _locationOwnerBookingRequestService.GetReceivedBookingRequests(currentUserId.Value);
+            var result = await _locationOwnerBookingRequestService.GetReceivedPendingBookingRequests(
+                currentUserId.Value
+            );
+
+            if (!result.Success)
+                return BadRequest(result);
+
+            return Ok(result);
+        }
+
+        [HttpGet("received/accepted")]
+        public async Task<ActionResult<ApiResponse<List<BookingRequestResponseDto>>>> GetReceivedAcceptedBookingRequests()
+        {
+            var currentUserId = GetCurrentUserId();
+
+            if (currentUserId == null)
+                return Unauthorized();
+
+            var result = await _locationOwnerBookingRequestService.GetReceivedAcceptedBookingRequests(
+                currentUserId.Value
+            );
+
+            if (!result.Success)
+                return BadRequest(result);
+
+            return Ok(result);
+        }
+
+        [HttpGet("received/rejected")]
+        public async Task<ActionResult<ApiResponse<List<BookingRequestResponseDto>>>> GetReceivedRejectedBookingRequests()
+        {
+            var currentUserId = GetCurrentUserId();
+
+            if (currentUserId == null)
+                return Unauthorized();
+
+            var result = await _locationOwnerBookingRequestService.GetReceivedRejectedBookingRequests(
+                currentUserId.Value
+            );
 
             if (!result.Success)
                 return BadRequest(result);

@@ -5,7 +5,7 @@
         public int locationId {  get; set; }
         public string? LocationName { get; set; }
         public string? LocationDescription { get; set; }
-        public string Country { get; set; } = string.Empty;
+        public string? Country { get; set; } 
         public decimal? HourlyPrice { get; set; }
         public string? FacilitiesDescription { get; set; }
         public int? LocationTypeId { get; set; }

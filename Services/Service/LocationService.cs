@@ -240,23 +240,31 @@ namespace FilmMaker.Services.Service
                 );
             }
 
-            var location = await _context.Locations
-                .Include(x => x.TermsOfUse)
-                .Include(x => x.Media)
-                    .ThenInclude(x => x.Media)
-                        .ThenInclude(x => x.MediaType)
-                        .Where(x =>
-                    x.Id == request.locationId &&
-                    x.LocationOwnerId == locationOwnerId.Value &&
-                    !x.IsDeleted).FirstOrDefaultAsync();
-
-            if (location == null)
+            var locationQuery = _context.Locations.Where(x =>x.Id == request.locationId &&
+                                                        x.LocationOwnerId == locationOwnerId.Value &&!x.IsDeleted);
+            if (locationQuery == null)
             {
                 return ApiResponse<LocationResponseDto>.FailureResponse(
                     "Location was not found.",
                     "لم يتم العثور على الموقع."
                 );
             }
+
+            if (request.TermsOfUse != null)
+            {
+                locationQuery = locationQuery
+                    .Include(x => x.TermsOfUse);
+            }
+
+            if (request.MediaIds != null)
+            {
+                locationQuery = locationQuery
+                    .Include(x => x.Media)
+                        .ThenInclude(x => x.Media)
+                            .ThenInclude(x => x.MediaType);
+            }
+
+            var location = await locationQuery.FirstOrDefaultAsync();
 
             LookupItem? locationType = null;
 

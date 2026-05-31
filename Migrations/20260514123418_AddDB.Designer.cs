@@ -4,6 +4,7 @@ using FilmMaker.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,16 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FilmMaker.Migrations
 {
     [DbContext(typeof(FilmMakerDbContext))]
-    partial class FilmMakerDbContextModelSnapshot : ModelSnapshot
+<<<<<<<< HEAD:Migrations/20260514130124_Update.Designer.cs
+    [Migration("20260514130124_Update")]
+    partial class Update
+========
+    [Migration("20260514123418_AddDB")]
+    partial class AddDB
+>>>>>>>> 8a2749c2038ca82db2a69c376c148a7976723699:Migrations/20260514123418_AddDB.Designer.cs
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -693,6 +701,9 @@ namespace FilmMaker.Migrations
                     b.Property<int>("LocationManagerId")
                         .HasColumnType("int");
 
+                    b.Property<int>("LocationOwnerId")
+                        .HasColumnType("int");
+
                     b.Property<string>("OwnerResponseMessage")
                         .HasColumnType("nvarchar(max)");
 
@@ -722,6 +733,8 @@ namespace FilmMaker.Migrations
                     b.HasIndex("LocationId");
 
                     b.HasIndex("LocationManagerId");
+
+                    b.HasIndex("LocationOwnerId");
 
                     b.HasIndex("RespondedByUserId");
 
@@ -1519,6 +1532,12 @@ namespace FilmMaker.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
+                    b.HasOne("FilmMaker.Entities.LocationOwnerProfile", "LocationOwner")
+                        .WithMany()
+                        .HasForeignKey("LocationOwnerId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.HasOne("FilmMaker.Entities.User", "RespondedByUser")
                         .WithMany()
                         .HasForeignKey("RespondedByUserId");
@@ -1532,6 +1551,8 @@ namespace FilmMaker.Migrations
                     b.Navigation("Location");
 
                     b.Navigation("LocationManager");
+
+                    b.Navigation("LocationOwner");
 
                     b.Navigation("RespondedByUser");
 

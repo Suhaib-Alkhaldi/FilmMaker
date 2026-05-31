@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FilmMaker.Migrations
 {
     [DbContext(typeof(FilmMakerDbContext))]
-    [Migration("20260514130124_Update")]
-    partial class Update
+    [Migration("20260514172123_DeleteLocationOwnerFromLocationVisitRequest")]
+    partial class DeleteLocationOwnerFromLocationVisitRequest
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -696,9 +696,6 @@ namespace FilmMaker.Migrations
                     b.Property<int>("LocationManagerId")
                         .HasColumnType("int");
 
-                    b.Property<int>("LocationOwnerId")
-                        .HasColumnType("int");
-
                     b.Property<string>("OwnerResponseMessage")
                         .HasColumnType("nvarchar(max)");
 
@@ -728,8 +725,6 @@ namespace FilmMaker.Migrations
                     b.HasIndex("LocationId");
 
                     b.HasIndex("LocationManagerId");
-
-                    b.HasIndex("LocationOwnerId");
 
                     b.HasIndex("RespondedByUserId");
 
@@ -1527,12 +1522,6 @@ namespace FilmMaker.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("FilmMaker.Entities.LocationOwnerProfile", "LocationOwner")
-                        .WithMany()
-                        .HasForeignKey("LocationOwnerId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
                     b.HasOne("FilmMaker.Entities.User", "RespondedByUser")
                         .WithMany()
                         .HasForeignKey("RespondedByUserId");
@@ -1546,8 +1535,6 @@ namespace FilmMaker.Migrations
                     b.Navigation("Location");
 
                     b.Navigation("LocationManager");
-
-                    b.Navigation("LocationOwner");
 
                     b.Navigation("RespondedByUser");
 

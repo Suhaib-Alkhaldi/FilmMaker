@@ -4,6 +4,7 @@ using FilmMaker.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FilmMaker.Migrations
 {
     [DbContext(typeof(FilmMakerDbContext))]
-    partial class FilmMakerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260513135709_UpdateLocationBookingRequest")]
+    partial class UpdateLocationBookingRequest
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -402,9 +405,6 @@ namespace FilmMaker.Migrations
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("EndDateTime")
-                        .HasColumnType("datetime2");
-
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
@@ -420,13 +420,17 @@ namespace FilmMaker.Migrations
                     b.Property<int>("LocationOwnerId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Message")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int?>("ProductionCompanyId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("StartDateTime")
+                    b.Property<string>("RequestDetails")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("RequestedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ShootingDate")
                         .HasColumnType("datetime2");
 
                     b.Property<decimal>("TotalPrice")
@@ -693,6 +697,9 @@ namespace FilmMaker.Migrations
                     b.Property<int>("LocationManagerId")
                         .HasColumnType("int");
 
+                    b.Property<int>("LocationOwnerId")
+                        .HasColumnType("int");
+
                     b.Property<string>("OwnerResponseMessage")
                         .HasColumnType("nvarchar(max)");
 
@@ -722,6 +729,8 @@ namespace FilmMaker.Migrations
                     b.HasIndex("LocationId");
 
                     b.HasIndex("LocationManagerId");
+
+                    b.HasIndex("LocationOwnerId");
 
                     b.HasIndex("RespondedByUserId");
 
@@ -1519,9 +1528,16 @@ namespace FilmMaker.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
+                    b.HasOne("FilmMaker.Entities.LocationOwnerProfile", "LocationOwner")
+                        .WithMany()
+                        .HasForeignKey("LocationOwnerId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.HasOne("FilmMaker.Entities.User", "RespondedByUser")
                         .WithMany()
-                        .HasForeignKey("RespondedByUserId");
+                        .HasForeignKey("RespondedByUserId")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("FilmMaker.Entities.LookupItem", "VisitStatus")
                         .WithMany()
@@ -1532,6 +1548,8 @@ namespace FilmMaker.Migrations
                     b.Navigation("Location");
 
                     b.Navigation("LocationManager");
+
+                    b.Navigation("LocationOwner");
 
                     b.Navigation("RespondedByUser");
 
