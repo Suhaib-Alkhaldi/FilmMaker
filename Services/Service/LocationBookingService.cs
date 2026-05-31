@@ -20,13 +20,13 @@ namespace FilmMaker.Services.Service
             _logger = logger;
         }
 
-        public async Task<ApiResponse<BookingRequestResponseDto>> CreateBookingRequestAsync(int productionCompanyProfileId, CreateBookingRequestDto dto)
+        public async Task<ApiResponse<LocationOwnerBookingRequestResponseDto>> CreateBookingRequestAsync(int productionCompanyProfileId, CreateBookingRequestDto dto)
         {
             try
             {
                 if (dto.StartDateTime >= dto.EndDateTime)
                 {
-                    return ApiResponse<BookingRequestResponseDto>.FailureResponse(
+                    return ApiResponse<LocationOwnerBookingRequestResponseDto>.FailureResponse(
                         "Start time must be before end time.",
                         "وقت البداية يجب أن يكون قبل وقت النهاية."
                     );
@@ -34,7 +34,7 @@ namespace FilmMaker.Services.Service
 
                 if (dto.StartDateTime < DateTime.UtcNow)
                 {
-                    return ApiResponse<BookingRequestResponseDto>.FailureResponse(
+                    return ApiResponse<LocationOwnerBookingRequestResponseDto>.FailureResponse(
                         "Cannot book in the past.",
                         "لا يمكن الحجز في تاريخ ماضٍ."
                     );
@@ -48,7 +48,7 @@ namespace FilmMaker.Services.Service
 
                 if (location == null)
                 {
-                    return ApiResponse<BookingRequestResponseDto>.FailureResponse(
+                    return ApiResponse<LocationOwnerBookingRequestResponseDto>.FailureResponse(
                         "Location not found or inactive.",
                         "الموقع غير موجود أو غير نشط."
                     );
@@ -81,7 +81,7 @@ namespace FilmMaker.Services.Service
 
                 if (hasConflict)
                 {
-                    return ApiResponse<BookingRequestResponseDto>.FailureResponse(
+                    return ApiResponse<LocationOwnerBookingRequestResponseDto>.FailureResponse(
                         "This location is already booked for the selected time.",
                         "الموقع محجوز مسبقاً في هذا الوقت."
                     );
@@ -97,7 +97,7 @@ namespace FilmMaker.Services.Service
 
                 if (pendingStatus == null)
                 {
-                    return ApiResponse<BookingRequestResponseDto>.FailureResponse(
+                    return ApiResponse<LocationOwnerBookingRequestResponseDto>.FailureResponse(
                         "System error: status not found.",
                         "خطأ في النظام: الحالة غير موجودة."
                     );
@@ -127,7 +127,7 @@ namespace FilmMaker.Services.Service
                     dto.LocationId, productionCompanyProfileId
                 );
 
-                return ApiResponse<BookingRequestResponseDto>.SuccessResponse(
+                return ApiResponse<LocationOwnerBookingRequestResponseDto>.SuccessResponse(
                     MapToDto(booking, location, isFullDay, pendingStatus.Name),
                     "Booking request sent successfully.",
                     "تم إرسال طلب الحجز بنجاح."
@@ -140,14 +140,14 @@ namespace FilmMaker.Services.Service
                     dto.LocationId
                 );
 
-                return ApiResponse<BookingRequestResponseDto>.FailureResponse(
+                return ApiResponse<LocationOwnerBookingRequestResponseDto>.FailureResponse(
                     "An error occurred while creating the booking request.",
                     "حدث خطأ أثناء إنشاء طلب الحجز."
                 );
             }
         }
 
-        public async Task<ApiResponse<List<BookingRequestResponseDto>>> GetBookingRequestsAsync(int managerProfileId)
+        public async Task<ApiResponse<List<LocationOwnerBookingRequestResponseDto>>> GetBookingRequestsAsync(int managerProfileId)
         {
             try
             {
@@ -159,7 +159,7 @@ namespace FilmMaker.Services.Service
                         b.IsActive &&
                         !b.IsDeleted)
                     .OrderByDescending(b => b.CreatedAt)
-                    .Select(b => new BookingRequestResponseDto
+                    .Select(b => new LocationOwnerBookingRequestResponseDto
                     {
                         Id = b.Id,
                         LocationId = b.LocationId,
@@ -177,7 +177,7 @@ namespace FilmMaker.Services.Service
                     })
                     .ToListAsync();
 
-                return ApiResponse<List<BookingRequestResponseDto>>.SuccessResponse(
+                return ApiResponse<List<LocationOwnerBookingRequestResponseDto>>.SuccessResponse(
                     requests,
                     "Booking requests retrieved successfully.",
                     "تم جلب طلبات الحجز بنجاح."
@@ -190,14 +190,14 @@ namespace FilmMaker.Services.Service
                     managerProfileId
                 );
 
-                return ApiResponse<List<BookingRequestResponseDto>>.FailureResponse(
+                return ApiResponse<List<LocationOwnerBookingRequestResponseDto>>.FailureResponse(
                     "An error occurred while retrieving booking requests.",
                     "حدث خطأ أثناء جلب طلبات الحجز."
                 );
             }
         }
 
-        public async Task<ApiResponse<BookingRequestResponseDto>> GetBookingRequestByIdAsync(int requestId, int managerProfileId)
+        public async Task<ApiResponse<LocationOwnerBookingRequestResponseDto>> GetBookingRequestByIdAsync(int requestId, int managerProfileId)
         {
             try
             {
@@ -212,13 +212,13 @@ namespace FilmMaker.Services.Service
 
                 if (request == null)
                 {
-                    return ApiResponse<BookingRequestResponseDto>.FailureResponse(
+                    return ApiResponse<LocationOwnerBookingRequestResponseDto>.FailureResponse(
                         "Booking request not found.",
                         "طلب الحجز غير موجود."
                     );
                 }
 
-                return ApiResponse<BookingRequestResponseDto>.SuccessResponse(
+                return ApiResponse<LocationOwnerBookingRequestResponseDto>.SuccessResponse(
                     MapToDto(request, request.Location),
                     "Booking request retrieved successfully.",
                     "تم جلب طلب الحجز بنجاح."
@@ -228,14 +228,14 @@ namespace FilmMaker.Services.Service
             {
                 _logger.LogError(ex, "Error getting booking request {RequestId}", requestId);
 
-                return ApiResponse<BookingRequestResponseDto>.FailureResponse(
+                return ApiResponse<LocationOwnerBookingRequestResponseDto>.FailureResponse(
                     "An error occurred while retrieving the booking request.",
                     "حدث خطأ أثناء جلب طلب الحجز."
                 );
             }
         }
 
-        public async Task<ApiResponse<BookingRequestResponseDto>> UpdateBookingRequestAsync(int requestId, int managerProfileId, UpdateBookingRequestDto dto)
+        public async Task<ApiResponse<LocationOwnerBookingRequestResponseDto>> UpdateBookingRequestAsync(int requestId, int managerProfileId, UpdateBookingRequestDto dto)
         {
             try
             {
@@ -250,7 +250,7 @@ namespace FilmMaker.Services.Service
 
                 if (request == null)
                 {
-                    return ApiResponse<BookingRequestResponseDto>.FailureResponse(
+                    return ApiResponse<LocationOwnerBookingRequestResponseDto>.FailureResponse(
                         "Booking request not found.",
                         "طلب الحجز غير موجود."
                     );
@@ -258,7 +258,7 @@ namespace FilmMaker.Services.Service
 
                 if (request.BookingStatus.Name != "Pending")
                 {
-                    return ApiResponse<BookingRequestResponseDto>.FailureResponse(
+                    return ApiResponse<LocationOwnerBookingRequestResponseDto>.FailureResponse(
                         "Only pending requests can be updated.",
                         "يمكن تعديل الطلبات المعلقة فقط."
                     );
@@ -269,7 +269,7 @@ namespace FilmMaker.Services.Service
 
                 if (finalStart >= finalEnd)
                 {
-                    return ApiResponse<BookingRequestResponseDto>.FailureResponse(
+                    return ApiResponse<LocationOwnerBookingRequestResponseDto>.FailureResponse(
                         "Start time must be before end time.",
                         "وقت البداية يجب أن يكون قبل وقت النهاية."
                     );
@@ -277,7 +277,7 @@ namespace FilmMaker.Services.Service
 
                 if (finalStart < DateTime.UtcNow)
                 {
-                    return ApiResponse<BookingRequestResponseDto>.FailureResponse(
+                    return ApiResponse<LocationOwnerBookingRequestResponseDto>.FailureResponse(
                         "Cannot book in the past.",
                         "لا يمكن الحجز في تاريخ ماضٍ."
                     );
@@ -311,7 +311,7 @@ namespace FilmMaker.Services.Service
 
                 if (hasConflict)
                 {
-                    return ApiResponse<BookingRequestResponseDto>.FailureResponse(
+                    return ApiResponse<LocationOwnerBookingRequestResponseDto>.FailureResponse(
                         "This location is already booked for the selected time.",
                         "الموقع محجوز مسبقاً في هذا الوقت."
                     );
@@ -335,7 +335,7 @@ namespace FilmMaker.Services.Service
 
                 _logger.LogInformation("Booking request {RequestId} updated", requestId);
 
-                return ApiResponse<BookingRequestResponseDto>.SuccessResponse(
+                return ApiResponse<LocationOwnerBookingRequestResponseDto>.SuccessResponse(
                     MapToDto(request, request.Location, isFullDay),
                     "Booking request updated successfully.",
                     "تم تعديل طلب الحجز بنجاح."
@@ -345,7 +345,7 @@ namespace FilmMaker.Services.Service
             {
                 _logger.LogError(ex, "Error updating booking request {RequestId}", requestId);
 
-                return ApiResponse<BookingRequestResponseDto>.FailureResponse(
+                return ApiResponse<LocationOwnerBookingRequestResponseDto>.FailureResponse(
                     "An error occurred while updating the booking request.",
                     "حدث خطأ أثناء تعديل طلب الحجز."
                 );
@@ -414,7 +414,7 @@ namespace FilmMaker.Services.Service
             return hours * (location.HourlyPrice ?? location.DailyPrice);
         }
 
-        private static BookingRequestResponseDto MapToDto(
+        private static LocationOwnerBookingRequestResponseDto MapToDto(
             LocationBookingRequest request,
             Location location,
             bool? isFullDay = null,
@@ -422,7 +422,7 @@ namespace FilmMaker.Services.Service
         {
             var fullDay = isFullDay ?? (request.EndDateTime - request.StartDateTime).TotalHours >= 4;
 
-            return new BookingRequestResponseDto
+            return new LocationOwnerBookingRequestResponseDto
             {
                 Id = request.Id,
                 LocationId = request.LocationId,

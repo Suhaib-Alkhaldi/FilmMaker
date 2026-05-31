@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FilmMaker.Migrations
 {
     [DbContext(typeof(FilmMakerDbContext))]
-    [Migration("20260513130111_AddLocationVisitRequest")]
-    partial class AddLocationVisitRequest
+    [Migration("20260514130124_Update")]
+    partial class Update
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -405,6 +405,9 @@ namespace FilmMaker.Migrations
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("EndDateTime")
+                        .HasColumnType("datetime2");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
@@ -420,17 +423,13 @@ namespace FilmMaker.Migrations
                     b.Property<int>("LocationOwnerId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ProductionCompanyId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("RequestDetails")
-                        .IsRequired()
+                    b.Property<string>("Message")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("RequestedAtUtc")
-                        .HasColumnType("datetime2");
+                    b.Property<int?>("ProductionCompanyId")
+                        .HasColumnType("int");
 
-                    b.Property<DateTime>("ShootingDate")
+                    b.Property<DateTime>("StartDateTime")
                         .HasColumnType("datetime2");
 
                     b.Property<decimal>("TotalPrice")
@@ -1430,8 +1429,7 @@ namespace FilmMaker.Migrations
                     b.HasOne("FilmMaker.Entities.ProductionCompanyProfile", "ProductionCompany")
                         .WithMany()
                         .HasForeignKey("ProductionCompanyId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("BookingStatus");
 
@@ -1537,8 +1535,7 @@ namespace FilmMaker.Migrations
 
                     b.HasOne("FilmMaker.Entities.User", "RespondedByUser")
                         .WithMany()
-                        .HasForeignKey("RespondedByUserId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .HasForeignKey("RespondedByUserId");
 
                     b.HasOne("FilmMaker.Entities.LookupItem", "VisitStatus")
                         .WithMany()

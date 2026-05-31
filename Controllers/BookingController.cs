@@ -26,12 +26,12 @@ namespace FilmMaker.Controllers
         }
 
         [HttpPost("create-booking-request")]
-        public async Task<ActionResult<ApiResponse<BookingRequestResponseDto>>> CreateBookingRequest(CreateBookingRequestDto dto)
+        public async Task<ActionResult<ApiResponse<LocationOwnerBookingRequestResponseDto>>> CreateBookingRequest(CreateBookingRequestDto dto)
         {
             var currentUserId = GetCurrentUserId();
             if (currentUserId == null)
                 return Unauthorized(
-                    ApiResponse<BookingRequestResponseDto>.FailureResponse(
+                    ApiResponse<LocationOwnerBookingRequestResponseDto>.FailureResponse(
                         "Unauthorized.",
                         "غير مصرح."
                     ));
@@ -43,12 +43,12 @@ namespace FilmMaker.Controllers
         }
 
         [HttpGet("my-booking-requests")]
-        public async Task<ActionResult<ApiResponse<List<BookingRequestResponseDto>>>> GetMyBookingRequests()
+        public async Task<ActionResult<ApiResponse<List<LocationOwnerBookingRequestResponseDto>>>> GetMyBookingRequests()
         {
             var currentUserId = GetCurrentUserId();
             if (currentUserId == null)
                 return Unauthorized(
-                    ApiResponse<List<BookingRequestResponseDto>>.FailureResponse(
+                    ApiResponse<List<LocationOwnerBookingRequestResponseDto>>.FailureResponse(
                         "Unauthorized.",
                         "غير مصرح."
                     ));
@@ -60,12 +60,12 @@ namespace FilmMaker.Controllers
         }
 
         [HttpGet("my-booking-requests/{requestId}")]
-        public async Task<ActionResult<ApiResponse<BookingRequestResponseDto>>> GetBookingRequestById(int requestId)
+        public async Task<ActionResult<ApiResponse<LocationOwnerBookingRequestResponseDto>>> GetBookingRequestById(int requestId)
         {
             var currentUserId = GetCurrentUserId();
             if (currentUserId == null)
                 return Unauthorized(
-                    ApiResponse<BookingRequestResponseDto>.FailureResponse(
+                    ApiResponse<LocationOwnerBookingRequestResponseDto>.FailureResponse(
                         "Unauthorized.",
                         "غير مصرح."
                     ));
@@ -77,12 +77,12 @@ namespace FilmMaker.Controllers
         }
 
         [HttpPut("update-booking-request/{requestId}")]
-        public async Task<ActionResult<ApiResponse<BookingRequestResponseDto>>> UpdateBookingRequest(int requestId, UpdateBookingRequestDto dto)
+        public async Task<ActionResult<ApiResponse<LocationOwnerBookingRequestResponseDto>>> UpdateBookingRequest(int requestId, UpdateBookingRequestDto dto)
         {
             var currentUserId = GetCurrentUserId();
             if (currentUserId == null)
                 return Unauthorized(
-                    ApiResponse<BookingRequestResponseDto>.FailureResponse(
+                    ApiResponse<LocationOwnerBookingRequestResponseDto>.FailureResponse(
                         "Unauthorized.",
                         "غير مصرح."
                     ));

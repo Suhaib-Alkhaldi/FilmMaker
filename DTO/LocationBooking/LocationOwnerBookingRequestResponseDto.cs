@@ -1,6 +1,6 @@
 ﻿namespace FilmMaker.DTO.LocationManager
 {
-    public class BookingRequestResponseDto
+    public class LocationOwnerBookingRequestResponseDto
     {
         public int Id { get; set; }
         public int LocationId { get; set; }
