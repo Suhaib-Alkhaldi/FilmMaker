@@ -1,4 +1,5 @@
 ﻿using FilmMaker.Entities;
+using FilmMaker.Helper.Hashing;
 using FilmMaker.Services.Interface;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -30,7 +31,7 @@ namespace FilmMaker.Services.Service
             _context.OtpCodes.Add(new OtpCode
             {
                 UserId = userId,
-                Code = code,
+                Code = HashingHelper.HashValueWith384(code),
                 Purpose = purpose,
                 ExpiresAt = DateTime.UtcNow.AddMinutes(10)
             });
@@ -41,9 +42,11 @@ namespace FilmMaker.Services.Service
 
         public async Task<OtpCode?> ValidateOtpAsync(int userId, string code, OtpPurpose purpose)
         {
+
+            
             var otp = await _context.OtpCodes.FirstOrDefaultAsync(o =>
                 o.UserId == userId &&
-                o.Code == code &&
+                o.Code == HashingHelper.HashValueWith384(code) &&
                 o.Purpose == purpose &&
                 !o.IsUsed &&
                 o.ExpiresAt > DateTime.UtcNow);

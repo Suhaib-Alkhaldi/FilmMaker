@@ -69,8 +69,6 @@ namespace FilmMaker.Services.Service
                     "دور صاحب الموقع غير موجود."
                 );
             }
-
-
             try
             {
                 var user = CreateUser(request, role.Id);
@@ -292,6 +290,8 @@ namespace FilmMaker.Services.Service
 
             var accessToken = _tokenService.GenerateAccessToken(user.Id, user.Name, roleName);
             var refreshToken = _tokenService.GenerateRefreshToken();
+
+            refreshToken = HashingHelper.HashValueWith384(refreshToken);
 
             await _tokenService.SaveRefreshTokenAsync(user.Id, refreshToken);
 
@@ -691,7 +691,10 @@ namespace FilmMaker.Services.Service
                 IBAN = request.IBAN,
                 RoleId = roleId,
                 IsActive = true,
-                IsDeleted = false
+                IsDeleted = false,
+                IsEmailVerified = false,
+                EmailVerifiedAt =  null,
+
             };
         }
         private RegisterResponseDto CreateRegisterResponse(User user, string roleName)
