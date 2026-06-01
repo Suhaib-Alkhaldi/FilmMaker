@@ -7,6 +7,7 @@ namespace FilmMaker.Entities
 
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
+        public DbSet<OtpCode> OtpCodes { get; set; }
 
         public DbSet<LookupCategory> LookupCategories { get; set; }
         public DbSet<LookupItem> LookupItems { get; set; }
@@ -16,12 +17,13 @@ namespace FilmMaker.Entities
         public DbSet<LocationManagerProfile> LocationManagerProfiles { get; set; }
         public DbSet<LocationManagerCity> LocationManagerCities { get; set; }
         public DbSet<PreviousProject> PreviousProjects { get; set; }
-
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<ProductionCompanyProfile> ProductionCompanyProfiles { get; set; }
         public DbSet<ProductionCompanyProductionType> ProductionCompanyProductionTypes { get; set; }
 
         public DbSet<ServiceProviderProfile> ServiceProviderProfiles { get; set; }
         public DbSet<ServiceProviderServiceType> ServiceProviderServiceTypes { get; set; }
+
 
         public DbSet<Media> Media { get; set; }
 
