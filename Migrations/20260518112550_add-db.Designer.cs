@@ -4,6 +4,7 @@ using FilmMaker.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FilmMaker.Migrations
 {
     [DbContext(typeof(FilmMakerDbContext))]
-    partial class FilmMakerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260518112550_add-db")]
+    partial class adddb
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -865,40 +868,6 @@ namespace FilmMaker.Migrations
                     b.ToTable("Media");
                 });
 
-            modelBuilder.Entity("FilmMaker.Entities.OtpCode", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsUsed")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("Purpose")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("OtpCodes");
-                });
-
             modelBuilder.Entity("FilmMaker.Entities.Payment", b =>
                 {
                     b.Property<int>("Id")
@@ -1089,37 +1058,6 @@ namespace FilmMaker.Migrations
                         .IsUnique();
 
                     b.ToTable("ProductionCompanyProfiles");
-                });
-
-            modelBuilder.Entity("FilmMaker.Entities.RefreshToken", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsRevoked")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Token")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("RefreshTokens");
                 });
 
             modelBuilder.Entity("FilmMaker.Entities.Role", b =>
@@ -1485,9 +1423,6 @@ namespace FilmMaker.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("EmailVerifiedAt")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("IBAN")
                         .HasColumnType("nvarchar(max)");
 
@@ -1496,12 +1431,6 @@ namespace FilmMaker.Migrations
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
-
-                    b.Property<bool>("IsEmailVerified")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("LastLogin")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -1865,17 +1794,6 @@ namespace FilmMaker.Migrations
                     b.Navigation("UploadedByUser");
                 });
 
-            modelBuilder.Entity("FilmMaker.Entities.OtpCode", b =>
-                {
-                    b.HasOne("FilmMaker.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("FilmMaker.Entities.Payment", b =>
                 {
                     b.HasOne("FilmMaker.Entities.DigitalContract", "DigitalContract")
@@ -1952,15 +1870,56 @@ namespace FilmMaker.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("FilmMaker.Entities.RefreshToken", b =>
+            modelBuilder.Entity("FilmMaker.Entities.ServiceBooking", b =>
                 {
-                    b.HasOne("FilmMaker.Entities.User", "User")
+                    b.HasOne("FilmMaker.Entities.Location", "Location")
                         .WithMany()
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("LocationId");
+
+                    b.HasOne("FilmMaker.Entities.User", "Requester")
+                        .WithMany()
+                        .HasForeignKey("RequesterId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("User");
+                    b.HasOne("FilmMaker.Entities.ServicesProvided", "Service")
+                        .WithMany()
+                        .HasForeignKey("ServiceId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("FilmMaker.Entities.LookupItem", "Status")
+                        .WithMany()
+                        .HasForeignKey("StatusId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Location");
+
+                    b.Navigation("Requester");
+
+                    b.Navigation("Service");
+
+                    b.Navigation("Status");
+                });
+
+            modelBuilder.Entity("FilmMaker.Entities.ServiceProviderCities", b =>
+                {
+                    b.HasOne("FilmMaker.Entities.LookupItem", "City")
+                        .WithMany()
+                        .HasForeignKey("CityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FilmMaker.Entities.ServiceProviderProfile", "ServiceProviderProfile")
+                        .WithMany("Cities")
+                        .HasForeignKey("ServiceProviderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("City");
+
+                    b.Navigation("ServiceProviderProfile");
                 });
 
             modelBuilder.Entity("FilmMaker.Entities.ServiceProviderProfile", b =>
@@ -2062,8 +2021,6 @@ namespace FilmMaker.Migrations
 
             modelBuilder.Entity("FilmMaker.Entities.LocationBookingRequest", b =>
                 {
-                    b.Navigation("ServiceBookingRequests");
-
                     b.Navigation("StatusHistories");
                 });
 
@@ -2081,16 +2038,12 @@ namespace FilmMaker.Migrations
 
             modelBuilder.Entity("FilmMaker.Entities.LookupItem", b =>
                 {
-                    b.Navigation("RequestToLocationManagers");
-
                     b.Navigation("ServicesProvided");
                 });
 
             modelBuilder.Entity("FilmMaker.Entities.ProductionCompanyProfile", b =>
                 {
                     b.Navigation("ProductionTypes");
-
-                    b.Navigation("ServiceBookingRequests");
                 });
 
             modelBuilder.Entity("FilmMaker.Entities.ServiceProviderProfile", b =>

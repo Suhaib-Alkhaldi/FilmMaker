@@ -37,6 +37,14 @@ namespace FilmMaker.Attribute
             Roles = "Production Company";
         }
     }
+    public class AuthorizeProductionCompanyOrLocationManagerAttribute : AuthorizeAttribute
+    {
+        public AuthorizeProductionCompanyOrLocationManagerAttribute()
+        {
+            AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme;
+            Roles = "Production Company,Location Manager";
+        }
+    }
     public class AuthorizeServiceProviderAttribute : AuthorizeAttribute
     {
         public AuthorizeServiceProviderAttribute()

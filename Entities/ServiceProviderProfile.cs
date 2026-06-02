@@ -11,5 +11,9 @@ namespace FilmMaker.Entities
         public User User { get; set; }
         public DateTime RegisterDate { get; set; } = DateTime.Now;
         public ICollection<ServiceProviderServiceType> ServiceTypes { get; set; }
+
+        public ICollection<ServiceProviderCities> Cities { get; set; }
+
+        public ICollection<ServicesProvided> ServicesProvided { get; set; } 
     }
 }
