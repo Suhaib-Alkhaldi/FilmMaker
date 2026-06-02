@@ -1,4 +1,5 @@
 ﻿using FilmMaker.Common;
+using FilmMaker.DTO.Location.Response;
 using FilmMaker.DTO.ServiceProvider;
 using FilmMaker.Entities;
 using FilmMaker.Services.Interface;
@@ -11,12 +12,15 @@ namespace FilmMaker.Services.Service
         private readonly FilmMakerDbContext _context;
         private readonly IConfiguration _configuration;
         private readonly ILogger<ServicesProvidedService> _logger;
+        private readonly IMediaService _mediaService;   
 
-        public ServicesProvidedService(FilmMakerDbContext context, IConfiguration configuration, ILogger<ServicesProvidedService> logger)
+        public ServicesProvidedService(FilmMakerDbContext context, IConfiguration configuration, ILogger<ServicesProvidedService> logger
+            ,IMediaService mediaService)
         {
             _context = context;
             _configuration = configuration;
             _logger = logger;
+            _mediaService = mediaService;
         }
 
         private async Task<int?> GetServiceProviderIdAsync(int userId)
@@ -25,6 +29,41 @@ namespace FilmMaker.Services.Service
                 .FirstOrDefaultAsync(p => p.UserId == userId && !p.IsDeleted);
             return profile?.Id;
         }
+
+        private async Task<ApiResponse<bool>?> ValidateServiceMedia(List<Media> mediaItems, List<int> requestedMediaIds)
+        {
+            var distinctMediaIds = requestedMediaIds.Distinct().ToList();
+
+            var alreadyLinked = await _context.ServicesMedia
+                .AnyAsync(x =>
+                    distinctMediaIds.Contains(x.MediaId) &&
+                    !x.IsDeleted);
+
+            if (alreadyLinked)
+            {
+                return ApiResponse<bool>.FailureResponse(
+                    "One or more media files are already linked to another location.",
+                    "واحد أو أكثر من الملفات مرتبط بموقع آخر."
+                );
+            }
+
+            var hasImage = mediaItems.Any(x =>
+                x.MediaType != null &&
+                x.MediaType.Name == "Image");
+
+
+
+            if (!hasImage)
+            {
+                return ApiResponse<bool>.FailureResponse(
+                    "At least one image are required.",
+                    "يجب إضافة صورة واحدة على الأقل ."
+                );
+            }
+
+            return null;
+        }
+
 
         public async Task<ApiResponse<bool>> AddService(CreateServiceDTO serviceDto, int currentUserId)
         {
@@ -80,6 +119,28 @@ namespace FilmMaker.Services.Service
                         "نوع الخدمة غير صالح"
                     );
 
+
+
+                var mediaValidationResult = await _mediaService.ValidateMediaOwnership(serviceDto.MediaIds, currentUserId);
+
+                if (!mediaValidationResult.Success)
+                {
+                    return ApiResponse<bool>.FailureResponse(
+                        mediaValidationResult.MessageEn,
+                        mediaValidationResult.MessageAr
+                    );
+                }
+
+                var mediaItems = mediaValidationResult.Data ?? new List<Media>();
+
+                var mediaBusinessValidation = await ValidateServiceMedia(
+                    mediaItems,
+                    serviceDto.MediaIds
+                );
+
+                if (mediaBusinessValidation != null)
+                    return mediaBusinessValidation;
+
                 var service = new ServicesProvided
                 {
                     ServiceName = serviceDto.ServiceName,
@@ -95,6 +156,24 @@ namespace FilmMaker.Services.Service
 
                 await _context.ServicesProvided.AddAsync(service);
                 await _context.SaveChangesAsync();
+
+
+                var locationMediaLinks = mediaItems
+                     .Select(media => new ServicesMedia
+                     {
+                         ServicesProvidedId = service.Id,
+                         MediaId = media.Id,
+                         IsActive = true,
+                         IsDeleted = false,
+                         CreatedBy = currentUserId.ToString(),
+                         CreatedAt = DateTime.UtcNow
+                     })
+                     .ToList();
+
+                _context.ServicesMedia.AddRange(locationMediaLinks);
+
+                await _context.SaveChangesAsync();
+
 
                 return ApiResponse<bool>.SuccessResponse(
                     true,
@@ -297,7 +376,7 @@ namespace FilmMaker.Services.Service
             }
         }
 
-        public async Task<ApiResponse<List<GetServiceDTO>>> GetMyServicesByProvider(int currentUserId, bool includeDeleted = false)
+        public async Task<ApiResponse<List<GetServiceDTO>>> GetMyServices(int currentUserId, bool includeDeleted = false)
         {
             try
             {

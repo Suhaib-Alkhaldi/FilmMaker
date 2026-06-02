@@ -13,14 +13,15 @@ namespace FilmMaker.Services.Interface
         Task<ApiResponse<GetServiceBookingDTO>> GetBookingById(
             int bookingId);
 
-        Task<ApiResponse<List<GetServiceBookingDTO>>> GetProviderBookings(
+        Task<ApiResponse<List<GetServiceBookingDTO>>> GetAllProviderBookings(
             int currentUserId);
+
         Task<ApiResponse<List<GetServiceBookingDTO>>> GetProviderBookingsByDate(
         DateTime startDate,
         DateTime endDate,
         int currentUserId);
 
-        Task<ApiResponse<List<GetServiceBookingDTO>>> GetReceivedBookings(
+        Task<ApiResponse<List<GetServiceBookingDTO>>> GetPendingBookings(
             int currentUserId);
 
         Task<ApiResponse<List<GetServiceBookingDTO>>> GetServicesIBooked(

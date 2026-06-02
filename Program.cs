@@ -122,20 +122,20 @@ app.UseSerilogRequestLogging();
 
 
 // Configure the HTTP request pipeline.
-//if (app.Environment.IsDevelopment())
-//{
-//    app.UseSwagger();
-//    app.UseSwaggerUI();
-//}
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 #region puplish
-app.UseSwagger();
-app.UseSwaggerUI(
-    c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Film Maker v1");
-        c.RoutePrefix = string.Empty;
-    }
-    );
+//app.UseSwagger();
+//app.UseSwaggerUI(
+//    c =>
+//    {
+//        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Film Maker v1");
+//        c.RoutePrefix = string.Empty;
+//    }
+//    );
 
 #endregion
 app.UseHttpsRedirection();
