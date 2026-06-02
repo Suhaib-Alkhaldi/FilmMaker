@@ -20,7 +20,6 @@
         public bool IsFullDay { get; set; }
         public string Message { get; set; } = string.Empty;
         public decimal TotalPrice { get; set; }
-        public DateTime RequestedAtUtc { get; set; }
         public DateTime CreatedAt { get; set; }
     }
 }

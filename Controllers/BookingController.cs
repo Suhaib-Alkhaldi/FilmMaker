@@ -4,6 +4,7 @@ using FilmMaker.DTO.LocationBooking;
 using FilmMaker.DTO.LocationManager;
 using FilmMaker.Entities;
 using FilmMaker.Services.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -25,6 +26,8 @@ namespace FilmMaker.Controllers
             _context = context;
         }
 
+
+        [Authorize(Roles = "Location Manager , Production Company")]
         [HttpPost("create-booking-request")]
         public async Task<ActionResult<ApiResponse<BookingRequestDto>>> CreateBookingRequest([FromBody]CreateBookingRequestDto dto)
         {
@@ -39,6 +42,8 @@ namespace FilmMaker.Controllers
             return Ok(response);
         }
 
+
+        [Authorize(Roles = "Location Manager , Production Company")]
         [HttpGet("my-booking-requests")]
         public async Task<ActionResult<ApiResponse<List<BookingRequestDto>>>> GetMyBookingRequests()
         {
@@ -53,6 +58,7 @@ namespace FilmMaker.Controllers
             return Ok(response);
         }
 
+        [Authorize(Roles = "Location Manager , Production Company")]
         [HttpGet("my-booking-requests/{requestId}")]
         public async Task<ActionResult<ApiResponse<BookingRequestDto>>> GetBookingRequestById(int requestId)
         {
@@ -67,15 +73,16 @@ namespace FilmMaker.Controllers
             return Ok(response);
         }
 
-
+        [Authorize(Roles = "Location Manager , Production Company")]
         [HttpGet("GetLocationBookingCalendar")]
-        public async Task<ActionResult<ApiResponse<List<LocationBookingCalendarDayDto>>>> GetLocationBookingCalendar(int locationId , [FromQuery] DateTime fromDate , [FromQuery] DateTime toDate)
+        public async Task<ActionResult<ApiResponse<List<LocationBookingCalendarDayDto>>>> GetLocationBookingCalendar(int locationId , [FromQuery] DateTime? fromDate , [FromQuery] DateTime? toDate)
         {
-            var result = await _locationBookingService.GetLocationBookingCalendarAsync(
-                locationId,
-                fromDate,
-                toDate
-            );
+            var currentUserId = GetCurrentUserId();
+
+            if (currentUserId == null)
+                return Unauthorized();
+
+            var result = await _locationBookingService.GetLocationBookingCalendarAsync(currentUserId.Value ,locationId, fromDate,toDate);
 
             if (!result.Success)
                 return BadRequest(result);
@@ -83,6 +90,8 @@ namespace FilmMaker.Controllers
             return Ok(result);
         }
 
+
+        [Authorize(Roles = "Location Manager , Production Company")]
         [HttpPut("update-booking-request")]
         public async Task<ActionResult<ApiResponse<BookingRequestDto>>> UpdateBookingRequest(UpdateBookingRequestDto dto)
         {
@@ -98,6 +107,7 @@ namespace FilmMaker.Controllers
             return Ok(response);
         }
 
+        [Authorize(Roles ="Location Manager , Production Company")]
         [HttpDelete("cancel-booking-request/{requestId}")]
         public async Task<ActionResult<ApiResponse<bool>>> CancelBookingRequest(int requestId)
         {

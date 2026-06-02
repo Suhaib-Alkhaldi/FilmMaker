@@ -59,6 +59,9 @@ builder.Services.AddDbContext<FilmMakerDbContext>(options =>
 
 builder.Services.AddScoped<IRequestToLocationManagerToBookServiceService, RequestToLocationManagerToBookServiceService>();
 
+builder.Services.AddScoped<IOtpService, OtpService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<IServicesProvidedService, ServicesProvidedService>();
@@ -72,6 +75,7 @@ builder.Services.AddScoped<ILocationService, LocationService>();
 builder.Services.AddScoped<ILocationOwnerVisitRequestService, LocationOwnerVisitRequestService>();
 builder.Services.AddScoped<ILocationOwnerBookingRequestService, LocationOwnerBookingRequestService>();
 
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 
 builder.Services.AddAuthentication(options =>
@@ -93,6 +97,16 @@ builder.Services.AddAuthentication(options =>
             Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
     };
 });
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAllOrigins",
+        policy =>
+        {
+            policy.AllowAnyOrigin()
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+});
 
 var app = builder.Build();
 
@@ -105,14 +119,28 @@ using (var scope = app.Services.CreateScope())
 
 app.UseSerilogRequestLogging();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
 
+
+// Configure the HTTP request pipeline.
+//if (app.Environment.IsDevelopment())
+//{
+//    app.UseSwagger();
+//    app.UseSwaggerUI();
+//}
+#region puplish
+app.UseSwagger();
+app.UseSwaggerUI(
+    c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Film Maker v1");
+        c.RoutePrefix = string.Empty;
+    }
+    );
+
+#endregion
 app.UseHttpsRedirection();
+app.UseStaticFiles();
+app.UseCors("AllowAllOrigins");
 app.UseAuthentication();
 
 app.UseAuthorization();

@@ -8,6 +8,11 @@ namespace FilmMaker.Entities
         public string Email { get; set; }
         public string Password { get; set; }
         public string PhoneNumber { get; set; }
+
+        public bool IsEmailVerified { get; set; } = false;
+
+        public DateTime? EmailVerifiedAt { get; set; }
+
         public string? IBAN { get; set; }
         public int RoleId { get; set; }
         [ForeignKey("RoleId")]
@@ -16,5 +21,7 @@ namespace FilmMaker.Entities
         public LocationManagerProfile? LocationManagerProfile { get; set; }
         public ProductionCompanyProfile? ProductionCompanyProfile { get; set; }
         public ServiceProviderProfile? ServiceProviderProfile { get; set; }
+
+        public DateTime? LastLogin { get; set; }
     }
 }
