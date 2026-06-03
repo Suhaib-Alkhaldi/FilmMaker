@@ -12,5 +12,8 @@
 
         public int ServiceTypeId { get; set; }
 
+        public List<int> MediaIds { get; set; } = new();
+
+
     }
 }

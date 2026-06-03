@@ -291,9 +291,9 @@ namespace FilmMaker.Services.Service
             var accessToken = _tokenService.GenerateAccessToken(user.Id, user.Name, roleName);
             var refreshToken = _tokenService.GenerateRefreshToken();
 
-            refreshToken = HashingHelper.HashValueWith384(refreshToken);
+           var  HashedRefreshToken = HashingHelper.HashValueWith384(refreshToken);
 
-            await _tokenService.SaveRefreshTokenAsync(user.Id, refreshToken);
+            await _tokenService.SaveRefreshTokenAsync(user.Id, HashedRefreshToken);
 
 
             user.LastLogin = DateTime.UtcNow;
@@ -730,7 +730,8 @@ namespace FilmMaker.Services.Service
         }
         public async Task<ApiResponse<object>> RefreshToken(string refreshToken)
         {
-            var stored = await _tokenService.GetRefreshTokenAsync(refreshToken);
+            var hashedRefreshToken = HashingHelper.HashValueWith384(refreshToken);
+            var stored = await _tokenService.GetRefreshTokenAsync(hashedRefreshToken);
 
             if (stored is null)
                 return new ApiResponse<object>
@@ -750,7 +751,9 @@ namespace FilmMaker.Services.Service
 
             var newRefreshToken = _tokenService.GenerateRefreshToken();
 
-            await _tokenService.SaveRefreshTokenAsync(stored.UserId, newRefreshToken);
+            var hashedNewRefreshToken = HashingHelper.HashValueWith384(newRefreshToken);    
+
+            await _tokenService.SaveRefreshTokenAsync(stored.UserId, hashedNewRefreshToken);
 
             return new ApiResponse<object>
             {

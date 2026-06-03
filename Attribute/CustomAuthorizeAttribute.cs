@@ -53,4 +53,13 @@ namespace FilmMaker.Attribute
             Roles = "Service Provider";
         }
     }
+
+    public class AuthorizeServiceProviderOrLocationOwnerAttribute : AuthorizeAttribute
+    {
+        public AuthorizeServiceProviderOrLocationOwnerAttribute()
+        {
+            AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme;
+            Roles = "Service Provider,Location Owner";
+        }
+    }
 }

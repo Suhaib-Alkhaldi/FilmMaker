@@ -654,7 +654,7 @@ namespace FilmMaker.Services.Service
             }
         }
 
-        public async Task<ApiResponse<List<GetServiceBookingDTO>>> GetProviderBookings(int currentUserId)
+        public async Task<ApiResponse<List<GetServiceBookingDTO>>> GetAllProviderBookings(int currentUserId)
         {
             try
             {
@@ -687,7 +687,7 @@ namespace FilmMaker.Services.Service
             }
         }
 
-        public async Task<ApiResponse<List<GetServiceBookingDTO>>> GetReceivedBookings(int currentUserId)
+        public async Task<ApiResponse<List<GetServiceBookingDTO>>> GetPendingBookings(int currentUserId)
         {
             try
             {

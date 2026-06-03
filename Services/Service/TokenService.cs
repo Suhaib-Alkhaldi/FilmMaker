@@ -1,4 +1,5 @@
 ﻿using FilmMaker.Entities;
+using FilmMaker.Helper.Hashing;
 using FilmMaker.Helper.Token;
 using FilmMaker.Services.Interface;
 using Microsoft.EntityFrameworkCore;
@@ -56,8 +57,10 @@ namespace FilmMaker.Services.Service
 
         public async Task RevokeRefreshTokenAsync(string token)
         {
+            var hashedRefreshToken = HashingHelper.HashValueWith384(token);
+
             var refreshToken = await _context.RefreshTokens
-                .FirstOrDefaultAsync(r => r.Token == token);
+                .FirstOrDefaultAsync(r => r.Token == hashedRefreshToken);
 
             if (refreshToken is not null)
             {

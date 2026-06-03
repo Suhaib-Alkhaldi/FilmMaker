@@ -171,7 +171,7 @@ namespace FilmMaker.Controllers
             if (currentUserId == 0)
                 return Unauthorized(new { MessageEn = "Invalid token", MessageAr = "رمز غير صالح" });
 
-            var result = await _serviceBookingService.GetProviderBookings(currentUserId);
+            var result = await _serviceBookingService.GetAllProviderBookings(currentUserId);
             return result.Success ? Ok(result) : BadRequest(result);
         }
 
@@ -195,7 +195,7 @@ namespace FilmMaker.Controllers
             if (currentUserId == 0)
                 return Unauthorized(new { MessageEn = "Invalid token", MessageAr = "رمز غير صالح" });
 
-            var result = await _serviceBookingService.GetReceivedBookings(currentUserId);
+            var result = await _serviceBookingService.GetPendingBookings(currentUserId);
             return result.Success ? Ok(result) : BadRequest(result);
         }
 

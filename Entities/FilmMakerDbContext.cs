@@ -19,6 +19,8 @@ namespace FilmMaker.Entities
         public DbSet<PreviousProject> PreviousProjects { get; set; }
         public DbSet<ServiceBooking> ServiceBookings { get; set; }
 
+        public DbSet<ServicesMedia> ServicesMedia { get; set; }
+
         public DbSet<ServicesProvided> ServicesProvided { get; set; }
 
         public DbSet<RequestToLocationManagerToBookService> RequestToLocationManagerToBookService { get; set; }
@@ -66,7 +68,17 @@ namespace FilmMaker.Entities
         {
             base.OnModelCreating(modelBuilder);
 
-            
+            modelBuilder.Entity<ServicesMedia>()
+            .HasOne(x => x.ServicesProvided)
+            .WithMany(x => x.Media)
+            .HasForeignKey(x => x.ServicesProvidedId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ServicesMedia>()
+                .HasOne(x => x.Media)
+                .WithMany()
+                .HasForeignKey(x => x.MediaId)
+                .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<LocationArchiveHistory>()
                 .HasOne(x => x.Location)
@@ -124,6 +136,8 @@ namespace FilmMaker.Entities
                 .WithMany()
                 .HasForeignKey(x => x.BookingStatusId)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            
 
 
 
