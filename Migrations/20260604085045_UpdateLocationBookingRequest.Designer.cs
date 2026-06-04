@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FilmMaker.Migrations
 {
     [DbContext(typeof(FilmMakerDbContext))]
-    [Migration("20260603211055_AddColumnsToServicesProvided")]
-    partial class AddColumnsToServicesProvided
+    [Migration("20260604085045_UpdateLocationBookingRequest")]
+    partial class UpdateLocationBookingRequest
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

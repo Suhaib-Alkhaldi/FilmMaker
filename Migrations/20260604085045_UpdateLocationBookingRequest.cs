@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace FilmMaker.Migrations
 {
     /// <inheritdoc />
-    public partial class AddDb : Migration
+    public partial class UpdateLocationBookingRequest : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -85,8 +85,11 @@ namespace FilmMaker.Migrations
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsEmailVerified = table.Column<bool>(type: "bit", nullable: false),
+                    EmailVerifiedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     IBAN = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     RoleId = table.Column<int>(type: "int", nullable: false),
+                    LastLogin = table.Column<DateTime>(type: "datetime2", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -197,6 +200,30 @@ namespace FilmMaker.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "OtpCodes",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Purpose = table.Column<int>(type: "int", nullable: false),
+                    ExpiresAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsUsed = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OtpCodes", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_OtpCodes_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ProductionCompanyProfiles",
                 columns: table => new
                 {
@@ -219,6 +246,29 @@ namespace FilmMaker.Migrations
                     table.PrimaryKey("PK_ProductionCompanyProfiles", x => x.Id);
                     table.ForeignKey(
                         name: "FK_ProductionCompanyProfiles_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RefreshTokens",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    Token = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ExpiresAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsRevoked = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RefreshTokens", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_RefreshTokens_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -324,6 +374,9 @@ namespace FilmMaker.Migrations
                     LocationManagerId = table.Column<int>(type: "int", nullable: true),
                     LocationStatusId = table.Column<int>(type: "int", nullable: false),
                     LocationTypeId = table.Column<int>(type: "int", nullable: false),
+                    Country = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    HourlyPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    FacilitiesDescription = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     LocationOnGoogleMaps = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Latitude = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     Longitude = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
@@ -393,6 +446,38 @@ namespace FilmMaker.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ServiceProviderCities",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ServiceProviderId = table.Column<int>(type: "int", nullable: false),
+                    CityId = table.Column<int>(type: "int", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ServiceProviderCities", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ServiceProviderCities_LookupItems_CityId",
+                        column: x => x.CityId,
+                        principalTable: "LookupItems",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ServiceProviderCities_ServiceProviderProfiles_ServiceProviderId",
+                        column: x => x.ServiceProviderId,
+                        principalTable: "ServiceProviderProfiles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ServiceProviderServiceTypes",
                 columns: table => new
                 {
@@ -419,6 +504,42 @@ namespace FilmMaker.Migrations
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_ServiceProviderServiceTypes_ServiceProviderProfiles_ServiceProviderId",
+                        column: x => x.ServiceProviderId,
+                        principalTable: "ServiceProviderProfiles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ServicesProvided",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ServiceName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DailyPrice = table.Column<decimal>(type: "smallmoney", nullable: false),
+                    ServiceTypeId = table.Column<int>(type: "int", nullable: true),
+                    CustomServiceType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsCustom = table.Column<bool>(type: "bit", nullable: false),
+                    ServiceProviderId = table.Column<int>(type: "int", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ServicesProvided", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ServicesProvided_LookupItems_ServiceTypeId",
+                        column: x => x.ServiceTypeId,
+                        principalTable: "LookupItems",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_ServicesProvided_ServiceProviderProfiles_ServiceProviderId",
                         column: x => x.ServiceProviderId,
                         principalTable: "ServiceProviderProfiles",
                         principalColumn: "Id",
@@ -476,15 +597,15 @@ namespace FilmMaker.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     LocationId = table.Column<int>(type: "int", nullable: false),
                     BookingStatusId = table.Column<int>(type: "int", nullable: false),
-                    ShootingDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    RequestDetails = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    StartDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     LocationOwnerId = table.Column<int>(type: "int", nullable: false),
                     LocationManagerId = table.Column<int>(type: "int", nullable: true),
-                    ProductionCompanyId = table.Column<int>(type: "int", nullable: false),
+                    ProductionCompanyId = table.Column<int>(type: "int", nullable: true),
+                    Message = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     TotalPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    RequestedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
@@ -578,6 +699,175 @@ namespace FilmMaker.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "LocationVisitRequests",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    LocationId = table.Column<int>(type: "int", nullable: false),
+                    LocationManagerId = table.Column<int>(type: "int", nullable: false),
+                    RequestedVisitDateUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    RequestMessage = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    VisitStatusId = table.Column<int>(type: "int", nullable: false),
+                    OwnerResponseMessage = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RespondedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    RespondedByUserId = table.Column<int>(type: "int", nullable: true),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LocationVisitRequests", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_LocationVisitRequests_LocationManagerProfiles_LocationManagerId",
+                        column: x => x.LocationManagerId,
+                        principalTable: "LocationManagerProfiles",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_LocationVisitRequests_Locations_LocationId",
+                        column: x => x.LocationId,
+                        principalTable: "Locations",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_LocationVisitRequests_LookupItems_VisitStatusId",
+                        column: x => x.VisitStatusId,
+                        principalTable: "LookupItems",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_LocationVisitRequests_Users_RespondedByUserId",
+                        column: x => x.RespondedByUserId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ServiceBookings",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ServiceId = table.Column<int>(type: "int", nullable: false),
+                    RequesterId = table.Column<int>(type: "int", nullable: false),
+                    LocationId = table.Column<int>(type: "int", nullable: true),
+                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Latitude = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    Longitude = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    LocationOnGoogleMaps = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    StatusId = table.Column<int>(type: "int", nullable: false),
+                    bookingStartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    bookingEndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ServiceBookings", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ServiceBookings_Locations_LocationId",
+                        column: x => x.LocationId,
+                        principalTable: "Locations",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_ServiceBookings_LookupItems_StatusId",
+                        column: x => x.StatusId,
+                        principalTable: "LookupItems",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ServiceBookings_ServicesProvided_ServiceId",
+                        column: x => x.ServiceId,
+                        principalTable: "ServicesProvided",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_ServiceBookings_Users_RequesterId",
+                        column: x => x.RequesterId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ServicesMedia",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ServicesProvidedId = table.Column<int>(type: "int", nullable: false),
+                    MediaId = table.Column<int>(type: "int", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ServicesMedia", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ServicesMedia_Media_MediaId",
+                        column: x => x.MediaId,
+                        principalTable: "Media",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_ServicesMedia_ServicesProvided_ServicesProvidedId",
+                        column: x => x.ServicesProvidedId,
+                        principalTable: "ServicesProvided",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ServicesProvidedMedia",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UploadedByUserId = table.Column<int>(type: "int", nullable: false),
+                    ServicesProvidedId = table.Column<int>(type: "int", nullable: true),
+                    FileName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FileUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ContentType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SizeInBytes = table.Column<long>(type: "bigint", nullable: false),
+                    MediaTypeId = table.Column<int>(type: "int", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ServicesProvidedMedia", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ServicesProvidedMedia_LookupItems_MediaTypeId",
+                        column: x => x.MediaTypeId,
+                        principalTable: "LookupItems",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ServicesProvidedMedia_ServicesProvided_ServicesProvidedId",
+                        column: x => x.ServicesProvidedId,
+                        principalTable: "ServicesProvided",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_ServicesProvidedMedia_Users_UploadedByUserId",
+                        column: x => x.UploadedByUserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "BookingStatusHistories",
                 columns: table => new
                 {
@@ -654,6 +944,51 @@ namespace FilmMaker.Migrations
                         name: "FK_DigitalContracts_LookupItems_ContractStatusId",
                         column: x => x.ContractStatusId,
                         principalTable: "LookupItems",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RequestToLocationManagerToBookService",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ProductionCompanyId = table.Column<int>(type: "int", nullable: false),
+                    ServiceTypeId = table.Column<int>(type: "int", nullable: false),
+                    LocationBookingId = table.Column<int>(type: "int", nullable: false),
+                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Latitude = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    Longitude = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    LocationOnGoogleMaps = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RequestToLocationManagerToBookService", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_RequestToLocationManagerToBookService_LocationBookingRequests_LocationBookingId",
+                        column: x => x.LocationBookingId,
+                        principalTable: "LocationBookingRequests",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_RequestToLocationManagerToBookService_LookupItems_ServiceTypeId",
+                        column: x => x.ServiceTypeId,
+                        principalTable: "LookupItems",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_RequestToLocationManagerToBookService_ProductionCompanyProfiles_ProductionCompanyId",
+                        column: x => x.ProductionCompanyId,
+                        principalTable: "ProductionCompanyProfiles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -932,6 +1267,26 @@ namespace FilmMaker.Migrations
                 column: "LocationId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_LocationVisitRequests_LocationId",
+                table: "LocationVisitRequests",
+                column: "LocationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LocationVisitRequests_LocationManagerId",
+                table: "LocationVisitRequests",
+                column: "LocationManagerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LocationVisitRequests_RespondedByUserId",
+                table: "LocationVisitRequests",
+                column: "RespondedByUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LocationVisitRequests_VisitStatusId",
+                table: "LocationVisitRequests",
+                column: "VisitStatusId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_LookupItems_LookupCategoryId",
                 table: "LookupItems",
                 column: "LookupCategoryId");
@@ -945,6 +1300,11 @@ namespace FilmMaker.Migrations
                 name: "IX_Media_UploadedByUserId",
                 table: "Media",
                 column: "UploadedByUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OtpCodes_UserId",
+                table: "OtpCodes",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Payments_DigitalContractId",
@@ -988,6 +1348,56 @@ namespace FilmMaker.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_RefreshTokens_UserId",
+                table: "RefreshTokens",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RequestToLocationManagerToBookService_LocationBookingId",
+                table: "RequestToLocationManagerToBookService",
+                column: "LocationBookingId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RequestToLocationManagerToBookService_ProductionCompanyId",
+                table: "RequestToLocationManagerToBookService",
+                column: "ProductionCompanyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RequestToLocationManagerToBookService_ServiceTypeId",
+                table: "RequestToLocationManagerToBookService",
+                column: "ServiceTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ServiceBookings_LocationId",
+                table: "ServiceBookings",
+                column: "LocationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ServiceBookings_RequesterId",
+                table: "ServiceBookings",
+                column: "RequesterId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ServiceBookings_ServiceId",
+                table: "ServiceBookings",
+                column: "ServiceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ServiceBookings_StatusId",
+                table: "ServiceBookings",
+                column: "StatusId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ServiceProviderCities_CityId",
+                table: "ServiceProviderCities",
+                column: "CityId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ServiceProviderCities_ServiceProviderId",
+                table: "ServiceProviderCities",
+                column: "ServiceProviderId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ServiceProviderProfiles_UserId",
                 table: "ServiceProviderProfiles",
                 column: "UserId",
@@ -1002,6 +1412,41 @@ namespace FilmMaker.Migrations
                 name: "IX_ServiceProviderServiceTypes_ServiceTypeId",
                 table: "ServiceProviderServiceTypes",
                 column: "ServiceTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ServicesMedia_MediaId",
+                table: "ServicesMedia",
+                column: "MediaId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ServicesMedia_ServicesProvidedId",
+                table: "ServicesMedia",
+                column: "ServicesProvidedId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ServicesProvided_ServiceProviderId",
+                table: "ServicesProvided",
+                column: "ServiceProviderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ServicesProvided_ServiceTypeId",
+                table: "ServicesProvided",
+                column: "ServiceTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ServicesProvidedMedia_MediaTypeId",
+                table: "ServicesProvidedMedia",
+                column: "MediaTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ServicesProvidedMedia_ServicesProvidedId",
+                table: "ServicesProvidedMedia",
+                column: "ServicesProvidedId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ServicesProvidedMedia_UploadedByUserId",
+                table: "ServicesProvidedMedia",
+                column: "UploadedByUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_RoleId",
@@ -1034,13 +1479,37 @@ namespace FilmMaker.Migrations
                 name: "LocationTermsOfUse");
 
             migrationBuilder.DropTable(
+                name: "LocationVisitRequests");
+
+            migrationBuilder.DropTable(
+                name: "OtpCodes");
+
+            migrationBuilder.DropTable(
                 name: "PreviousProjects");
 
             migrationBuilder.DropTable(
                 name: "ProductionCompanyProductionTypes");
 
             migrationBuilder.DropTable(
+                name: "RefreshTokens");
+
+            migrationBuilder.DropTable(
+                name: "RequestToLocationManagerToBookService");
+
+            migrationBuilder.DropTable(
+                name: "ServiceBookings");
+
+            migrationBuilder.DropTable(
+                name: "ServiceProviderCities");
+
+            migrationBuilder.DropTable(
                 name: "ServiceProviderServiceTypes");
+
+            migrationBuilder.DropTable(
+                name: "ServicesMedia");
+
+            migrationBuilder.DropTable(
+                name: "ServicesProvidedMedia");
 
             migrationBuilder.DropTable(
                 name: "Payments");
@@ -1049,10 +1518,13 @@ namespace FilmMaker.Migrations
                 name: "Media");
 
             migrationBuilder.DropTable(
-                name: "ServiceProviderProfiles");
+                name: "ServicesProvided");
 
             migrationBuilder.DropTable(
                 name: "DigitalContracts");
+
+            migrationBuilder.DropTable(
+                name: "ServiceProviderProfiles");
 
             migrationBuilder.DropTable(
                 name: "LocationBookingRequests");

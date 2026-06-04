@@ -96,7 +96,7 @@ namespace FilmMaker.Controllers
                         "Unauthorized.",
                         "غير مصرح."
                     ));
-            var response = await _locationBookingService.UpdateBookingRequestAsync(requestId, currentUserId.Value, dto);
+            var response = await _locationBookingService.UpdateBookingRequestAsync(currentUserId.Value, dto);
             if (!response.Success)
                 return BadRequest(response);
             return Ok(response);
