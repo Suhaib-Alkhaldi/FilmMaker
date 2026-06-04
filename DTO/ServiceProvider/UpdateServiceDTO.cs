@@ -10,7 +10,9 @@
 
         public decimal Price { get; set; }
 
-        public int ServiceTypeId { get; set; }
+        public int? ServiceTypeId { get; set; }
+
+        public string? CustomServiceType { get; set; }
 
         public List<int> MediaIds { get; set; } = new();
 

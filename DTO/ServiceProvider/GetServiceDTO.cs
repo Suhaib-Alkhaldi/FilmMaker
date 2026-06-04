@@ -10,9 +10,13 @@
 
         public decimal Price { get; set; }
 
-        public int ServiceTypeId { get; set; }
+        public int? ServiceTypeId { get; set; }
 
         public string ServiceTypeName { get; set; } = string.Empty;
+
+        public string? CustomServiceType { get; set; }
+
+        public bool IsCustomServiceType { get; set; }
 
         public int ServiceProviderId { get; set; }
 

@@ -136,7 +136,7 @@ namespace FilmMaker.Controllers
             return result.Success ? Ok(result) : BadRequest(result);
         }
 
-        [HttpGet("{serviceId:int}")]
+        [HttpGet("GetServiceById{serviceId:int}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetServiceById(int serviceId)
         {
@@ -177,6 +177,19 @@ namespace FilmMaker.Controllers
         {
             var result = await _servicesProvidedService.GetServicesByProvider(providerId);
             return result.Success ? Ok(result) : BadRequest(result);
+        }
+
+        [HttpGet("GetServicesByCustomServiceType")]
+        public async Task<IActionResult> GetServicesByCustomServiceType([FromQuery] string customServiceTypeName)
+        {
+            var response = await _servicesProvidedService.GetServicesByCustomServiceType(customServiceTypeName);
+
+            if (!response.Success)
+            {
+                return BadRequest(response);
+            }
+
+            return Ok(response);
         }
 
         [HttpGet("by-type/{serviceTypeId:int}")]
