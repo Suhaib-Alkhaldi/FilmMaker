@@ -1,0 +1,27 @@
+﻿using FilmMaker.Common;
+using FilmMaker.DTO.ServiceProvider;
+
+namespace FilmMaker.Services.Interface
+{
+    public interface IServicesProvidedService
+    {
+        Task<ApiResponse<GetServiceDTO>> AddService(CreateServiceDTO serviceDto, int currentUserId);
+
+        Task<ApiResponse<GetServiceDTO>> UpdateService(UpdateServiceDTO serviceDto, int currentUserId);
+
+        Task<ApiResponse<bool>> DeleteService(int serviceId, int currentUserId);
+        Task<ApiResponse<GetServiceDTO>> RestoreDeletedService(int serviceId, int currentUserId);
+        Task<ApiResponse<GetServiceDTO?>> GetServiceById(int serviceId);
+
+        Task<ApiResponse<List<GetServiceDTO>>> GetAllServices();
+        Task<ApiResponse<List<GetServiceDTO>>> SearchServices(string searchTerm);
+
+        Task<ApiResponse<List<GetServiceDTO>>> GetMyServices(int currentUserId , bool includeDeleted = false);
+        Task<ApiResponse<List<GetServiceDTO>>> GetServicesByProvider(int currentUserId);
+        Task<ApiResponse<List<GetServiceDTO>>> GetServicesByServiceType(int serviceTypeId);
+        Task<ApiResponse<List<GetServiceDTO>>> SearchServicesByServiceType(int serviceTypeId, string searchTerm);
+        Task<ApiResponse<List<GetServiceDTO>>> GetServicesByCustomServiceType(string customServiceTypeName);
+        Task<ApiResponse<GetServiceDTO>> SetServiceActive(int serviceId, int currentUserId);
+        Task<ApiResponse<GetServiceDTO>> SetServiceInactive(int serviceId, int currentUserId);
+    }
+}

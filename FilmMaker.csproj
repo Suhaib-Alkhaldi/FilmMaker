@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MailKit" Version="4.16.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.26" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.26">
       <PrivateAssets>all</PrivateAssets>
@@ -24,7 +25,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="DataSeed\" />
     <Folder Include="Helper\Enum\" />
+    <Folder Include="Migrations\" />
   </ItemGroup>
 
 </Project>

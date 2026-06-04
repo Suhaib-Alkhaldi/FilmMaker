@@ -11,5 +11,7 @@
         public List<int>? ServiceTypeIds { get; set; }
 
         public List<string>? CustomServiceTypes { get; set; }
+
+        public List<int>? CitiesIds { get; set; }
     }
 }

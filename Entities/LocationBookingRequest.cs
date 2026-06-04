@@ -26,6 +26,7 @@ namespace FilmMaker.Entities
         public string? Message { get; set; }
         public decimal TotalPrice { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public ICollection<BookingStatusHistory> StatusHistories { get; set; }
+        public ICollection<BookingStatusHistory> StatusHistories { get; set; } = new List<BookingStatusHistory>();  
+        public ICollection<RequestToLocationManagerToBookService> ServiceBookingRequests { get; set; } = new List<RequestToLocationManagerToBookService>();
     }
 }

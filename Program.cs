@@ -18,6 +18,8 @@ Log.Logger = new LoggerConfiguration()
 
 builder.Host.UseSerilog();
 
+builder.Services.AddScoped<ILocationService, LocationService>();
+
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -55,10 +57,15 @@ builder.Services.AddDbContext<FilmMakerDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddScoped<IRequestToLocationManagerToBookServiceService, RequestToLocationManagerToBookServiceService>();
 
+builder.Services.AddScoped<IOtpService, OtpService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
+builder.Services.AddScoped<IServicesProvidedService, ServicesProvidedService>();
+builder.Services.AddScoped<IServiceBookingService, ServiceBookingService>();
 
 builder.Services.AddScoped<ILocationVisitService, LocationVisitService>();
 builder.Services.AddScoped<ILocationBookingService, LocationBookingService>();
@@ -68,6 +75,7 @@ builder.Services.AddScoped<ILocationService, LocationService>();
 builder.Services.AddScoped<ILocationOwnerVisitRequestService, LocationOwnerVisitRequestService>();
 builder.Services.AddScoped<ILocationOwnerBookingRequestService, LocationOwnerBookingRequestService>();
 
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 
 builder.Services.AddAuthentication(options =>
@@ -114,20 +122,20 @@ app.UseSerilogRequestLogging();
 
 
 // Configure the HTTP request pipeline.
-//if (app.Environment.IsDevelopment())
-//{
-//    app.UseSwagger();
-//    app.UseSwaggerUI();
-//}
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 #region puplish
-app.UseSwagger();
-app.UseSwaggerUI(
-    c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Film Maker v1");
-        c.RoutePrefix = string.Empty;
-    }
-    );
+//app.UseSwagger();
+//app.UseSwaggerUI(
+//    c =>
+//    {
+//        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Film Maker v1");
+//        c.RoutePrefix = string.Empty;
+//    }
+//    );
 
 #endregion
 app.UseHttpsRedirection();

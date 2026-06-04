@@ -19,7 +19,7 @@ namespace FilmMaker.Controllers
         }
 
 
-        [AuthorizeLocationOwner]
+        [AuthorizeServiceProviderOrLocationOwner]
         [HttpPost("UploadMedia")]
         public async Task<ActionResult<ApiResponse<List<MediaResponseDto>>>> UploadMedia([FromForm] List<IFormFile> files)
         {
@@ -36,7 +36,7 @@ namespace FilmMaker.Controllers
             return Ok(result);
         }
 
-        [AuthorizeLocationOwner]
+        [AuthorizeServiceProviderOrLocationOwner]
         [HttpDelete("DeleteMedia/{mediaId}")]
         public async Task<ActionResult<ApiResponse<bool>>> DeleteMedia(int mediaId)
         {

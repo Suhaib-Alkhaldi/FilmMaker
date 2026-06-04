@@ -7,6 +7,7 @@ namespace FilmMaker.Entities
 
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
+        public DbSet<OtpCode> OtpCodes { get; set; }
 
         public DbSet<LookupCategory> LookupCategories { get; set; }
         public DbSet<LookupItem> LookupItems { get; set; }
@@ -16,12 +17,25 @@ namespace FilmMaker.Entities
         public DbSet<LocationManagerProfile> LocationManagerProfiles { get; set; }
         public DbSet<LocationManagerCity> LocationManagerCities { get; set; }
         public DbSet<PreviousProject> PreviousProjects { get; set; }
+        public DbSet<ServiceBooking> ServiceBookings { get; set; }
 
+        public DbSet<ServicesMedia> ServicesMedia { get; set; }
+
+        public DbSet<ServicesProvided> ServicesProvided { get; set; }
+
+        public DbSet<RequestToLocationManagerToBookService> RequestToLocationManagerToBookService { get; set; }
+        public DbSet<ServicesProvidedMedia> ServicesProvidedMedia { get; set; }
+
+        public DbSet<ServiceProviderCities> ServiceProviderCities { get; set; }
+
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<ProductionCompanyProfile> ProductionCompanyProfiles { get; set; }
+
         public DbSet<ProductionCompanyProductionType> ProductionCompanyProductionTypes { get; set; }
 
         public DbSet<ServiceProviderProfile> ServiceProviderProfiles { get; set; }
         public DbSet<ServiceProviderServiceType> ServiceProviderServiceTypes { get; set; }
+
 
         public DbSet<Media> Media { get; set; }
 
@@ -50,13 +64,21 @@ namespace FilmMaker.Entities
         }
 
 
-
-
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<ServicesMedia>()
+            .HasOne(x => x.ServicesProvided)
+            .WithMany(x => x.Media)
+            .HasForeignKey(x => x.ServicesProvidedId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ServicesMedia>()
+                .HasOne(x => x.Media)
+                .WithMany()
+                .HasForeignKey(x => x.MediaId)
+                .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<LocationArchiveHistory>()
                 .HasOne(x => x.Location)
@@ -89,6 +111,14 @@ namespace FilmMaker.Entities
                 .HasForeignKey(x => x.LocationOwnerId)
                 .OnDelete(DeleteBehavior.NoAction);
 
+            modelBuilder.Entity<ServiceBooking>()
+            .HasOne(x => x.Service)
+            .WithMany()
+            .HasForeignKey(x => x.ServiceId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+          
+
             modelBuilder.Entity<LocationBookingRequest>()
                 .HasOne(x => x.LocationManager)
                 .WithMany()
@@ -106,6 +136,8 @@ namespace FilmMaker.Entities
                 .WithMany()
                 .HasForeignKey(x => x.BookingStatusId)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            
 
 
 

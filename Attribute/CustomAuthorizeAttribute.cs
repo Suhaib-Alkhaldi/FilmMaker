@@ -37,12 +37,29 @@ namespace FilmMaker.Attribute
             Roles = "Production Company";
         }
     }
+    public class AuthorizeProductionCompanyOrLocationManagerAttribute : AuthorizeAttribute
+    {
+        public AuthorizeProductionCompanyOrLocationManagerAttribute()
+        {
+            AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme;
+            Roles = "Production Company,Location Manager";
+        }
+    }
     public class AuthorizeServiceProviderAttribute : AuthorizeAttribute
     {
         public AuthorizeServiceProviderAttribute()
         {
             AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme;
             Roles = "Service Provider";
+        }
+    }
+
+    public class AuthorizeServiceProviderOrLocationOwnerAttribute : AuthorizeAttribute
+    {
+        public AuthorizeServiceProviderOrLocationOwnerAttribute()
+        {
+            AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme;
+            Roles = "Service Provider,Location Owner";
         }
     }
 }
