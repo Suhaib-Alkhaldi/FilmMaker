@@ -56,11 +56,7 @@ namespace FilmMaker.Services.Service
 
                 StartDate = entity.StartDate,
                 EndDate = entity.EndDate,
-                Notes = entity.Notes,
-                Latitude = entity.Latitude,
-                Longitude = entity.Longitude,
-                LocationOnGoogleMaps = entity.LocationOnGoogleMaps,
-
+                Notes = entity.Notes
             };
 
 
@@ -134,30 +130,7 @@ namespace FilmMaker.Services.Service
                     IsDeleted = false
                 };
 
-                if (request.Latitude != 0 && request.Longitude != 0)
-                {
-                    entity.Latitude = request.Latitude;
-                    entity.Longitude = request.Longitude;
-                    if (request.LocationOnGoogleMaps.IsNullOrEmpty())
-                    {
-                        entity.LocationOnGoogleMaps = $"https://www.google.com/maps/search/?api=1&query={request.Latitude},{request.Longitude}";
-                    }
-                    else
-                    {
-                        entity.LocationOnGoogleMaps = request.LocationOnGoogleMaps;
-                    }
-                }
-                else if (!request.LocationOnGoogleMaps.IsNullOrEmpty())
-                {
-                    entity.LocationOnGoogleMaps = request.LocationOnGoogleMaps;
-                }
-                else
-                {
-                    return ApiResponse<CreateRequestToLocationManagerToBookServiceDTO>.FailureResponse(
-                   "location or latitude and longitude is required",
-                   "الموقع أو خط العرض وخط الطول مطلوبان"
-                );
-                }
+                
 
                     await _context.RequestToLocationManagerToBookService.AddAsync(entity);
                     await _context.SaveChangesAsync();
@@ -353,30 +326,6 @@ namespace FilmMaker.Services.Service
                 entity.UpdatedAt = DateTime.UtcNow;
 
 
-                if (request.Latitude != 0 && request.Longitude != 0)
-                {
-                    entity.Latitude = request.Latitude;
-                    entity.Longitude = request.Longitude;
-                    if (request.LocationOnGoogleMaps.IsNullOrEmpty())
-                    {
-                        entity.LocationOnGoogleMaps = $"https://www.google.com/maps/search/?api=1&query={request.Latitude},{request.Longitude}";
-                    }
-                    else
-                    {
-                        entity.LocationOnGoogleMaps = request.LocationOnGoogleMaps;
-                    }
-                }
-                else if (!request.LocationOnGoogleMaps.IsNullOrEmpty())
-                {
-                    entity.LocationOnGoogleMaps = request.LocationOnGoogleMaps;
-                }
-                else
-                {
-                    return ApiResponse<UpdateRequestToLocationManagerToBookServiceDTO>.FailureResponse(
-                   "location or latitude and longitude is required",
-                   "الموقع أو خط العرض وخط الطول مطلوبان"
-                );
-                }
 
                 _context.RequestToLocationManagerToBookService.Update(entity);
                 await _context.SaveChangesAsync();
