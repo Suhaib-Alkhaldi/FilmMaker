@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace FilmMaker.Migrations
 {
     /// <inheritdoc />
-    public partial class addedDB : Migration
+    public partial class UpdateLocationBookingRequest : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -519,7 +519,9 @@ namespace FilmMaker.Migrations
                     ServiceName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DailyPrice = table.Column<decimal>(type: "smallmoney", nullable: false),
-                    ServiceTypeId = table.Column<int>(type: "int", nullable: false),
+                    ServiceTypeId = table.Column<int>(type: "int", nullable: true),
+                    CustomServiceType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsCustom = table.Column<bool>(type: "bit", nullable: false),
                     ServiceProviderId = table.Column<int>(type: "int", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -535,8 +537,7 @@ namespace FilmMaker.Migrations
                         name: "FK_ServicesProvided_LookupItems_ServiceTypeId",
                         column: x => x.ServiceTypeId,
                         principalTable: "LookupItems",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_ServicesProvided_ServiceProviderProfiles_ServiceProviderId",
                         column: x => x.ServiceProviderId,
