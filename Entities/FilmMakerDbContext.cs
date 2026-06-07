@@ -49,6 +49,7 @@ namespace FilmMaker.Entities
         public DbSet<LocationBookingRequest> LocationBookingRequests { get; set; }
         public DbSet<BookingStatusHistory> BookingStatusHistories { get; set; }
         public DbSet<LocationVisitRequest> LocationVisitRequests { get; set; }
+        public DbSet<LocationScoutingRequest> LocationScoutingRequests { get; set; }
 
         // Contract
         public DbSet<DigitalContract> DigitalContracts { get; set; }
@@ -252,7 +253,42 @@ namespace FilmMaker.Entities
                 .WithMany()
                 .HasForeignKey(x => x.LocationStatusId)
                 .OnDelete(DeleteBehavior.NoAction);
-            
+
+
+
+
+            modelBuilder.Entity<LocationScoutingRequest>()
+                .HasOne(x => x.ProductionCompany)
+                .WithMany()
+                .HasForeignKey(x => x.ProductionCompanyId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<LocationScoutingRequest>()
+                .HasOne(x => x.LocationManager)
+                .WithMany()
+                .HasForeignKey(x => x.LocationManagerId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<LocationScoutingRequest>()
+                .HasOne(x => x.City)
+                .WithMany()
+                .HasForeignKey(x => x.CityId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<LocationScoutingRequest>()
+                .HasOne(x => x.Status)
+                .WithMany()
+                .HasForeignKey(x => x.StatusId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<LocationScoutingRequest>()
+                .Property(x => x.MinBudget)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<LocationScoutingRequest>()
+                .Property(x => x.MaxBudget)
+                .HasPrecision(18, 2);
+
         }
     }
 }

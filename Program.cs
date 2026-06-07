@@ -70,6 +70,8 @@ builder.Services.AddScoped<IServiceBookingService, ServiceBookingService>();
 builder.Services.AddScoped<ILocationVisitService, LocationVisitService>();
 builder.Services.AddScoped<ILocationBookingService, LocationBookingService>();
 
+builder.Services.AddScoped<ILocationScoutingRequestService, LocationScoutingRequestService>();
+
 builder.Services.AddScoped<IMediaService, MediaService>();
 builder.Services.AddScoped<ILocationService, LocationService>();
 builder.Services.AddScoped<ILocationOwnerVisitRequestService, LocationOwnerVisitRequestService>();

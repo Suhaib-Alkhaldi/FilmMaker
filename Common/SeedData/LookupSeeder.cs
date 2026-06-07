@@ -203,6 +203,18 @@ namespace FilmMaker.Common.SeedData
                     new() {Name = "Rejected"},
                     new() {Name = "Cancelled"}
                 }
+            },
+            new LookupCategory
+            {
+                Name = "LocationScoutingRequestStatus",
+                LookupItems = new List<LookupItem>
+                {
+                    new() {Name = "Pending"},
+                    new() {Name = "Accepted"},
+                    new() {Name = "Rejected"},
+                    new() {Name = "Completed"},
+                    new() {Name = "Cancelled"}
+                }
             }
         };
 
