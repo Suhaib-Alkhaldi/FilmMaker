@@ -15,5 +15,7 @@
 
         public string? Notes { get; set; }
 
+        public string? CustomServiceType { get; set; }
+
     }
 }

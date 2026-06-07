@@ -17,5 +17,6 @@ namespace FilmMaker.DTO.RequestToLocationManagerToBookService
 
         public string? Notes { get; set; }
 
+        public string? CustomServiceType { get; set; }
     }
 }

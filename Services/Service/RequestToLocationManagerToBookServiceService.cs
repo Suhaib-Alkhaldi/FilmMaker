@@ -21,6 +21,18 @@ namespace FilmMaker.Services.Service
             _logger = logger;
         }
 
+        private async Task<bool> ValidateServiceType(int TypeId)
+        {
+            var serviceTypes = await _context.LookupItems.Where(li => li.Id == TypeId).Include
+                (li => li.LookupCategory).FirstOrDefaultAsync();
+            if (serviceTypes == null || serviceTypes.LookupCategory.Name != "ServiceType")
+            {
+                return false;
+            }
+
+            return serviceTypes != null;
+        }
+
         private async Task<int?> GetProductionCompanyIdAsync(int userId)
         {
             var profile = await _context.ProductionCompanyProfiles
@@ -56,7 +68,8 @@ namespace FilmMaker.Services.Service
 
                 StartDate = entity.StartDate,
                 EndDate = entity.EndDate,
-                Notes = entity.Notes
+                Notes = entity.Notes,
+                CustomServiceType = entity.CustomServiceType
             };
 
 
@@ -95,14 +108,46 @@ namespace FilmMaker.Services.Service
                         "حجز الموقع غير موجود"
                     );
 
-                var serviceTypeExists = await _context.LookupItems
-                    .AnyAsync(l => l.Id == request.ServiceTypeId && !l.IsDeleted);
 
-                if (!serviceTypeExists)
-                    return ApiResponse<CreateRequestToLocationManagerToBookServiceDTO>.FailureResponse(
-                        "Service type not found",
-                        "نوع الخدمة غير موجود"
-                    );
+                var entity = new  RequestToLocationManagerToBookService();
+
+                if (string.IsNullOrEmpty(request.CustomServiceType))
+                {
+
+
+
+                    var serviceTypeExists = await _context.LookupItems
+                        .AnyAsync(l => l.Id == request.ServiceTypeId && !l.IsDeleted);
+
+                    if (!serviceTypeExists)
+                        return ApiResponse<CreateRequestToLocationManagerToBookServiceDTO>.FailureResponse(
+                            "Service type not found",
+                            "نوع الخدمة غير موجود"
+                        );
+
+                    if (!await ValidateServiceType(request.ServiceTypeId)) 
+                    {
+                        return ApiResponse<CreateRequestToLocationManagerToBookServiceDTO>.FailureResponse(
+                            "Invalid service type",
+                            "نوع الخدمة غير صالح"
+                        );  
+                    }
+                     entity = new RequestToLocationManagerToBookService
+                    {
+                        ProductionCompanyId = productionCompanyId.Value,
+                        ServiceTypeId = request.ServiceTypeId,
+                        LocationBookingId = request.LocationBookingId,
+                        StartDate = request.StartDate,
+                        EndDate = request.EndDate,
+                        Notes = request.Notes,
+                        CreatedAt = DateTime.UtcNow,
+                        IsActive = true,
+                        IsDeleted = false
+                    };
+
+                }
+
+                
 
                 //var duplicateExists = await _context.RequestToLocationManagerToBookServices
                 //    .AnyAsync(r =>
@@ -117,10 +162,12 @@ namespace FilmMaker.Services.Service
                 //        "يوجد طلب بالفعل لنوع الخدمة هذا في هذا الحجز"
                 //    );
 
-                var entity = new RequestToLocationManagerToBookService
+
+
+                 entity = new RequestToLocationManagerToBookService
                 {
                     ProductionCompanyId = productionCompanyId.Value,
-                    ServiceTypeId = request.ServiceTypeId,
+                    CustomServiceType = request.CustomServiceType,
                     LocationBookingId = request.LocationBookingId,
                     StartDate = request.StartDate,
                     EndDate = request.EndDate,
@@ -317,9 +364,44 @@ namespace FilmMaker.Services.Service
                         "يجب أن يكون تاريخ الانتهاء بعد تاريخ البداية"
                     );
 
-  
+                if (string.IsNullOrEmpty(request.CustomServiceType))
+                {
+                    var serviceTypeExists = await _context.LookupItems
+                        .AnyAsync(l => l.Id == request.ServiceTypeId && !l.IsDeleted);
 
-                entity.ServiceTypeId = request.ServiceTypeId;
+                    if (!serviceTypeExists)
+                        return ApiResponse<UpdateRequestToLocationManagerToBookServiceDTO>.FailureResponse(
+                            "Service type not found",
+                            "نوع الخدمة غير موجود"
+                        );
+
+                    if (!await ValidateServiceType(request.ServiceTypeId))
+                    {
+                        return ApiResponse<UpdateRequestToLocationManagerToBookServiceDTO>.FailureResponse(
+                            "Invalid service type",
+                            "نوع الخدمة غير صالح"
+                        );
+                    }
+                    entity.CustomServiceType = null;
+                    entity.ServiceTypeId = request.ServiceTypeId;
+                    entity.StartDate = request.StartDate;
+                    entity.EndDate = request.EndDate;
+                    entity.Notes = request.Notes;
+                    entity.UpdatedAt = DateTime.UtcNow;
+
+                    _context.RequestToLocationManagerToBookService.Update(entity);
+                    await _context.SaveChangesAsync();
+
+                    return ApiResponse<UpdateRequestToLocationManagerToBookServiceDTO>.SuccessResponse(
+                        request,
+                        "Request updated successfully",
+                        "تم تحديث الطلب بنجاح"
+                    );
+                }
+
+
+                entity.ServiceTypeId = null;
+                entity.CustomServiceType = request.CustomServiceType;
                 entity.StartDate = request.StartDate;
                 entity.EndDate = request.EndDate;
                 entity.Notes = request.Notes;

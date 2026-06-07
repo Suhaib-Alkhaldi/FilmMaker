@@ -9,7 +9,7 @@ namespace FilmMaker.Entities
 
         [ForeignKey("ProductionCompanyId")]
         public ProductionCompanyProfile ProductionCompany { get; set; }
-        public int ServiceTypeId { get; set; }
+        public int? ServiceTypeId { get; set; }
 
         [ForeignKey("ServiceTypeId")]
         public LookupItem ServiceType { get; set; }
@@ -24,6 +24,8 @@ namespace FilmMaker.Entities
         public DateTime EndDate { get; set; }
 
         public string? Notes { get; set; }
+
+        public string? CustomServiceType { get; set; }
 
 
     }
