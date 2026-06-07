@@ -99,6 +99,7 @@ namespace FilmMaker.Services.Service
                     ownerProfile.Id
                 );
 
+                await SendVerificationOtp(user.Id);
 
                 var response = CreateRegisterResponse(user, role.Name);
 
@@ -189,6 +190,8 @@ namespace FilmMaker.Services.Service
 
 
                 var response = CreateRegisterResponse(user, role.Name);
+
+                await SendVerificationOtp(user.Id);
 
                 _logger.LogInformation(
                     "Register location manager process completed successfully. UserId: {UserId}, Email: {Email}, ProfileId: {ProfileId}",
@@ -283,6 +286,18 @@ namespace FilmMaker.Services.Service
                 return ApiResponse<LoginResponseDTO>.FailureResponse(
                     "Invalid email/phone or password.",
                     "البريد الإلكتروني/رقم الهاتف أو كلمة المرور غير صحيحة."
+                );
+            }
+
+            if(user.IsEmailVerified == false)
+            {
+                _logger.LogWarning(
+                        "Login failed: email not verified. UserId: {UserId}, Email: {Email}",
+                        user.Id,
+                        user.Email);
+                return ApiResponse<LoginResponseDTO>.FailureResponse(
+                    "Email is not verified. Please verify your email before logging in.",
+                    "البريد الإلكتروني غير مُحقق. يرجى التحقق من بريدك الإلكتروني قبل تسجيل الدخول."
                 );
             }
 
@@ -397,6 +412,7 @@ namespace FilmMaker.Services.Service
                     await _context.SaveChangesAsync();
                 }
 
+                await SendVerificationOtp(user.Id);
 
                 var response = CreateRegisterResponse(user, role.Name);
 
@@ -517,6 +533,7 @@ namespace FilmMaker.Services.Service
                     _context.ServiceProviderCities.AddRange(cities);
                     await _context.SaveChangesAsync();
                 }
+                await SendVerificationOtp(user.Id);
 
                 var response = CreateRegisterResponse(user, role.Name);
 
@@ -769,9 +786,22 @@ namespace FilmMaker.Services.Service
 
         }
 
-        public async Task<ApiResponse<object>> VerifyEmail(VerifyOtpRequest request, int currentUserId)
+        public async Task<ApiResponse<object>> VerifyEmail(VerifyOtpRequest request)
         {
-            var otp = await _otpService.ValidateOtpAsync(currentUserId, request.Code, OtpPurpose.EmailVerification);
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == request.Email);
+
+            if (user == null)
+            {
+                return new ApiResponse<object>
+                {
+                    Success = false,
+                    MessageEn = "User not found.",
+                    MessageAr = "المستخدم غير موجود.",
+                    Data = null
+                };
+            }
+
+            var otp = await _otpService.ValidateOtpAsync(user.Id, request.Code, OtpPurpose.EmailVerification);
 
             if(otp == null)
             {
@@ -782,9 +812,8 @@ namespace FilmMaker.Services.Service
                     MessageAr = "رمز OTP غير صالح أو منتهي الصلاحية.",
                     Data = null
                 };
-            }
+            }       
 
-            var user = await _context.Users.FindAsync(currentUserId);
             user!.IsEmailVerified = true;
             user.EmailVerifiedAt = DateTime.Now;
             await _context.SaveChangesAsync();
@@ -896,6 +925,43 @@ namespace FilmMaker.Services.Service
                 null,
                 "Password reset successfully.",
                 "تم إعادة تعيين كلمة المرور بنجاح."
+            );
+        }
+
+
+        public async Task<ApiResponse<object>> SendVerificationOtp(string email)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == email);
+
+            if (user == null)
+            {
+                return new ApiResponse<object>
+                {
+                    Success = false,
+                    MessageEn = "User not found.",
+                    MessageAr = "المستخدم غير موجود.",
+                    Data = null
+                };
+            }
+
+            if (user.IsEmailVerified)
+            {
+                return new ApiResponse<object>
+                {
+                    Success = false,
+                    MessageEn = "Email is already verified.",
+                    MessageAr = "البريد الإلكتروني تم التحقق منه مسبقًا.",
+                    Data = null
+                };
+            }
+
+            var code = await _otpService.GenerateAndSaveOtpAsync(user.Id, OtpPurpose.EmailVerification);
+            await _emailService.SendOtpAsync(user.Email, code, OtpPurpose.EmailVerification);
+
+            return ApiResponse<object>.SuccessResponse(
+                null,
+                "Verification OTP sent to email successfully.",
+                "تم إرسال رمز التحقق إلى البريد الإلكتروني بنجاح."
             );
         }
     }
