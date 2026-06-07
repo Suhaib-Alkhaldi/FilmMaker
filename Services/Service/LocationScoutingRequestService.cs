@@ -180,21 +180,6 @@ namespace FilmMaker.Services.Service
                     );
                 }
 
-                var validationResult = ValidateLocationScoutingRequest(
-                    dto.LocationManagerId,
-                    dto.CityId,
-                    dto.StartDate,
-                    dto.EndDate,
-                    dto.Requirements,
-                    dto.MinBudget,
-                    dto.MaxBudget
-                );
-
-                if (validationResult != null)
-                {
-                    return validationResult;
-                }
-
                 var productionCompanyId = await GetProductionCompanyIdByUserId(currentUserId);
 
                 if (productionCompanyId == null)
@@ -240,9 +225,32 @@ namespace FilmMaker.Services.Service
                     );
                 }
 
+                var finalLocationManagerId = dto.LocationManagerId ?? request.LocationManagerId;
+                var finalCityId = dto.CityId ?? request.CityId;
+                var finalStartDate = dto.StartDate ?? request.StartDate;
+                var finalEndDate = dto.EndDate ?? request.EndDate;
+                var finalRequirements = dto.Requirements ?? request.Requirements;
+                var finalMinBudget = dto.MinBudget ?? request.MinBudget;
+                var finalMaxBudget = dto.MaxBudget ?? request.MaxBudget;
+
+                var validationResult = ValidateLocationScoutingRequest(
+                    finalLocationManagerId,
+                    finalCityId,
+                    finalStartDate,
+                    finalEndDate,
+                    finalRequirements,
+                    finalMinBudget,
+                    finalMaxBudget
+                );
+
+                if (validationResult != null)
+                {
+                    return validationResult;
+                }
+
                 var locationManagerExists = await _context.LocationManagerProfiles
                     .AnyAsync(x =>
-                        x.Id == dto.LocationManagerId &&
+                        x.Id == finalLocationManagerId &&
                         x.IsActive &&
                         !x.IsDeleted);
 
@@ -254,13 +262,11 @@ namespace FilmMaker.Services.Service
                     );
                 }
 
-                
-
-                if (dto.CityId.HasValue)
+                if (finalCityId.HasValue)
                 {
                     var cityExists = await _context.LookupItems
                         .AnyAsync(x =>
-                            x.Id == dto.CityId.Value &&
+                            x.Id == finalCityId.Value &&
                             x.IsActive &&
                             !x.IsDeleted &&
                             x.LookupCategory.Name == "City" &&
@@ -276,19 +282,22 @@ namespace FilmMaker.Services.Service
                     }
                 }
 
-                request.LocationManagerId = dto.LocationManagerId;
-                request.CityId = dto.CityId;
+                request.LocationManagerId = finalLocationManagerId;
+                request.CityId = finalCityId;
+                request.StartDate = finalStartDate;
+                request.EndDate = finalEndDate;
 
-                request.StartDate = dto.StartDate;
-                request.EndDate = dto.EndDate;
+                request.Requirements = finalRequirements.Trim();
 
-                request.Requirements = dto.Requirements.Trim();
-                request.Notes = string.IsNullOrWhiteSpace(dto.Notes)
-                    ? null
-                    : dto.Notes.Trim();
+                if (dto.Notes != null)
+                {
+                    request.Notes = string.IsNullOrWhiteSpace(dto.Notes)
+                        ? null
+                        : dto.Notes.Trim();
+                }
 
-                request.MinBudget = dto.MinBudget;
-                request.MaxBudget = dto.MaxBudget;
+                request.MinBudget = finalMinBudget;
+                request.MaxBudget = finalMaxBudget;
 
                 request.UpdatedAt = DateTime.UtcNow;
                 request.UpdatedBy = currentUserId.ToString();

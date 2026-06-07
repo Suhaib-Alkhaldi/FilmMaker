@@ -131,7 +131,7 @@ namespace FilmMaker.Controllers
             return response.Success ? Ok(response) : BadRequest(response);
         }
 
-        [HttpPost("RespondToLocationScoutingRequest")]
+        [HttpPut("RespondToLocationScoutingRequest")]
         [AuthorizeLocationManager]
         public async Task<IActionResult> RespondToLocationScoutingRequest([FromBody] RespondLocationScoutingRequestDto dto)
         {
@@ -153,7 +153,7 @@ namespace FilmMaker.Controllers
             return response.Success ? Ok(response) : BadRequest(response);
         }
 
-        [HttpPost("CancelLocationScoutingRequest")]
+        [HttpPut("CancelLocationScoutingRequest")]
         [AuthorizeProductionCompany]
         public async Task<IActionResult> CancelLocationScoutingRequest(int requestId)
         {
