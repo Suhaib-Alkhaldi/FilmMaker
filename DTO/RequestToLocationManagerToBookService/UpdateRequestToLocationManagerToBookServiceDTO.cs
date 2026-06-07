@@ -15,10 +15,7 @@
 
         public string? Notes { get; set; }
 
-        public decimal? Latitude { get; set; }
+        public string? CustomServiceType { get; set; }
 
-        public decimal? Longitude { get; set; }
-
-        public string? LocationOnGoogleMaps { get; set; } = string.Empty;
     }
 }

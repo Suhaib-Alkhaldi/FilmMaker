@@ -17,10 +17,6 @@ namespace FilmMaker.DTO.RequestToLocationManagerToBookService
 
         public string? Notes { get; set; }
 
-        public decimal? Latitude { get; set; }
-
-        public decimal? Longitude { get; set; }
-
-        public string? LocationOnGoogleMaps { get; set; } = string.Empty;
+        public string? CustomServiceType { get; set; }
     }
 }
