@@ -964,5 +964,28 @@ namespace FilmMaker.Services.Service
                 "تم إرسال رمز التحقق إلى البريد الإلكتروني بنجاح."
             );
         }
+
+        public async Task<ApiResponse<object>> ForceVerifyEmail(int UserId)
+        {
+            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == UserId);
+
+            if(existingUser == null)
+            {
+                return (ApiResponse<object>.FailureResponse(
+                    "User not found.",
+                    "المستخدم غير موجود."
+                ));
+            }
+
+            existingUser.IsEmailVerified = true;
+            _context.Users.Update(existingUser);
+            await _context.SaveChangesAsync();
+
+            return ApiResponse<object>.SuccessResponse(
+                null,
+                "Email verified successfully.",
+                "تم التحقق من البريد الإلكتروني بنجاح."
+            );
+        }
     }
 }

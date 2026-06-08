@@ -24,5 +24,7 @@ namespace FilmMaker.Services.Interface
 
         Task<ApiResponse<object>> ResetPassword(ResetPasswordRequest request);
 
+        Task<ApiResponse<object>> ForceVerifyEmail(int UserId);
+
     }
 }

@@ -91,6 +91,17 @@ namespace FilmMaker.Controllers
             return Ok(result);
         }
 
+        [HttpPatch("force-verify-email/{userId}")]
+        public async Task<IActionResult> ForceVerifyEmail(int userId)
+        {
+            var result = await _authService.ForceVerifyEmail(userId);
+
+            if (!result.Success)
+                return BadRequest(result);
+
+            return Ok(result);
+        }
+
         [HttpPost("Login")]
         public async Task<IActionResult> Login(LoginRequestDto request)
         {
