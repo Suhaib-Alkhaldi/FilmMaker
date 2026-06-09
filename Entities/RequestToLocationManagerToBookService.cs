@@ -8,28 +8,30 @@ namespace FilmMaker.Entities
         public int ProductionCompanyId { get; set; }
 
         [ForeignKey("ProductionCompanyId")]
-        public ProductionCompanyProfile ProductionCompany { get; set; }
-        public int ServiceTypeId { get; set; }
+        public ProductionCompanyProfile ProductionCompany { get; set; } = null!;
 
-        [ForeignKey("ServiceTypeId")]
-        public LookupItem ServiceType { get; set; }
+        public int LocationManagerId { get; set; }
+
+        [ForeignKey("LocationManagerId")]
+        public LocationManagerProfile LocationManager { get; set; } = null!;
 
         public int LocationBookingId { get; set; }
 
         [ForeignKey("LocationBookingId")]
-        public LocationBookingRequest LocationBooking { get; set; }
+        public LocationBookingRequest LocationBooking { get; set; } = null!;
+        public string? GeneralNotes { get; set; }
+        public int StatusId { get; set; }
 
-        public DateTime StartDate { get; set; }
+        [ForeignKey("StatusId")]
+        public LookupItem Status { get; set; } = null!;
 
-        public DateTime EndDate { get; set; }
+        public string? LocationManagerResponse { get; set; }
 
-        public string? Notes { get; set; }
+        public DateTime? RespondedAtUtc { get; set; }
 
-        public decimal? Latitude { get; set; }
-
-        public decimal? Longitude { get; set; }
-
-        public string? LocationOnGoogleMaps { get; set; } = string.Empty;
+        public int? RespondedByUserId { get; set; }
+        public ICollection<RequestToLocationManagerToBookServiceItem> Items { get; set; }
+            = new List<RequestToLocationManagerToBookServiceItem>();
 
     }
 }

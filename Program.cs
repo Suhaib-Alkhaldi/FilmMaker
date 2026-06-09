@@ -65,12 +65,13 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<IServicesProvidedService, ServicesProvidedService>();
-builder.Services.AddScoped<IServiceBookingService, ServiceBookingService>();
 
 builder.Services.AddScoped<ILocationVisitService, LocationVisitService>();
 builder.Services.AddScoped<ILocationBookingService, LocationBookingService>();
 
 builder.Services.AddScoped<ILocationScoutingRequestService, LocationScoutingRequestService>();
+
+builder.Services.AddScoped<IServiceProviderRequestService, ServiceProviderRequestService>();
 
 builder.Services.AddScoped<IMediaService, MediaService>();
 builder.Services.AddScoped<ILocationService, LocationService>();

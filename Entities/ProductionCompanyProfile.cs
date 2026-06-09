@@ -13,6 +13,6 @@ namespace FilmMaker.Entities
         public DateTime RegisterDate { get; set; } = DateTime.UtcNow;
         public ICollection<ProductionCompanyProductionType> ProductionTypes { get; set; }
 
-        public ICollection<RequestToLocationManagerToBookService> ServiceBookingRequests { get; set; }
+        public ICollection<RequestToLocationManagerToBookService> ServiceBookingRequests { get; set; } = new List<RequestToLocationManagerToBookService>();
     }
 }

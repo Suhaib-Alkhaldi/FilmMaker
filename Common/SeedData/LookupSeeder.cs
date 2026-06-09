@@ -215,7 +215,43 @@ namespace FilmMaker.Common.SeedData
                     new() {Name = "Completed"},
                     new() {Name = "Cancelled"}
                 }
+            },
+            new LookupCategory
+            {
+                Name = "ServiceRequestToLocationManagerStatus",
+                LookupItems = new List<LookupItem>
+                {
+                    new() {Name = "PendingManagerReview"},
+                    new() {Name = "Cancelled"},
+                    new() {Name = "AcceptedByManager"},
+                    new() {Name = "RejectedByManager"},
+                    new() {Name = "SentToProvider"}
+                }
+            },
+            new LookupCategory
+            {
+                Name = "ServiceProviderRequestStatus",
+                LookupItems = new List<LookupItem>
+                {
+                    new() {Name = "PendingProviderReview"},
+                    new() {Name = "AcceptedByProvider"},
+                    new() {Name = "RejectedByProvider"},
+                    new() {Name = "Cancelled"}
+                    
+                }
+            },new LookupCategory
+            {
+                Name = "ServiceBookingStatus",
+                LookupItems = new List<LookupItem>
+                {
+                    new() {Name = "Accepted"},
+                    new() {Name = "Rejected"},
+                    new() {Name = "Cancelled"}
+                    
+                    
+                }
             }
+
         };
 
             context.LookupCategories.AddRange(categories);

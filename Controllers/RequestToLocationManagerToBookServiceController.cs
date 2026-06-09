@@ -42,7 +42,82 @@ namespace FilmMaker.Controllers
             return userId;
         }
 
-        [HttpPost]
+        
+
+
+
+        
+
+
+        
+        [HttpGet("GetMySentServiceRequestsToLocationManager")]
+        [AuthorizeProductionCompanyOrLocationManager]
+
+        public async Task<IActionResult> GetMySentServiceRequestsToLocationManager()
+        {
+            var currentUserId = GetCurrentUserId();
+            if (currentUserId == 0)
+                return Unauthorized(new ApiResponse<bool> { MessageEn = "Invalid token", MessageAr = "رمز غير صالح" });
+
+            var result = await _service.GetMySentServiceRequestsToLocationManager(currentUserId);
+
+            return Ok(result);
+        }
+
+        
+
+        [HttpGet("GetMyServiceRequestToLocationManagerById")]
+        [AuthorizeProductionCompanyOrLocationManager]
+
+        public async Task<IActionResult> GetMyServiceRequestToLocationManagerById(int requestId)
+        {
+            var currentUserId = GetCurrentUserId();
+            if (currentUserId == 0)
+                return Unauthorized(new ApiResponse<bool> { MessageEn = "Invalid token", MessageAr = "رمز غير صالح" });
+
+            var result = await _service.GetMyServiceRequestToLocationManagerById(requestId,currentUserId);
+            return Ok(result);
+        }
+
+        [HttpGet("GetMyReceivedServiceRequests")]
+        [AuthorizeLocationManager]
+        public async Task<IActionResult> GetMyReceivedServiceRequests()
+        {
+            var currentUserId = GetCurrentUserId();
+
+            if (currentUserId == 0)
+            {
+                return Unauthorized(ApiResponse<List<ReadRequestToLocationManagerToBookServiceDTO>>.FailureResponse(
+                    "Invalid token.",
+                    "رمز الدخول غير صالح."
+                ));
+            }
+
+            var response = await _service.GetMyReceivedServiceRequestsToLocationManager(currentUserId);
+
+            return response.Success ? Ok(response) : BadRequest(response);
+        }
+
+        [HttpGet("GetReceivedServiceRequestById")]
+        [AuthorizeLocationManager]
+        public async Task<IActionResult> GetReceivedServiceRequestById(int requestId)
+        {
+            var currentUserId = GetCurrentUserId();
+
+            if (currentUserId == 0)
+            {
+                return Unauthorized(ApiResponse<ReadRequestToLocationManagerToBookServiceDTO>.FailureResponse(
+                    "Invalid token.",
+                    "رمز الدخول غير صالح."
+                ));
+            }
+
+            var response = await _service.GetReceivedServiceRequestToLocationManagerById(requestId,currentUserId);
+
+            return response.Success ? Ok(response) : BadRequest(response);
+        }
+
+        [HttpPost("CreateServiceRequestToLocationManager")]
         [AuthorizeProductionCompany]
         public async Task<IActionResult> CreateServiceRequestToLocationManager(
             [FromBody] CreateRequestToLocationManagerToBookServiceDTO request)
@@ -55,96 +130,26 @@ namespace FilmMaker.Controllers
             return Ok(result);
         }
 
-
-
-        [HttpGet("{id:int}/is-deleted")]
-        [AuthorizeProductionCompany]
-
-        public async Task<IActionResult> ReadServiceRequestToLocationManagerByIdWhereDeleted(int id)
+        [HttpPost("RespondToServiceRequest")]
+        [AuthorizeLocationManager]
+        public async Task<IActionResult> RespondToServiceRequest(RespondRequestToLocationManagerToBookServiceDTO request)
         {
             var currentUserId = GetCurrentUserId();
+
             if (currentUserId == 0)
-                return Unauthorized(new ApiResponse<bool> { MessageEn = "Invalid token", MessageAr = "رمز غير صالح" });
+            {
+                return Unauthorized(ApiResponse<ReadRequestToLocationManagerToBookServiceDTO>.FailureResponse(
+                    "Invalid token.",
+                    "رمز الدخول غير صالح."
+                ));
+            }
 
-            var result = await _service.ReadServiceRequestToLocationManager(currentUserId, true);
+            var response = await _service.RespondToServiceRequestToLocationManager(request,currentUserId);
 
-            return Ok(result);
+            return response.Success ? Ok(response) : BadRequest(response);
         }
 
-
-        [HttpGet("{id:int}")]
-        [AuthorizeProductionCompanyOrLocationManager]
-        public async Task<IActionResult> ReadServiceRequestToLocationManagerById(int id)
-        {
-            var currentUserId = GetCurrentUserId();
-            if (currentUserId == 0)
-                return Unauthorized(new ApiResponse<bool> { MessageEn = "Invalid token", MessageAr = "رمز غير صالح" });
-
-            var result = await _service.ReadServiceRequestToLocationManagerById(currentUserId, false,id);
-
-            return Ok(result);
-        }
-
-        [HttpGet]
-        [AuthorizeProductionCompanyOrLocationManager]
-
-        public async Task<IActionResult> ReadServiceRequestToLocationManager()
-        {
-            var currentUserId = GetCurrentUserId();
-            if (currentUserId == 0)
-                return Unauthorized(new ApiResponse<bool> { MessageEn = "Invalid token", MessageAr = "رمز غير صالح" });
-
-            var result = await _service.ReadServiceRequestToLocationManager(currentUserId, false);
-
-            return Ok(result);
-        }
-
-        [HttpGet("is-deleted")]
-        [AuthorizeProductionCompany]
-        public async Task<IActionResult> ReadServiceRequestToLocationManagerWhereDeleted()
-        {
-            var currentUserId = GetCurrentUserId();
-            if (currentUserId == 0)
-                return Unauthorized(new ApiResponse<bool> { MessageEn = "Invalid token", MessageAr = "رمز غير صالح" });
-
-            var result = await _service.ReadServiceRequestToLocationManager(currentUserId, true);
-
-            return Ok(result); 
-        }
-
-        [HttpGet("by-location-booking/{locationBookingId:int}")]
-        [AuthorizeProductionCompanyOrLocationManager]
-
-        public async Task<IActionResult> ReadServiceRequestToLocationManagerByLocationBookingId(
-            int locationBookingId)
-        {
-            var currentUserId = GetCurrentUserId();
-            if (currentUserId == 0)
-                return Unauthorized(new ApiResponse<bool> { MessageEn = "Invalid token", MessageAr = "رمز غير صالح" });
-
-            var result = await _service.ReadServiceRequestToLocationManagerByLocationBookingId(
-                currentUserId, locationBookingId, false);
-            return Ok(result);
-        }
-
-
-        [HttpGet("by-location-booking/{locationBookingId:int}/is-deleted")]
-        [AuthorizeProductionCompany]
-
-        public async Task<IActionResult> ReadServiceRequestToLocationManagerByLocationBookingIdWhereDeleted(
-            int locationBookingId)
-        {
-            var currentUserId = GetCurrentUserId();
-            if (currentUserId == 0)
-                return Unauthorized(new ApiResponse<bool> { MessageEn = "Invalid token", MessageAr = "رمز غير صالح" });
-
-            var result = await _service.ReadServiceRequestToLocationManagerByLocationBookingId(
-                currentUserId, locationBookingId, true);
-            return Ok(result);
-        }
-
-
-        [HttpPut]
+        [HttpPut("UpdateServiceRequestToLocationManager")]
         [AuthorizeProductionCompany]
 
         public async Task<IActionResult> UpdateServiceRequestToLocationManager(
@@ -158,31 +163,21 @@ namespace FilmMaker.Controllers
             return Ok(result);
         }
 
-
-        [HttpDelete("{id:int}")]
+        [HttpPut("CancelServiceRequestToLocationManager")]
         [AuthorizeProductionCompany]
 
-        public async Task<IActionResult> DeleteServiceRequestToLocationManager(int id)
+        public async Task<IActionResult> CancelServiceRequestToLocationManager(int requestId)
         {
             var currentUserId = GetCurrentUserId();
             if (currentUserId == 0)
                 return Unauthorized(new ApiResponse<bool> { MessageEn = "Invalid token", MessageAr = "رمز غير صالح" });
 
-            var result = await _service.DeleteServiceRequestToLocationManager(currentUserId, id);
+            var result = await _service.CancelServiceRequestToLocationManager(requestId, currentUserId);
+
             return Ok(result);
         }
 
-        [HttpPatch("{id:int}/restore")]
-        [AuthorizeProductionCompany]
 
-        public async Task<IActionResult> RestoreDeletedServiceRequestToLocationManager(int id)
-        {
-            var currentUserId = GetCurrentUserId();
-            if (currentUserId == 0)
-                return Unauthorized(new ApiResponse<bool> { MessageEn = "Invalid token", MessageAr = "رمز غير صالح" });
 
-            var result = await _service.RestoreDeletedServiceRequestToLocationManager(currentUserId, id);
-            return Ok(result);
-        }
     }
 }

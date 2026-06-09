@@ -4,6 +4,7 @@ using FilmMaker.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FilmMaker.Migrations
 {
     [DbContext(typeof(FilmMakerDbContext))]
-    partial class FilmMakerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260609120749_FixRequestToLocationManagerShadowColumns")]
+    partial class FixRequestToLocationManagerShadowColumns
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1766,6 +1769,67 @@ namespace FilmMaker.Migrations
                     b.ToTable("ServicesProvided");
                 });
 
+            modelBuilder.Entity("FilmMaker.Entities.ServicesProvidedMedia", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FileUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("MediaTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ServicesProvidedId")
+                        .HasColumnType("int");
+
+                    b.Property<long>("SizeInBytes")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UploadedByUserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MediaTypeId");
+
+                    b.HasIndex("ServicesProvidedId");
+
+                    b.HasIndex("UploadedByUserId");
+
+                    b.ToTable("ServicesProvidedMedia");
+                });
+
             modelBuilder.Entity("FilmMaker.Entities.User", b =>
                 {
                     b.Property<int>("Id")
@@ -2542,6 +2606,31 @@ namespace FilmMaker.Migrations
                     b.Navigation("ServiceProvider");
 
                     b.Navigation("ServiceType");
+                });
+
+            modelBuilder.Entity("FilmMaker.Entities.ServicesProvidedMedia", b =>
+                {
+                    b.HasOne("FilmMaker.Entities.LookupItem", "MediaType")
+                        .WithMany()
+                        .HasForeignKey("MediaTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FilmMaker.Entities.ServicesProvided", "ServicesProvided")
+                        .WithMany()
+                        .HasForeignKey("ServicesProvidedId");
+
+                    b.HasOne("FilmMaker.Entities.User", "UploadedByUser")
+                        .WithMany()
+                        .HasForeignKey("UploadedByUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MediaType");
+
+                    b.Navigation("ServicesProvided");
+
+                    b.Navigation("UploadedByUser");
                 });
 
             modelBuilder.Entity("FilmMaker.Entities.User", b =>

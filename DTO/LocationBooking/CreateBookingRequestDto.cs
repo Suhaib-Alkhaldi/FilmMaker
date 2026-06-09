@@ -6,7 +6,7 @@ namespace FilmMaker.DTO.LocationManager
     {
         [Required]
         public int LocationId { get; set; }
-
+        public int? LocationScoutingRequestId { get; set; }
         [Required]
         public DateTime StartDateTime { get; set; }
         [Required]

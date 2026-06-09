@@ -4,31 +4,37 @@ namespace FilmMaker.Entities
 {
     public class ServiceBooking : SharedEntity
     {
-       
         public int ServiceId { get; set; }
-        public ServicesProvided Service { get; set; }
+
+        [ForeignKey("ServiceId")]
+        public ServicesProvided Service { get; set; } = null!;
 
         public int RequesterId { get; set; }
 
         [ForeignKey("RequesterId")]
-        public User Requester { get; set; }
+        public User Requester { get; set; } = null!;
 
-        public int? LocationId { get; set; }
-        public Location Location { get; set; }
+        public int? LocationBookingId { get; set; }
+
+        [ForeignKey("LocationBookingId")]
+        public LocationBookingRequest? LocationBooking { get; set; }
+
+        public int? ServiceProviderRequestItemId { get; set; }
+
+        [ForeignKey("ServiceProviderRequestItemId")]
+        public ServiceProviderRequestItem? ServiceProviderRequestItem { get; set; }
+
+        public int? Quantity { get; set; }
 
         public string? Notes { get; set; }
-        public decimal? Latitude { get; set; }
-        public decimal? Longitude { get; set; }
-
-        public string? LocationOnGoogleMaps { get; set; }
 
         public int StatusId { get; set; }
 
         [ForeignKey("StatusId")]
-        public LookupItem Status { get; set; }
+        public LookupItem Status { get; set; } = null!;
 
-        public DateTime bookingStartDate { get; set; }
+        public DateTime BookingStartDate { get; set; }
 
-        public DateTime bookingEndDate { get; set; }
+        public DateTime BookingEndDate { get; set; }
     }
 }

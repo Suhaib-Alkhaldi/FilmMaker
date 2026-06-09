@@ -75,11 +75,80 @@ namespace FilmMaker.Services.Service
                     );
                 }
 
+                int finalProductionCompanyId;
+                int? finalLocationManagerId = null;
+                int? finalLocationScoutingRequestId = null;
+
+                if (isProductionCompany)
+                {
+                    finalProductionCompanyId = productionCompanyProfileId.Value;
+
+                    if (dto.LocationScoutingRequestId.HasValue)
+                    {
+                        return ApiResponse<BookingRequestDto>.FailureResponse(
+                            "Production company cannot create a direct location booking using a scouting request.",
+                            "لا يمكن لشركة الإنتاج إنشاء حجز مباشر باستخدام طلب بحث عن موقع."
+                        );
+                    }
+                }
+                else
+                {
+                    finalLocationManagerId = locationManagerProfileId.Value;
+
+                    if (!dto.LocationScoutingRequestId.HasValue)
+                    {
+                        return ApiResponse<BookingRequestDto>.FailureResponse(
+                            "Location scouting request is required when location manager creates a booking request.",
+                            "طلب البحث عن موقع مطلوب عندما يقوم مدير الموقع بإنشاء طلب حجز."
+                        );
+                    }
+
+                    var scoutingRequest = await _context.LocationScoutingRequests
+                        .FirstOrDefaultAsync(x =>
+                            x.Id == dto.LocationScoutingRequestId.Value &&
+                            x.LocationManagerId == finalLocationManagerId.Value &&
+                            x.IsActive &&
+                            !x.IsDeleted);
+
+                    if (scoutingRequest == null)
+                    {
+                        return ApiResponse<BookingRequestDto>.FailureResponse(
+                            "Location scouting request was not found for this location manager.",
+                            "لم يتم العثور على طلب البحث عن موقع لهذا المدير."
+                        );
+                    }
+
+                    var acceptedScoutingStatusId = await GetStatus(
+                        "LocationScoutingRequestStatus",
+                        "Accepted"
+                    );
+
+                    if (acceptedScoutingStatusId == null)
+                    {
+                        return ApiResponse<BookingRequestDto>.FailureResponse(
+                            "Accepted scouting request status was not found in lookup data.",
+                            "حالة قبول طلب البحث عن موقع غير موجودة في بيانات النظام."
+                        );
+                    }
+
+                    if (scoutingRequest.StatusId != acceptedScoutingStatusId.Value)
+                    {
+                        return ApiResponse<BookingRequestDto>.FailureResponse(
+                            "Only accepted scouting requests can be used to create location booking requests.",
+                            "يمكن إنشاء طلب حجز موقع فقط من طلبات البحث المقبولة."
+                        );
+                    }
+
+                    finalProductionCompanyId = scoutingRequest.ProductionCompanyId;
+                    finalLocationScoutingRequestId = scoutingRequest.Id;
+                }
+
                 var location = await _context.Locations
                     .Where(l =>
                         l.Id == dto.LocationId &&
                         l.IsActive &&
-                        !l.IsDeleted).FirstOrDefaultAsync();
+                        !l.IsDeleted)
+                    .FirstOrDefaultAsync();
 
                 if (location == null)
                 {
@@ -141,17 +210,13 @@ namespace FilmMaker.Services.Service
 
                     LocationOwnerId = location.LocationOwnerId,
 
-                    ProductionCompanyId = isProductionCompany
-                        ? productionCompanyProfileId.Value
-                        : null,
-
-                    LocationManagerId = isLocationManager
-                        ? locationManagerProfileId.Value
-                        : null,
+                    ProductionCompanyId = finalProductionCompanyId,
+                    LocationManagerId = finalLocationManagerId,
+                    LocationScoutingRequestId = finalLocationScoutingRequestId,
 
                     BookingStatusId = pendingStatus.Id,
                     TotalPrice = totalPrice,
-                    
+
                     CreatedAt = DateTime.UtcNow,
                     CreatedBy = currentUserId.ToString(),
                     IsActive = true,
@@ -162,52 +227,51 @@ namespace FilmMaker.Services.Service
                 await _context.SaveChangesAsync();
 
                 _logger.LogInformation(
-                    "Booking request created. LocationId: {LocationId}, UserId: {UserId}, ProductionCompanyId: {ProductionCompanyId}, LocationManagerId: {LocationManagerId}, CalendarColorBeforeCreate: {CalendarColor}",
+                    "Booking request created. LocationId: {LocationId}, UserId: {UserId}, ProductionCompanyId: {ProductionCompanyId}, LocationManagerId: {LocationManagerId}, LocationScoutingRequestId: {LocationScoutingRequestId}, CalendarColorBeforeCreate: {CalendarColor}",
                     location.Id,
                     currentUserId,
                     booking.ProductionCompanyId,
                     booking.LocationManagerId,
+                    booking.LocationScoutingRequestId,
                     availability.CalendarColor
                 );
 
                 var response = await _context.LocationBookingRequests
-                                .Where(b =>
-                                        b.Id == booking.Id &&
-                                        b.IsActive &&
-                                        !b.IsDeleted)
-                                .Select(b => new BookingRequestDto
-                                {
-                                    Id = b.Id,
+                    .Where(b =>
+                        b.Id == booking.Id &&
+                        b.IsActive &&
+                        !b.IsDeleted)
+                    .Select(b => new BookingRequestDto
+                    {
+                        Id = b.Id,
 
-                                    LocationId = b.LocationId,
-                                    LocationName = b.Location.LocationName,
-                                    City = b.Location.City,
+                        LocationId = b.LocationId,
+                        LocationName = b.Location.LocationName,
+                        City = b.Location.City,
 
-                                    StartDateTime = b.StartDateTime,
-                                    EndDateTime = b.EndDateTime,
-                                    IsFullDay = (b.EndDateTime - b.StartDateTime).TotalHours >= 4,
+                        StartDateTime = b.StartDateTime,
+                        EndDateTime = b.EndDateTime,
+                        IsFullDay = (b.EndDateTime - b.StartDateTime).TotalHours >= 4,
 
-                                    Status = b.BookingStatus.Name,
+                        Status = b.BookingStatus.Name,
 
-                                    Message = b.Message,
-                                    TotalPrice = b.TotalPrice,
+                        Message = b.Message,
+                        TotalPrice = b.TotalPrice,
 
-                                    LocationOwnerId = b.LocationOwnerId,
-                                    LocationOwnerName = b.Location.LocationOwner.User.Name,
+                        LocationOwnerId = b.LocationOwnerId,
+                        LocationOwnerName = b.Location.LocationOwner.User.Name,
 
-                                    LocationManagerId = b.LocationManagerId,
-                                    LocationManagerName = b.LocationManager != null
-                                        ? b.LocationManager.User.Name
-                                        : null,
+                        LocationManagerId = b.LocationManagerId,
+                        LocationManagerName = b.LocationManager != null
+                            ? b.LocationManager.User.Name
+                            : null,
 
-                                    ProductionCompanyId = b.ProductionCompanyId,
-                                    ProductionCompanyName = b.ProductionCompany != null
-                                        ? b.ProductionCompany.User.Name
-                                        : null,
+                        ProductionCompanyId = b.ProductionCompanyId,
+                        ProductionCompanyName = b.ProductionCompany.User.Name,
 
-                                    CreatedAt = b.CreatedAt
-                                })
-                                .FirstOrDefaultAsync();
+                        CreatedAt = b.CreatedAt
+                    })
+                    .FirstOrDefaultAsync();
 
                 if (response == null)
                 {

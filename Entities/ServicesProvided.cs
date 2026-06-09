@@ -22,6 +22,8 @@ namespace FilmMaker.Entities
         [ForeignKey("ServiceProviderId")]
         public ServiceProviderProfile ServiceProvider { get; set; }
 
+        public int? AvailableQuantity { get; set; }
+
         public ICollection<ServicesMedia> Media { get; set; } = new List<ServicesMedia>();
 
     }

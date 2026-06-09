@@ -2,23 +2,28 @@
 {
     public class UpdateRequestToLocationManagerToBookServiceDTO
     {
+        public int RequestId { get; set; }
 
-        public int Id { get; set; }
+        public int? LocationBookingId { get; set; }
+        public int? LocationManagerId { get; set; }
 
-        public int ServiceTypeId { get; set; }
+        public string? GeneralNotes { get; set; }
 
-        public int LocationBookingId { get; set; }
+        public List<UpdateRequestToLocationManagerToBookServiceItemDTO>? Items { get; set; }
+    }
 
-        public DateTime StartDate { get; set; }
+    public class UpdateRequestToLocationManagerToBookServiceItemDTO
+    {
+        public int? ServiceTypeId { get; set; }
 
-        public DateTime EndDate { get; set; }
+        public string? CustomServiceType { get; set; }
 
-        public string? Notes { get; set; }
+        public DateTime? StartDate { get; set; }
 
-        public decimal? Latitude { get; set; }
+        public DateTime? EndDate { get; set; }
 
-        public decimal? Longitude { get; set; }
+        public string? Details { get; set; }
 
-        public string? LocationOnGoogleMaps { get; set; } = string.Empty;
+        public int? Quantity { get; set; }
     }
 }

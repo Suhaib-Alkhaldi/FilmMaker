@@ -10,7 +10,6 @@ using System.Security.Claims;
 
 namespace FilmMaker.Controllers
 {
-    [AuthorizeLocationManager]
     [Route("api/[controller]")]
     [ApiController]
     public class BookingController : ControllerBase
@@ -27,7 +26,7 @@ namespace FilmMaker.Controllers
         }
 
 
-        [Authorize(Roles = "Location Manager , Production Company")]
+        [AuthorizeProductionCompanyOrLocationManagerAttribute]
         [HttpPost("create-booking-request")]
         public async Task<ActionResult<ApiResponse<BookingRequestDto>>> CreateBookingRequest([FromBody]CreateBookingRequestDto dto)
         {
@@ -43,7 +42,7 @@ namespace FilmMaker.Controllers
         }
 
 
-        [Authorize(Roles = "Location Manager , Production Company")]
+        [AuthorizeProductionCompanyOrLocationManagerAttribute]
         [HttpGet("my-booking-requests")]
         public async Task<ActionResult<ApiResponse<List<BookingRequestDto>>>> GetMyBookingRequests()
         {
@@ -58,7 +57,7 @@ namespace FilmMaker.Controllers
             return Ok(response);
         }
 
-        [Authorize(Roles = "Location Manager , Production Company")]
+        [AuthorizeProductionCompanyOrLocationManagerAttribute]
         [HttpGet("my-booking-requests/{requestId}")]
         public async Task<ActionResult<ApiResponse<BookingRequestDto>>> GetBookingRequestById(int requestId)
         {
@@ -73,7 +72,7 @@ namespace FilmMaker.Controllers
             return Ok(response);
         }
 
-        [Authorize(Roles = "Location Manager , Production Company")]
+        [AuthorizeProductionCompanyOrLocationManagerAttribute]
         [HttpGet("GetLocationBookingCalendar")]
         public async Task<ActionResult<ApiResponse<List<LocationBookingCalendarDayDto>>>> GetLocationBookingCalendar(int locationId , [FromQuery] DateTime? fromDate , [FromQuery] DateTime? toDate)
         {
@@ -91,7 +90,7 @@ namespace FilmMaker.Controllers
         }
 
 
-        [Authorize(Roles = "Location Manager , Production Company")]
+        [AuthorizeProductionCompanyOrLocationManagerAttribute]
         [HttpPut("update-booking-request")]
         public async Task<ActionResult<ApiResponse<BookingRequestDto>>> UpdateBookingRequest(UpdateBookingRequestDto dto)
         {
@@ -107,7 +106,7 @@ namespace FilmMaker.Controllers
             return Ok(response);
         }
 
-        [Authorize(Roles ="Location Manager , Production Company")]
+        [AuthorizeProductionCompanyOrLocationManagerAttribute]
         [HttpDelete("cancel-booking-request/{requestId}")]
         public async Task<ActionResult<ApiResponse<bool>>> CancelBookingRequest(int requestId)
         {

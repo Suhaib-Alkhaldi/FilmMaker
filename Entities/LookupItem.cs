@@ -14,5 +14,6 @@ namespace FilmMaker.Entities
         public ICollection<ServicesProvided> ServicesProvided { get; set; }
 
         public ICollection<RequestToLocationManagerToBookService> RequestToLocationManagers { get; set; }
+        = new List<RequestToLocationManagerToBookService>();
     }
 }

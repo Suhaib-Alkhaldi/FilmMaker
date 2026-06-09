@@ -72,7 +72,13 @@ namespace FilmMaker.Services.Service
                         "يجب أن يكون السعر أكبر من صفر."
                     );
                 }
-
+                if (serviceDto.AvailableQuantity.HasValue && serviceDto.AvailableQuantity.Value <= 0)
+                {
+                    return ApiResponse<GetServiceDTO>.FailureResponse(
+                        "Available quantity must be greater than zero.",
+                        "يجب أن تكون الكمية المتوفرة أكبر من صفر."
+                    );
+                }
                 var classificationValidation = await ValidateServiceClassificationAsync(
                     serviceProviderId.Value,
                     serviceDto.ServiceTypeId,
@@ -128,6 +134,7 @@ namespace FilmMaker.Services.Service
                     CustomServiceType = hasOfficialServiceType
                         ? null
                         : serviceDto.CustomServiceType!.Trim(),
+                    AvailableQuantity = serviceDto.AvailableQuantity,
 
                     IsCustom = !hasOfficialServiceType,
 
@@ -209,6 +216,14 @@ namespace FilmMaker.Services.Service
                     );
                 }
 
+                if (serviceDto.Id <= 0)
+                {
+                    return ApiResponse<GetServiceDTO>.FailureResponse(
+                        "Invalid service id.",
+                        "رقم الخدمة غير صالح."
+                    );
+                }
+
                 var serviceData = await _context.ServicesProvided
                     .Where(s =>
                         s.Id == serviceDto.Id &&
@@ -236,7 +251,40 @@ namespace FilmMaker.Services.Service
                     );
                 }
 
-                if (string.IsNullOrWhiteSpace(serviceDto.ServiceName))
+                var service = serviceData.Service;
+
+                var finalServiceName = serviceDto.ServiceName != null
+                    ? serviceDto.ServiceName.Trim()
+                    : service.ServiceName;
+
+                var finalDescription = serviceDto.Description != null
+                    ? serviceDto.Description.Trim()
+                    : service.Description;
+
+                var finalPrice = serviceDto.Price ?? service.DailyPrice;
+
+                var isServiceTypeProvided = serviceDto.ServiceTypeId.HasValue;
+                var isCustomServiceTypeProvided = serviceDto.CustomServiceType != null;
+
+                var finalServiceTypeId = service.ServiceTypeId;
+                var finalCustomServiceType = service.CustomServiceType;
+
+                if (isServiceTypeProvided || isCustomServiceTypeProvided)
+                {
+                    var hasOfficialServiceType = serviceDto.ServiceTypeId.HasValue &&
+                                                 serviceDto.ServiceTypeId.Value > 0;
+
+                    finalServiceTypeId = hasOfficialServiceType
+                        ? serviceDto.ServiceTypeId.Value
+                        : null;
+
+                    finalCustomServiceType = hasOfficialServiceType
+                        ? null
+                        : serviceDto.CustomServiceType?.Trim();
+                }
+
+                var finalAvailableQuantity = serviceDto.AvailableQuantity ?? service.AvailableQuantity;
+                if (string.IsNullOrWhiteSpace(finalServiceName))
                 {
                     return ApiResponse<GetServiceDTO>.FailureResponse(
                         "Service name is required.",
@@ -244,7 +292,7 @@ namespace FilmMaker.Services.Service
                     );
                 }
 
-                if (string.IsNullOrWhiteSpace(serviceDto.Description))
+                if (string.IsNullOrWhiteSpace(finalDescription))
                 {
                     return ApiResponse<GetServiceDTO>.FailureResponse(
                         "Service description is required.",
@@ -252,7 +300,7 @@ namespace FilmMaker.Services.Service
                     );
                 }
 
-                if (serviceDto.Price <= 0)
+                if (finalPrice <= 0)
                 {
                     return ApiResponse<GetServiceDTO>.FailureResponse(
                         "Price must be greater than zero.",
@@ -260,96 +308,104 @@ namespace FilmMaker.Services.Service
                     );
                 }
 
-                var service = serviceData.Service;
-
-                var classificationValidation = await ValidateServiceClassificationAsync(
-                    service.ServiceProviderId,
-                    serviceDto.ServiceTypeId,
-                    serviceDto.CustomServiceType
-                );
-
-                if (classificationValidation != null)
-                {
-                    return classificationValidation;
-                }
-
-                var mediaValidationResult = await _mediaService.ValidateMediaOwnership(
-                    serviceDto.MediaIds,
-                    currentUserId
-                );
-
-                if (!mediaValidationResult.Success)
+                if (finalAvailableQuantity.HasValue && finalAvailableQuantity.Value <= 0)
                 {
                     return ApiResponse<GetServiceDTO>.FailureResponse(
-                        mediaValidationResult.MessageEn,
-                        mediaValidationResult.MessageAr
+                        "Available quantity must be greater than zero.",
+                        "يجب أن تكون الكمية المتوفرة أكبر من صفر."
                     );
                 }
 
-                var mediaItems = mediaValidationResult.Data ?? new List<Media>();
-
-                var mediaBusinessValidation = await ValidateServiceMedia(
-                    mediaItems,
-                    serviceDto.MediaIds
-                );
-
-                if (mediaBusinessValidation != null)
+                if (isServiceTypeProvided || isCustomServiceTypeProvided)
                 {
-                    return ApiResponse<GetServiceDTO>.FailureResponse(
-                        mediaBusinessValidation.MessageEn,
-                        mediaBusinessValidation.MessageAr
+                    var classificationValidation = await ValidateServiceClassificationAsync(
+                        service.ServiceProviderId,
+                        finalServiceTypeId,
+                        finalCustomServiceType
                     );
+
+                    if (classificationValidation != null)
+                    {
+                        return classificationValidation;
+                    }
                 }
 
-                var hasOfficialServiceType = serviceDto.ServiceTypeId.HasValue &&
-                                             serviceDto.ServiceTypeId.Value > 0;
+                service.ServiceName = finalServiceName;
+                service.Description = finalDescription;
+                service.DailyPrice = finalPrice;
 
-                service.ServiceName = serviceDto.ServiceName.Trim();
-                service.Description = serviceDto.Description.Trim();
-                service.DailyPrice = serviceDto.Price;
-
-                service.ServiceTypeId = hasOfficialServiceType
-                    ? serviceDto.ServiceTypeId.Value
-                    : null;
-
-                service.CustomServiceType = hasOfficialServiceType
+                service.ServiceTypeId = finalServiceTypeId;
+                service.CustomServiceType = finalServiceTypeId.HasValue
                     ? null
-                    : serviceDto.CustomServiceType!.Trim();
+                    : finalCustomServiceType;
 
-                service.IsCustom = !hasOfficialServiceType;
+                service.IsCustom = !finalServiceTypeId.HasValue;
+
+                service.AvailableQuantity = finalAvailableQuantity;
 
                 service.UpdatedAt = DateTime.UtcNow;
                 service.UpdatedBy = currentUserId.ToString();
 
-                var oldServiceMediaLinks = await _context.ServicesMedia
-                    .Where(x =>
-                        x.ServicesProvidedId == service.Id &&
-                        !x.IsDeleted)
-                    .ToListAsync();
-
-                foreach (var oldLink in oldServiceMediaLinks)
+                if (serviceDto.MediaIds != null)
                 {
-                    oldLink.IsDeleted = true;
-                    oldLink.IsActive = false;
-                    oldLink.UpdatedAt = DateTime.UtcNow;
-                    oldLink.UpdatedBy = currentUserId.ToString();
-                }
+                    var mediaValidationResult = await _mediaService.ValidateMediaOwnership(
+                        serviceDto.MediaIds,
+                        currentUserId
+                    );
 
-                var newServiceMediaLinks = mediaItems
-                    .Select(media => new ServicesMedia
+                    if (!mediaValidationResult.Success)
                     {
-                        ServicesProvidedId = service.Id,
-                        MediaId = media.Id,
-                        IsActive = true,
-                        IsDeleted = false,
-                        CreatedBy = currentUserId.ToString(),
-                        CreatedAt = DateTime.UtcNow
-                    })
-                    .ToList();
+                        return ApiResponse<GetServiceDTO>.FailureResponse(
+                            mediaValidationResult.MessageEn,
+                            mediaValidationResult.MessageAr
+                        );
+                    }
 
-                if (newServiceMediaLinks.Any())
-                {
-                    await _context.ServicesMedia.AddRangeAsync(newServiceMediaLinks);
+                    var mediaItems = mediaValidationResult.Data ?? new List<Media>();
+
+                    var mediaBusinessValidation = await ValidateServiceMedia(
+                        mediaItems,
+                        serviceDto.MediaIds
+                    );
+
+                    if (mediaBusinessValidation != null)
+                    {
+                        return ApiResponse<GetServiceDTO>.FailureResponse(
+                            mediaBusinessValidation.MessageEn,
+                            mediaBusinessValidation.MessageAr
+                        );
+                    }
+
+                    var oldServiceMediaLinks = await _context.ServicesMedia
+                        .Where(x =>
+                            x.ServicesProvidedId == service.Id &&
+                            !x.IsDeleted)
+                        .ToListAsync();
+
+                    foreach (var oldLink in oldServiceMediaLinks)
+                    {
+                        oldLink.IsDeleted = true;
+                        oldLink.IsActive = false;
+                        oldLink.UpdatedAt = DateTime.UtcNow;
+                        oldLink.UpdatedBy = currentUserId.ToString();
+                    }
+
+                    var newServiceMediaLinks = mediaItems
+                        .Select(media => new ServicesMedia
+                        {
+                            ServicesProvidedId = service.Id,
+                            MediaId = media.Id,
+                            IsActive = true,
+                            IsDeleted = false,
+                            CreatedBy = currentUserId.ToString(),
+                            CreatedAt = DateTime.UtcNow
+                        })
+                        .ToList();
+
+                    if (newServiceMediaLinks.Any())
+                    {
+                        await _context.ServicesMedia.AddRangeAsync(newServiceMediaLinks);
+                    }
                 }
 
                 await _context.SaveChangesAsync();
@@ -484,7 +540,7 @@ namespace FilmMaker.Services.Service
                         ServiceName = s.ServiceName,
                         Description = s.Description,
                         Price = s.DailyPrice,
-
+                        AvailableQuantity = s.AvailableQuantity,
                         ServiceTypeId = s.ServiceTypeId,
                         ServiceTypeName = s.ServiceTypeId != null
                         ? s.ServiceType!.Name: string.Empty,
@@ -541,7 +597,7 @@ namespace FilmMaker.Services.Service
                         ServiceName = s.ServiceName,
                         Description = s.Description,
                         Price = s.DailyPrice,
-
+                        AvailableQuantity = s.AvailableQuantity,
                         ServiceTypeId = s.ServiceTypeId,
                         ServiceTypeName = s.ServiceTypeId != null? s.ServiceType!.Name: string.Empty,
 
@@ -668,7 +724,7 @@ namespace FilmMaker.Services.Service
                         ServiceName = s.ServiceName,
                         Description = s.Description,
                         Price = s.DailyPrice,
-
+                        AvailableQuantity = s.AvailableQuantity,
                         ServiceTypeId = s.ServiceTypeId,
                         ServiceTypeName = s.ServiceTypeId != null
                             ? s.ServiceType!.Name
@@ -745,7 +801,7 @@ namespace FilmMaker.Services.Service
                         ServiceName = s.ServiceName,
                         Description = s.Description,
                         Price = s.DailyPrice,
-
+                        AvailableQuantity = s.AvailableQuantity,
                         ServiceTypeId = s.ServiceTypeId,
                         ServiceTypeName = s.ServiceTypeId != null
                             ? s.ServiceType!.Name
@@ -1009,7 +1065,7 @@ namespace FilmMaker.Services.Service
 
                         ServiceTypeId = s.ServiceTypeId,
                         ServiceTypeName = s.ServiceTypeId != null ? s.ServiceType!.Name : string.Empty,
-
+                        AvailableQuantity = s.AvailableQuantity,
                         CustomServiceType = s.CustomServiceType,
                         IsCustomServiceType = s.IsCustom,
 
@@ -1105,7 +1161,7 @@ namespace FilmMaker.Services.Service
                         ServiceName = s.ServiceName,
                         Description = s.Description,
                         Price = s.DailyPrice,
-
+                        AvailableQuantity = s.AvailableQuantity,
                         ServiceTypeId = s.ServiceTypeId,
                         ServiceTypeName = s.ServiceTypeId != null
                             ? s.ServiceType!.Name
@@ -1285,7 +1341,7 @@ namespace FilmMaker.Services.Service
                         ServiceName = s.ServiceName,
                         Description = s.Description,
                         Price = s.DailyPrice,
-
+                        AvailableQuantity = s.AvailableQuantity,
                         ServiceTypeId = s.ServiceTypeId,
                         ServiceTypeName = s.ServiceTypeId != null
                             ? s.ServiceType!.Name
@@ -1396,7 +1452,7 @@ namespace FilmMaker.Services.Service
                     ServiceName = s.ServiceName,
                     Description = s.Description,
                     Price = s.DailyPrice,
-
+                    AvailableQuantity = s.AvailableQuantity,
                     ServiceTypeId = s.ServiceTypeId,
                     ServiceTypeName = s.ServiceTypeId != null
                         ? s.ServiceType!.Name

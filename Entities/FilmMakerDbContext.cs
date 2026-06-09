@@ -24,9 +24,11 @@ namespace FilmMaker.Entities
         public DbSet<ServicesProvided> ServicesProvided { get; set; }
 
         public DbSet<RequestToLocationManagerToBookService> RequestToLocationManagerToBookService { get; set; }
-        public DbSet<ServicesProvidedMedia> ServicesProvidedMedia { get; set; }
-
+        public DbSet<RequestToLocationManagerToBookServiceItem> RequestToLocationManagerToBookServiceItems { get; set; }
         public DbSet<ServiceProviderCities> ServiceProviderCities { get; set; }
+
+        public DbSet<ServiceProviderRequest> ServiceProviderRequests { get; set; }
+        public DbSet<ServiceProviderRequestItem> ServiceProviderRequestItems { get; set; }
 
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<ProductionCompanyProfile> ProductionCompanyProfiles { get; set; }
@@ -70,10 +72,10 @@ namespace FilmMaker.Entities
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<ServicesMedia>()
-            .HasOne(x => x.ServicesProvided)
-            .WithMany(x => x.Media)
-            .HasForeignKey(x => x.ServicesProvidedId)
-            .OnDelete(DeleteBehavior.Cascade);
+                .HasOne(x => x.ServicesProvided)
+                .WithMany(x => x.Media)
+                .HasForeignKey(x => x.ServicesProvidedId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<ServicesMedia>()
                 .HasOne(x => x.Media)
@@ -99,7 +101,6 @@ namespace FilmMaker.Entities
                 .HasForeignKey(x => x.RestoredByUserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-
             modelBuilder.Entity<LocationBookingRequest>()
                 .HasOne(x => x.Location)
                 .WithMany()
@@ -111,14 +112,6 @@ namespace FilmMaker.Entities
                 .WithMany()
                 .HasForeignKey(x => x.LocationOwnerId)
                 .OnDelete(DeleteBehavior.NoAction);
-
-            modelBuilder.Entity<ServiceBooking>()
-            .HasOne(x => x.Service)
-            .WithMany()
-            .HasForeignKey(x => x.ServiceId)
-            .OnDelete(DeleteBehavior.NoAction);
-
-          
 
             modelBuilder.Entity<LocationBookingRequest>()
                 .HasOne(x => x.LocationManager)
@@ -133,14 +126,16 @@ namespace FilmMaker.Entities
                 .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<LocationBookingRequest>()
+                .HasOne(x => x.LocationScoutingRequest)
+                .WithMany()
+                .HasForeignKey(x => x.LocationScoutingRequestId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<LocationBookingRequest>()
                 .HasOne(x => x.BookingStatus)
                 .WithMany()
                 .HasForeignKey(x => x.BookingStatusId)
                 .OnDelete(DeleteBehavior.NoAction);
-
-            
-
-
 
             modelBuilder.Entity<BookingStatusHistory>()
                 .HasOne(x => x.LocationBookingRequest)
@@ -166,8 +161,6 @@ namespace FilmMaker.Entities
                 .HasForeignKey(x => x.ChangedByUserId)
                 .OnDelete(DeleteBehavior.NoAction);
 
-
-
             modelBuilder.Entity<Payment>()
                 .HasOne(x => x.LocationBookingRequest)
                 .WithMany()
@@ -192,16 +185,11 @@ namespace FilmMaker.Entities
                 .HasForeignKey(x => x.PaymentTypeId)
                 .OnDelete(DeleteBehavior.NoAction);
 
-
-            
-
             modelBuilder.Entity<LocationVisitRequest>()
                 .HasOne(v => v.Location)
                 .WithMany()
                 .HasForeignKey(v => v.LocationId)
                 .OnDelete(DeleteBehavior.NoAction);
-
-            
 
             modelBuilder.Entity<LocationVisitRequest>()
                 .HasOne(v => v.LocationManager)
@@ -218,8 +206,8 @@ namespace FilmMaker.Entities
             modelBuilder.Entity<LocationVisitRequest>()
                 .HasOne(v => v.RespondedByUser)
                 .WithMany()
-                .HasForeignKey(v => v.RespondedByUserId);
-
+                .HasForeignKey(v => v.RespondedByUserId)
+                .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<LocationMedia>()
                 .HasOne(x => x.Media)
@@ -239,23 +227,17 @@ namespace FilmMaker.Entities
                 .HasForeignKey(x => x.UploadedByUserId)
                 .OnDelete(DeleteBehavior.NoAction);
 
-
-
             modelBuilder.Entity<Location>()
                 .HasOne(x => x.LocationType)
                 .WithMany()
                 .HasForeignKey(x => x.LocationTypeId)
                 .OnDelete(DeleteBehavior.NoAction);
 
-
             modelBuilder.Entity<Location>()
                 .HasOne(x => x.LocationStatus)
                 .WithMany()
                 .HasForeignKey(x => x.LocationStatusId)
                 .OnDelete(DeleteBehavior.NoAction);
-
-
-
 
             modelBuilder.Entity<LocationScoutingRequest>()
                 .HasOne(x => x.ProductionCompany)
@@ -289,6 +271,113 @@ namespace FilmMaker.Entities
                 .Property(x => x.MaxBudget)
                 .HasPrecision(18, 2);
 
+            modelBuilder.Entity<RequestToLocationManagerToBookService>()
+                .HasOne(x => x.ProductionCompany)
+                .WithMany(x => x.ServiceBookingRequests)
+                .HasForeignKey(x => x.ProductionCompanyId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<RequestToLocationManagerToBookService>()
+                .HasOne(x => x.LocationManager)
+                .WithMany()
+                .HasForeignKey(x => x.LocationManagerId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<RequestToLocationManagerToBookService>()
+                .HasOne(x => x.LocationBooking)
+                .WithMany(x => x.ServiceBookingRequests)
+                .HasForeignKey(x => x.LocationBookingId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<RequestToLocationManagerToBookService>()
+                .HasOne(x => x.Status)
+                .WithMany(x => x.RequestToLocationManagers)
+                .HasForeignKey(x => x.StatusId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<RequestToLocationManagerToBookServiceItem>()
+                .HasOne(x => x.RequestToLocationManagerToBookService)
+                .WithMany(x => x.Items)
+                .HasForeignKey(x => x.RequestToLocationManagerToBookServiceId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<RequestToLocationManagerToBookServiceItem>()
+                .HasOne(x => x.ServiceType)
+                .WithMany()
+                .HasForeignKey(x => x.ServiceTypeId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<ServiceProviderRequest>()
+                .HasOne(x => x.RequestToLocationManagerToBookService)
+                .WithMany()
+                .HasForeignKey(x => x.RequestToLocationManagerToBookServiceId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<ServiceProviderRequest>()
+                .HasOne(x => x.LocationManager)
+                .WithMany()
+                .HasForeignKey(x => x.LocationManagerId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<ServiceProviderRequest>()
+                .HasOne(x => x.ServiceProvider)
+                .WithMany()
+                .HasForeignKey(x => x.ServiceProviderId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<ServiceProviderRequest>()
+                .HasOne(x => x.Status)
+                .WithMany()
+                .HasForeignKey(x => x.StatusId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<ServiceProviderRequestItem>()
+                .HasOne(x => x.ServiceProviderRequest)
+                .WithMany(x => x.Items)
+                .HasForeignKey(x => x.ServiceProviderRequestId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ServiceProviderRequestItem>()
+                .HasOne(x => x.RequestToLocationManagerToBookServiceItem)
+                .WithMany()
+                .HasForeignKey(x => x.RequestToLocationManagerToBookServiceItemId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<ServiceProviderRequestItem>()
+                .HasOne(x => x.Service)
+                .WithMany()
+                .HasForeignKey(x => x.ServiceId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<ServiceBooking>()
+                .HasOne(x => x.Service)
+                .WithMany()
+                .HasForeignKey(x => x.ServiceId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<ServiceBooking>()
+                .HasOne(x => x.Requester)
+                .WithMany()
+                .HasForeignKey(x => x.RequesterId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<ServiceBooking>()
+                .HasOne(x => x.LocationBooking)
+                .WithMany()
+                .HasForeignKey(x => x.LocationBookingId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<ServiceBooking>()
+                .HasOne(x => x.ServiceProviderRequestItem)
+                .WithMany()
+                .HasForeignKey(x => x.ServiceProviderRequestItemId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<ServiceBooking>()
+                .HasOne(x => x.Status)
+                .WithMany()
+                .HasForeignKey(x => x.StatusId)
+                .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }
