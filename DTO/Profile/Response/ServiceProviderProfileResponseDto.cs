@@ -9,6 +9,6 @@
         public string PhoneNumber { get; set; } = string.Empty;
         public string? IBAN { get; set; }
         public List<string> ServiceTypes { get; set; } = new();
-        public List<string> CustomServiceTypes { get; set; } = new();
+       // public List<string> CustomServiceTypes { get; set; } = new();
     }
 }

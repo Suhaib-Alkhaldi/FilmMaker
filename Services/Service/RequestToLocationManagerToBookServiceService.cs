@@ -232,9 +232,9 @@ namespace FilmMaker.Services.Service
                     {
                         ServiceTypeId = item.ServiceTypeId,
 
-                        CustomServiceType = string.IsNullOrWhiteSpace(item.CustomServiceType)
-                            ? null
-                            : item.CustomServiceType.Trim(),
+                        // CustomServiceType = string.IsNullOrWhiteSpace(item.CustomServiceType)
+                        //     ? null
+                        //     : item.CustomServiceType.Trim(),
 
                         StartDate = item.StartDate,
                         EndDate = item.EndDate,
@@ -557,9 +557,9 @@ namespace FilmMaker.Services.Service
 
                         ServiceTypeId = item.ServiceTypeId,
 
-                        CustomServiceType = string.IsNullOrWhiteSpace(item.CustomServiceType)
-                            ? null
-                            : item.CustomServiceType.Trim(),
+                        // CustomServiceType = string.IsNullOrWhiteSpace(item.CustomServiceType)
+                        //     ? null
+                        //     : item.CustomServiceType.Trim(),
 
                         StartDate = item.StartDate.Value,
                         EndDate = item.EndDate.Value,
@@ -767,7 +767,7 @@ namespace FilmMaker.Services.Service
                                     ? i.ServiceType!.Name
                                     : null,
 
-                                CustomServiceType = i.CustomServiceType,
+                                //CustomServiceType = i.CustomServiceType,
 
                                 StartDate = i.StartDate,
                                 EndDate = i.EndDate,
@@ -872,7 +872,7 @@ namespace FilmMaker.Services.Service
                                     ? i.ServiceType!.Name
                                     : null,
 
-                                CustomServiceType = i.CustomServiceType,
+                                //CustomServiceType = i.CustomServiceType,
 
                                 StartDate = i.StartDate,
                                 EndDate = i.EndDate,
@@ -966,7 +966,7 @@ namespace FilmMaker.Services.Service
                                     ? i.ServiceType!.Name
                                     : null,
 
-                                CustomServiceType = i.CustomServiceType,
+                                //CustomServiceType = i.CustomServiceType,
 
                                 StartDate = i.StartDate,
                                 EndDate = i.EndDate,
@@ -1071,7 +1071,7 @@ namespace FilmMaker.Services.Service
                                     ? i.ServiceType!.Name
                                     : null,
 
-                                CustomServiceType = i.CustomServiceType,
+                                //CustomServiceType = i.CustomServiceType,
 
                                 StartDate = i.StartDate,
                                 EndDate = i.EndDate,
@@ -1275,9 +1275,9 @@ namespace FilmMaker.Services.Service
             foreach (var item in request.Items)
             {
                 var hasServiceType = item.ServiceTypeId.HasValue && item.ServiceTypeId.Value > 0;
-                var hasCustomServiceType = !string.IsNullOrWhiteSpace(item.CustomServiceType);
+               // var hasCustomServiceType = !string.IsNullOrWhiteSpace(item.CustomServiceType);
 
-                if (!hasServiceType && !hasCustomServiceType)
+                if (!hasServiceType /* && !hasCustomServiceType*/)
                 {
                     return ApiResponse<ReadRequestToLocationManagerToBookServiceDTO>.FailureResponse(
                         "Each service item must have either a service type or a custom service type.",
@@ -1285,13 +1285,13 @@ namespace FilmMaker.Services.Service
                     );
                 }
 
-                if (hasServiceType && hasCustomServiceType)
-                {
-                    return ApiResponse<ReadRequestToLocationManagerToBookServiceDTO>.FailureResponse(
-                        "Each service item cannot have both service type and custom service type.",
-                        "لا يمكن أن تحتوي الخدمة على نوع خدمة ونوع خدمة مخصص معًا."
-                    );
-                }
+                // if (hasServiceType /* && hasCustomServiceType*/)
+                // {
+                //     return ApiResponse<ReadRequestToLocationManagerToBookServiceDTO>.FailureResponse(
+                //         "Each service item cannot have both service type and custom service type.",
+                //         "لا يمكن أن تحتوي الخدمة على نوع خدمة ونوع خدمة مخصص معًا."
+                //     );
+                // }
 
                 if (item.StartDate <= DateTime.UtcNow)
                 {
@@ -1364,7 +1364,7 @@ namespace FilmMaker.Services.Service
                                             ? i.ServiceType!.Name
                                             : null,
 
-                                        CustomServiceType = i.CustomServiceType,
+                                        //CustomServiceType = i.CustomServiceType,
 
                                         StartDate = i.StartDate,
                                         EndDate = i.EndDate,
@@ -1440,13 +1440,13 @@ namespace FilmMaker.Services.Service
                 foreach (var item in request.Items)
                 {
                     var hasServiceType = item.ServiceTypeId.HasValue && item.ServiceTypeId.Value > 0;
-                    var hasCustomServiceType = !string.IsNullOrWhiteSpace(item.CustomServiceType);
-                    if (!hasServiceType && !hasCustomServiceType) {
+                    //var hasCustomServiceType = !string.IsNullOrWhiteSpace(item.CustomServiceType);
+                    if (!hasServiceType /*&& !hasCustomServiceType*/) {
                         return ApiResponse<ReadRequestToLocationManagerToBookServiceDTO>.FailureResponse(
                             "Service type or custom service type is required.",
                             "نوع الخدمة أو نوع الخدمة المخصص مطلوب."); 
                     }
-                    if (hasServiceType && hasCustomServiceType)
+                    if (hasServiceType /*&& hasCustomServiceType*/)
                     {
                         return ApiResponse<ReadRequestToLocationManagerToBookServiceDTO>.FailureResponse(
                             "Use either service type or custom service type, not both.",

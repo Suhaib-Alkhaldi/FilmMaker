@@ -1,4 +1,6 @@
-﻿namespace FilmMaker.DTO.RequestToLocationManagerToBookService
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace FilmMaker.DTO.RequestToLocationManagerToBookService
 {
     public class UpdateRequestToLocationManagerToBookServiceDTO
     {
@@ -14,9 +16,12 @@
 
     public class UpdateRequestToLocationManagerToBookServiceItemDTO
     {
+        [Required(ErrorMessage = "Service Type ID is required.")]
+        [Range(1, int.MaxValue, ErrorMessage = "Invalid Service Type ID.")]
+        
         public int? ServiceTypeId { get; set; }
 
-        public string? CustomServiceType { get; set; }
+       // public string? CustomServiceType { get; set; }
 
         public DateTime? StartDate { get; set; }
 

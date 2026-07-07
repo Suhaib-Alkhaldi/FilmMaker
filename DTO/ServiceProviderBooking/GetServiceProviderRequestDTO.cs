@@ -1,4 +1,6 @@
-﻿namespace FilmMaker.DTO.ServiceProviderBooking
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace FilmMaker.DTO.ServiceProviderBooking
 {
     public class GetServiceProviderRequestDTO
     {
@@ -45,11 +47,14 @@
 
         public string ServiceName { get; set; } = string.Empty;
 
+        [Required(ErrorMessage = "Service Type ID is required.")]
+        [Range(1, int.MaxValue, ErrorMessage = "Invalid Service Type ID.")]
         public int? ServiceTypeId { get; set; }
 
+       
         public string? ServiceTypeName { get; set; }
 
-        public string? CustomServiceType { get; set; }
+        //public string? CustomServiceType { get; set; }
 
         public int? RequestedQuantity { get; set; }
 

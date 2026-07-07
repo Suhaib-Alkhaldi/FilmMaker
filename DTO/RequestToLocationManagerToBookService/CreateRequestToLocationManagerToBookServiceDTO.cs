@@ -1,4 +1,5 @@
-﻿using FilmMaker.Entities;
+﻿using System.ComponentModel.DataAnnotations;
+using FilmMaker.Entities;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FilmMaker.DTO.RequestToLocationManagerToBookService
@@ -14,9 +15,11 @@ namespace FilmMaker.DTO.RequestToLocationManagerToBookService
 
     public class CreateRequestToLocationManagerToBookServiceItemDTO
     {
+        [Required(ErrorMessage = "Service Type ID is required.")]
+        [Range(1, int.MaxValue, ErrorMessage = "Invalid Service Type ID.")]
         public int? ServiceTypeId { get; set; }
 
-        public string? CustomServiceType { get; set; }
+        //public string? CustomServiceType { get; set; }
 
         public DateTime StartDate { get; set; }
 

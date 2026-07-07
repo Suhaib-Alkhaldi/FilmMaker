@@ -81,8 +81,7 @@ namespace FilmMaker.Services.Service
                 }
                 var classificationValidation = await ValidateServiceClassificationAsync(
                     serviceProviderId.Value,
-                    serviceDto.ServiceTypeId,
-                    serviceDto.CustomServiceType
+                    serviceDto.ServiceTypeId
                 );
 
                 if (classificationValidation != null)
@@ -131,9 +130,9 @@ namespace FilmMaker.Services.Service
                         ? serviceDto.ServiceTypeId.Value
                         : null,
 
-                    CustomServiceType = hasOfficialServiceType
-                        ? null
-                        : serviceDto.CustomServiceType!.Trim(),
+                    // CustomServiceType = hasOfficialServiceType
+                    //     ? null
+                    //     : serviceDto.CustomServiceType!.Trim(),
                     AvailableQuantity = serviceDto.AvailableQuantity,
 
                     IsCustom = !hasOfficialServiceType,
@@ -264,12 +263,12 @@ namespace FilmMaker.Services.Service
                 var finalPrice = serviceDto.Price ?? service.DailyPrice;
 
                 var isServiceTypeProvided = serviceDto.ServiceTypeId.HasValue;
-                var isCustomServiceTypeProvided = serviceDto.CustomServiceType != null;
+               // var isCustomServiceTypeProvided = serviceDto.CustomServiceType != null;
 
                 var finalServiceTypeId = service.ServiceTypeId;
                 var finalCustomServiceType = service.CustomServiceType;
 
-                if (isServiceTypeProvided || isCustomServiceTypeProvided)
+                if (isServiceTypeProvided /*|| isCustomServiceTypeProvided*/)
                 {
                     var hasOfficialServiceType = serviceDto.ServiceTypeId.HasValue &&
                                                  serviceDto.ServiceTypeId.Value > 0;
@@ -278,9 +277,9 @@ namespace FilmMaker.Services.Service
                         ? serviceDto.ServiceTypeId.Value
                         : null;
 
-                    finalCustomServiceType = hasOfficialServiceType
-                        ? null
-                        : serviceDto.CustomServiceType?.Trim();
+                    // finalCustomServiceType = hasOfficialServiceType
+                    //     ? null
+                    //     : serviceDto.CustomServiceType?.Trim();
                 }
 
                 var finalAvailableQuantity = serviceDto.AvailableQuantity ?? service.AvailableQuantity;
@@ -316,12 +315,12 @@ namespace FilmMaker.Services.Service
                     );
                 }
 
-                if (isServiceTypeProvided || isCustomServiceTypeProvided)
+                if (isServiceTypeProvided /*|| isCustomServiceTypeProvided*/)
                 {
                     var classificationValidation = await ValidateServiceClassificationAsync(
                         service.ServiceProviderId,
-                        finalServiceTypeId,
-                        finalCustomServiceType
+                        finalServiceTypeId
+                       // finalCustomServiceType
                     );
 
                     if (classificationValidation != null)
@@ -545,8 +544,8 @@ namespace FilmMaker.Services.Service
                         ServiceTypeName = s.ServiceTypeId != null
                         ? s.ServiceType!.Name: string.Empty,
 
-                        CustomServiceType = s.CustomServiceType,
-                        IsCustomServiceType = s.IsCustom,
+                        // CustomServiceType = s.CustomServiceType,
+                        // IsCustomServiceType = s.IsCustom,
 
                         ServiceProviderId = s.ServiceProviderId,
                         ServiceProviderName = s.ServiceProvider.User.Name,
@@ -601,8 +600,8 @@ namespace FilmMaker.Services.Service
                         ServiceTypeId = s.ServiceTypeId,
                         ServiceTypeName = s.ServiceTypeId != null? s.ServiceType!.Name: string.Empty,
 
-                        CustomServiceType = s.CustomServiceType,
-                        IsCustomServiceType = s.IsCustom,
+                        // CustomServiceType = s.CustomServiceType,
+                        // IsCustomServiceType = s.IsCustom,
 
                         ServiceProviderId = s.ServiceProviderId,
                         ServiceProviderName = s.ServiceProvider.User.Name,
@@ -645,8 +644,8 @@ namespace FilmMaker.Services.Service
                         ServiceTypeId = s.ServiceTypeId,
                         ServiceTypeName = s.ServiceTypeId != null ? s.ServiceType!.Name : string.Empty,
 
-                        CustomServiceType = s.CustomServiceType,
-                        IsCustomServiceType = s.IsCustom,
+                        // CustomServiceType = s.CustomServiceType,
+                        // IsCustomServiceType = s.IsCustom,
 
                         ServiceProviderId = s.ServiceProviderId,
                         ServiceProviderName = s.ServiceProvider.User.Name,
@@ -730,8 +729,8 @@ namespace FilmMaker.Services.Service
                             ? s.ServiceType!.Name
                             : string.Empty,
 
-                        CustomServiceType = s.CustomServiceType,
-                        IsCustomServiceType = s.IsCustom,
+                        // CustomServiceType = s.CustomServiceType,
+                        // IsCustomServiceType = s.IsCustom,
 
                         ServiceProviderId = s.ServiceProviderId,
                         ServiceProviderName = s.ServiceProvider.User.Name,
@@ -807,8 +806,8 @@ namespace FilmMaker.Services.Service
                             ? s.ServiceType!.Name
                             : string.Empty,
 
-                        CustomServiceType = s.CustomServiceType,
-                        IsCustomServiceType = s.IsCustom,
+                        // CustomServiceType = s.CustomServiceType,
+                        // IsCustomServiceType = s.IsCustom,
 
                         ServiceProviderId = s.ServiceProviderId,
                         ServiceProviderName = s.ServiceProvider.User.Name,
@@ -1066,8 +1065,8 @@ namespace FilmMaker.Services.Service
                         ServiceTypeId = s.ServiceTypeId,
                         ServiceTypeName = s.ServiceTypeId != null ? s.ServiceType!.Name : string.Empty,
                         AvailableQuantity = s.AvailableQuantity,
-                        CustomServiceType = s.CustomServiceType,
-                        IsCustomServiceType = s.IsCustom,
+                        // CustomServiceType = s.CustomServiceType,
+                        // IsCustomServiceType = s.IsCustom,
 
                         ServiceProviderId = s.ServiceProviderId,
                         ServiceProviderName = s.ServiceProvider.User.Name,
@@ -1167,8 +1166,8 @@ namespace FilmMaker.Services.Service
                             ? s.ServiceType!.Name
                             : string.Empty,
 
-                        CustomServiceType = s.CustomServiceType,
-                        IsCustomServiceType = s.IsCustom,
+                        // CustomServiceType = s.CustomServiceType,
+                        // IsCustomServiceType = s.IsCustom,
 
                         ServiceProviderId = s.ServiceProviderId,
                         ServiceProviderName = s.ServiceProvider.User.Name,
@@ -1347,8 +1346,8 @@ namespace FilmMaker.Services.Service
                             ? s.ServiceType!.Name
                             : string.Empty,
 
-                        CustomServiceType = s.CustomServiceType,
-                        IsCustomServiceType = s.IsCustom,
+                        // CustomServiceType = s.CustomServiceType,
+                        // IsCustomServiceType = s.IsCustom,
 
                         ServiceProviderId = s.ServiceProviderId,
                         ServiceProviderName = s.ServiceProvider.User.Name,
@@ -1458,8 +1457,8 @@ namespace FilmMaker.Services.Service
                         ? s.ServiceType!.Name
                         : string.Empty,
 
-                    CustomServiceType = s.CustomServiceType,
-                    IsCustomServiceType = s.IsCustom,
+                    // CustomServiceType = s.CustomServiceType,
+                    // IsCustomServiceType = s.IsCustom,
 
                     ServiceProviderId = s.ServiceProviderId,
                     ServiceProviderName = s.ServiceProvider.User.Name,
@@ -1468,12 +1467,12 @@ namespace FilmMaker.Services.Service
                 })
                 .FirstOrDefaultAsync();
         }
-        private async Task<ApiResponse<GetServiceDTO>?> ValidateServiceClassificationAsync(int serviceProviderId,int? serviceTypeId,string? customServiceTypeName)
+        private async Task<ApiResponse<GetServiceDTO>?> ValidateServiceClassificationAsync(int serviceProviderId,int? serviceTypeId /*string? customServiceTypeName*/)
         {
             var hasOfficialServiceType = serviceTypeId.HasValue && serviceTypeId.Value > 0;
-            var hasCustomServiceType = !string.IsNullOrWhiteSpace(customServiceTypeName);
+           // var hasCustomServiceType = !string.IsNullOrWhiteSpace(customServiceTypeName);
 
-            if (!hasOfficialServiceType && !hasCustomServiceType)
+            if (!hasOfficialServiceType /* && !hasCustomServiceType*/)
             {
                 return ApiResponse<GetServiceDTO>.FailureResponse(
                     "Service type or custom service type is required.",
@@ -1481,13 +1480,13 @@ namespace FilmMaker.Services.Service
                 );
             }
 
-            if (hasOfficialServiceType && hasCustomServiceType)
-            {
-                return ApiResponse<GetServiceDTO>.FailureResponse(
-                    "Choose either service type or custom service type, not both.",
-                    "اختر نوع خدمة رسمي أو نوع خدمة مخصص، وليس الاثنين معًا."
-                );
-            }
+            // if (hasOfficialServiceType /*&& hasCustomServiceType*/)
+            // {
+            //     return ApiResponse<GetServiceDTO>.FailureResponse(
+            //         "Choose either service type or custom service type, not both.",
+            //         "اختر نوع خدمة رسمي أو نوع خدمة مخصص، وليس الاثنين معًا."
+            //     );
+            // }
 
             if (hasOfficialServiceType)
             {
@@ -1527,24 +1526,24 @@ namespace FilmMaker.Services.Service
                 return null;
             }
 
-            var normalizedCustomType = customServiceTypeName!.Trim().ToLower();
+            //var normalizedCustomType = customServiceTypeName!.Trim().ToLower();
 
-            var providerHasThisCustomType = await _context.ServiceProviderServiceTypes
-                .AnyAsync(x =>
-                    x.ServiceProviderId == serviceProviderId &&
-                    x.IsCustom == true &&
-                    x.CustomServiceTypeName != null &&
-                    x.CustomServiceTypeName.ToLower() == normalizedCustomType &&
-                    x.IsActive &&
-                    !x.IsDeleted);
-
-            if (!providerHasThisCustomType)
-            {
-                return ApiResponse<GetServiceDTO>.FailureResponse(
-                    "You cannot add or update a service under a custom service type that is not registered in your profile.",
-                    "لا يمكنك إضافة أو تعديل خدمة تحت نوع خدمة مخصص غير مسجل في ملفك."
-                );
-            }
+            // var providerHasThisCustomType = await _context.ServiceProviderServiceTypes
+            //     .AnyAsync(x =>
+            //         x.ServiceProviderId == serviceProviderId &&
+            //         x.IsCustom == true &&
+            //         x.CustomServiceTypeName != null &&
+            //         //x.CustomServiceTypeName.ToLower() == normalizedCustomType &&
+            //         x.IsActive &&
+            //         !x.IsDeleted);
+            //
+            // if (!providerHasThisCustomType)
+            // {
+            //     return ApiResponse<GetServiceDTO>.FailureResponse(
+            //         "You cannot add or update a service under a custom service type that is not registered in your profile.",
+            //         "لا يمكنك إضافة أو تعديل خدمة تحت نوع خدمة مخصص غير مسجل في ملفك."
+            //     );
+            // }
 
             return null;
         }

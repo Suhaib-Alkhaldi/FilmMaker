@@ -486,24 +486,24 @@ namespace FilmMaker.Services.Service
                         })
                         .ToList();
 
-                var customServiceTypes = request.CustomServiceTypes == null
-                    ? new List<ServiceProviderServiceType>()
-                    : request.CustomServiceTypes
-                        .Where(x => !string.IsNullOrWhiteSpace(x))
-                        .Select(x => x.Trim())
-                        .Distinct()
-                        .Select(customName => new ServiceProviderServiceType
-                        {
-                            ServiceProviderId = profile.Id,
-                            CustomServiceTypeName = customName,
-                            IsCustom = true,
-                            IsActive = true,
-                            IsDeleted = false
-                        })
-                        .ToList();
+                // var customServiceTypes = request.CustomServiceTypes == null
+                //     ? new List<ServiceProviderServiceType>()
+                //     : request.CustomServiceTypes
+                //         .Where(x => !string.IsNullOrWhiteSpace(x))
+                //         .Select(x => x.Trim())
+                //         .Distinct()
+                //         .Select(customName => new ServiceProviderServiceType
+                //         {
+                //             ServiceProviderId = profile.Id,
+                //             CustomServiceTypeName = customName,
+                //             IsCustom = true,
+                //             IsActive = true,
+                //             IsDeleted = false
+                //         })
+                //         .ToList();
 
                 var allServiceTypes = selectedServiceTypes
-                    .Concat(customServiceTypes)
+                    //.Concat(customServiceTypes)
                     .ToList();
 
                 if (allServiceTypes.Any())
