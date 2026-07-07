@@ -11,9 +11,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f2b79ac7-ab45-4e5a-862a-c3640a4b94ac" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/DTO/Auth/Request/RegisterServiceProviderRequestDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DTO/Auth/Request/RegisterServiceProviderRequestDto.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DTO/Profile/Request/UpdateServiceProviderProfileRequestDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DTO/Profile/Request/UpdateServiceProviderProfileRequestDto.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DTO/Profile/Response/ServiceProviderProfileResponseDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DTO/Profile/Response/ServiceProviderProfileResponseDto.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.FilmMaker/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.FilmMaker/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DTO/RequestToLocationManagerToBookService/CreateRequestToLocationManagerToBookServiceDTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DTO/RequestToLocationManagerToBookService/CreateRequestToLocationManagerToBookServiceDTO.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DTO/RequestToLocationManagerToBookService/ReadRequestToLocationManagerToBookServiceDTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DTO/RequestToLocationManagerToBookService/ReadRequestToLocationManagerToBookServiceDTO.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DTO/RequestToLocationManagerToBookService/UpdateRequestToLocationManagerToBookServiceDTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DTO/RequestToLocationManagerToBookService/UpdateRequestToLocationManagerToBookServiceDTO.cs" afterDir="false" />
@@ -21,12 +19,9 @@
       <change beforePath="$PROJECT_DIR$/DTO/ServiceProvider/GetServiceDTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DTO/ServiceProvider/GetServiceDTO.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DTO/ServiceProvider/UpdateServiceDTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DTO/ServiceProvider/UpdateServiceDTO.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DTO/ServiceProviderBooking/GetServiceProviderRequestDTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DTO/ServiceProviderBooking/GetServiceProviderRequestDTO.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Services/Service/AuthService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Services/Service/AuthService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Services/Service/ProfileService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Services/Service/ProfileService.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Services/Service/RequestToLocationManagerToBookServiceService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Services/Service/RequestToLocationManagerToBookServiceService.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Services/Service/ServiceProviderRequestService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Services/Service/ServiceProviderRequestService.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Services/Service/ServicesProvidedService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Services/Service/ServicesProvidedService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/appsettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/appsettings.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -45,6 +40,7 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/e27251b50e9349628057884442348f951de938/63/bdfaadd5/ControllerBase.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/03ac07f794a71f728baff7e267a90dee13380a2532e2062c51debe4571217a/ILoggerT.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/17a3a8d481919bdc3f1630b5a7deadb2cd394fa12fff3312e6abe29bfc4/IConfiguration.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
@@ -148,7 +144,7 @@
       <updated>1782828956643</updated>
       <workItem from="1782828960418" duration="5244000" />
       <workItem from="1783243229861" duration="15540000" />
-      <workItem from="1783380360353" duration="4766000" />
+      <workItem from="1783380360353" duration="13328000" />
     </task>
     <servers />
   </component>

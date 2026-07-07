@@ -1285,13 +1285,13 @@ namespace FilmMaker.Services.Service
                     );
                 }
 
-                if (hasServiceType/* && hasCustomServiceType*/)
-                {
-                    return ApiResponse<ReadRequestToLocationManagerToBookServiceDTO>.FailureResponse(
-                        "Each service item cannot have both service type and custom service type.",
-                        "لا يمكن أن تحتوي الخدمة على نوع خدمة ونوع خدمة مخصص معًا."
-                    );
-                }
+                // if (hasServiceType /* && hasCustomServiceType*/)
+                // {
+                //     return ApiResponse<ReadRequestToLocationManagerToBookServiceDTO>.FailureResponse(
+                //         "Each service item cannot have both service type and custom service type.",
+                //         "لا يمكن أن تحتوي الخدمة على نوع خدمة ونوع خدمة مخصص معًا."
+                //     );
+                // }
 
                 if (item.StartDate <= DateTime.UtcNow)
                 {

@@ -47,10 +47,11 @@ namespace FilmMaker.DTO.ServiceProviderBooking
 
         public string ServiceName { get; set; } = string.Empty;
 
+        [Required(ErrorMessage = "Service Type ID is required.")]
+        [Range(1, int.MaxValue, ErrorMessage = "Invalid Service Type ID.")]
         public int? ServiceTypeId { get; set; }
 
-        [Required(ErrorMessage = "Service Type ID is required.")]   
-        [MinLength(1, ErrorMessage = "At least one service type must be selected.")]
+       
         public string? ServiceTypeName { get; set; }
 
         //public string? CustomServiceType { get; set; }

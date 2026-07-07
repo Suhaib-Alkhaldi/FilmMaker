@@ -114,7 +114,7 @@ namespace FilmMaker.Services.Service
                     {
                         x.Id,
                         x.ServiceTypeId,
-                        x.CustomServiceType,
+                        //x.CustomServiceType,
                         x.Quantity,
                         x.StartDate,
                         x.EndDate
@@ -145,8 +145,8 @@ namespace FilmMaker.Services.Service
                         x.Id,
                         x.ServiceProviderId,
                         x.ServiceTypeId,
-                        x.CustomServiceType,
-                        x.IsCustom,
+                        //x.CustomServiceType,
+                        //x.IsCustom,
                         x.AvailableQuantity
                     })
                     .ToListAsync();
@@ -213,8 +213,8 @@ namespace FilmMaker.Services.Service
 
                     var providerSupportsRequestedType = await ProviderSupportsRequestedServiceType(
                         request.ServiceProviderId,
-                        originalItem.ServiceTypeId,
-                        originalItem.CustomServiceType
+                        originalItem.ServiceTypeId
+                       // originalItem.CustomServiceType
                     );
 
                     if (!providerSupportsRequestedType)
@@ -227,10 +227,10 @@ namespace FilmMaker.Services.Service
 
                     var serviceMatchesRequestedType = DoesSelectedServiceMatchRequestedItem(
                         selectedService.ServiceTypeId,
-                        selectedService.CustomServiceType,
-                        selectedService.IsCustom,
-                        originalItem.ServiceTypeId,
-                        originalItem.CustomServiceType
+                        //selectedService.CustomServiceType,
+                       // selectedService.IsCustom,
+                        originalItem.ServiceTypeId
+                       // originalItem.CustomServiceType
                     );
 
                     if (!serviceMatchesRequestedType)
@@ -469,7 +469,7 @@ namespace FilmMaker.Services.Service
                         {
                             x.Id,
                             x.ServiceTypeId,
-                            x.CustomServiceType,
+                            //x.CustomServiceType,
                             x.Quantity,
                             x.StartDate,
                             x.EndDate
@@ -500,8 +500,8 @@ namespace FilmMaker.Services.Service
                             x.Id,
                             x.ServiceProviderId,
                             x.ServiceTypeId,
-                            x.CustomServiceType,
-                            x.IsCustom,
+                           // x.CustomServiceType,
+                            //x.IsCustom,
                             x.AvailableQuantity
                         })
                         .ToListAsync();
@@ -544,8 +544,8 @@ namespace FilmMaker.Services.Service
 
                         var providerSupportsRequestedType = await ProviderSupportsRequestedServiceType(
                             finalServiceProviderId,
-                            originalItem.ServiceTypeId,
-                            originalItem.CustomServiceType
+                            originalItem.ServiceTypeId
+                            //originalItem.CustomServiceType
                         );
 
                         if (!providerSupportsRequestedType)
@@ -558,10 +558,10 @@ namespace FilmMaker.Services.Service
 
                         var serviceMatchesRequestedType = DoesSelectedServiceMatchRequestedItem(
                             selectedService.ServiceTypeId,
-                            selectedService.CustomServiceType,
-                            selectedService.IsCustom,
-                            originalItem.ServiceTypeId,
-                            originalItem.CustomServiceType
+                            //selectedService.CustomServiceType,
+                            //selectedService.IsCustom,
+                            originalItem.ServiceTypeId
+                            //originalItem.CustomServiceType
                         );
 
                         if (!serviceMatchesRequestedType)
@@ -1581,7 +1581,7 @@ namespace FilmMaker.Services.Service
             return null;
         }
 
-        private async Task<bool> ProviderSupportsRequestedServiceType(int serviceProviderId,int? serviceTypeId,string? customServiceType)
+        private async Task<bool> ProviderSupportsRequestedServiceType(int serviceProviderId,int? serviceTypeId /*string? customServiceType*/)
         {
             if (serviceTypeId.HasValue)
             {
@@ -1594,42 +1594,42 @@ namespace FilmMaker.Services.Service
                         !x.IsDeleted);
             }
 
-            if (!string.IsNullOrWhiteSpace(customServiceType))
-            {
-                var normalizedCustomType = customServiceType.Trim().ToLower();
-
-                return await _context.ServiceProviderServiceTypes
-                    .AnyAsync(x =>
-                        x.ServiceProviderId == serviceProviderId &&
-                        x.IsCustom &&
-                        x.CustomServiceTypeName != null &&
-                        x.CustomServiceTypeName.Trim().ToLower() == normalizedCustomType &&
-                        x.IsActive &&
-                        !x.IsDeleted);
-            }
+            // if (!string.IsNullOrWhiteSpace(customServiceType))
+            // {
+            //     var normalizedCustomType = customServiceType.Trim().ToLower();
+            //
+            //     return await _context.ServiceProviderServiceTypes
+            //         .AnyAsync(x =>
+            //             x.ServiceProviderId == serviceProviderId &&
+            //             x.IsCustom &&
+            //             x.CustomServiceTypeName != null &&
+            //             x.CustomServiceTypeName.Trim().ToLower() == normalizedCustomType &&
+            //             x.IsActive &&
+            //             !x.IsDeleted);
+            // }
 
             return false;
         }
 
-        private bool DoesSelectedServiceMatchRequestedItem(int? selectedServiceTypeId,string? selectedCustomServiceType,bool selectedServiceIsCustom,int? requestedServiceTypeId,string? requestedCustomServiceType)
+        private bool DoesSelectedServiceMatchRequestedItem(int? selectedServiceTypeId, /*string? selectedCustomServiceTypebool selectedServiceIsCustom,*/ int? requestedServiceTypeId /*string? requestedCustomServiceType*/)
         {
             if (requestedServiceTypeId.HasValue)
             {
-                return selectedServiceTypeId == requestedServiceTypeId.Value &&
-                       !selectedServiceIsCustom;
+                return selectedServiceTypeId == requestedServiceTypeId.Value; //&&
+                //!selectedServiceIsCustom;
             }
 
-            if (!string.IsNullOrWhiteSpace(requestedCustomServiceType))
-            {
-                if (!selectedServiceIsCustom ||
-                    string.IsNullOrWhiteSpace(selectedCustomServiceType))
-                {
-                    return false;
-                }
-
-                return selectedCustomServiceType.Trim().ToLower() ==
-                       requestedCustomServiceType.Trim().ToLower();
-            }
+            // if (!string.IsNullOrWhiteSpace(requestedCustomServiceType))
+            // {
+            //     if (!selectedServiceIsCustom ||
+            //         string.IsNullOrWhiteSpace(selectedCustomServiceType))
+            //     {
+            //         return false;
+            //     }
+            //
+            //     return selectedCustomServiceType.Trim().ToLower() ==
+            //            requestedCustomServiceType.Trim().ToLower();
+            // }
 
             return false;
         }

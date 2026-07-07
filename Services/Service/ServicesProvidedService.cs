@@ -1472,7 +1472,7 @@ namespace FilmMaker.Services.Service
             var hasOfficialServiceType = serviceTypeId.HasValue && serviceTypeId.Value > 0;
            // var hasCustomServiceType = !string.IsNullOrWhiteSpace(customServiceTypeName);
 
-            if (!hasOfficialServiceType/* && !hasCustomServiceType*/)
+            if (!hasOfficialServiceType /* && !hasCustomServiceType*/)
             {
                 return ApiResponse<GetServiceDTO>.FailureResponse(
                     "Service type or custom service type is required.",
@@ -1480,13 +1480,13 @@ namespace FilmMaker.Services.Service
                 );
             }
 
-            if (hasOfficialServiceType /*&& hasCustomServiceType*/)
-            {
-                return ApiResponse<GetServiceDTO>.FailureResponse(
-                    "Choose either service type or custom service type, not both.",
-                    "اختر نوع خدمة رسمي أو نوع خدمة مخصص، وليس الاثنين معًا."
-                );
-            }
+            // if (hasOfficialServiceType /*&& hasCustomServiceType*/)
+            // {
+            //     return ApiResponse<GetServiceDTO>.FailureResponse(
+            //         "Choose either service type or custom service type, not both.",
+            //         "اختر نوع خدمة رسمي أو نوع خدمة مخصص، وليس الاثنين معًا."
+            //     );
+            // }
 
             if (hasOfficialServiceType)
             {
@@ -1528,22 +1528,22 @@ namespace FilmMaker.Services.Service
 
             //var normalizedCustomType = customServiceTypeName!.Trim().ToLower();
 
-            var providerHasThisCustomType = await _context.ServiceProviderServiceTypes
-                .AnyAsync(x =>
-                    x.ServiceProviderId == serviceProviderId &&
-                    x.IsCustom == true &&
-                    x.CustomServiceTypeName != null &&
-                    //x.CustomServiceTypeName.ToLower() == normalizedCustomType &&
-                    x.IsActive &&
-                    !x.IsDeleted);
-
-            if (!providerHasThisCustomType)
-            {
-                return ApiResponse<GetServiceDTO>.FailureResponse(
-                    "You cannot add or update a service under a custom service type that is not registered in your profile.",
-                    "لا يمكنك إضافة أو تعديل خدمة تحت نوع خدمة مخصص غير مسجل في ملفك."
-                );
-            }
+            // var providerHasThisCustomType = await _context.ServiceProviderServiceTypes
+            //     .AnyAsync(x =>
+            //         x.ServiceProviderId == serviceProviderId &&
+            //         x.IsCustom == true &&
+            //         x.CustomServiceTypeName != null &&
+            //         //x.CustomServiceTypeName.ToLower() == normalizedCustomType &&
+            //         x.IsActive &&
+            //         !x.IsDeleted);
+            //
+            // if (!providerHasThisCustomType)
+            // {
+            //     return ApiResponse<GetServiceDTO>.FailureResponse(
+            //         "You cannot add or update a service under a custom service type that is not registered in your profile.",
+            //         "لا يمكنك إضافة أو تعديل خدمة تحت نوع خدمة مخصص غير مسجل في ملفك."
+            //     );
+            // }
 
             return null;
         }

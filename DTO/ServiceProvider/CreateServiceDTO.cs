@@ -9,8 +9,8 @@ namespace FilmMaker.DTO.ServiceProvider
         public int? AvailableQuantity { get; set; }
         public decimal Price { get; set; }
         
-        [Required(ErrorMessage = "Service Type ID is required.")]   
-        [MinLength(1, ErrorMessage = "At least one service type must be selected.")]
+        [Required(ErrorMessage = "Service Type ID is required.")]
+        [Range(1, int.MaxValue, ErrorMessage = "Invalid Service Type ID.")]
         public int? ServiceTypeId { get; set; }
        // public string? CustomServiceType { get; set; }
         public List<int> MediaIds { get; set; } = new();
