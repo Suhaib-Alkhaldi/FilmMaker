@@ -828,8 +828,8 @@ namespace FilmMaker.Services.Service
                                         ? i.RequestToLocationManagerToBookServiceItem.ServiceType!.Name
                                         : null,
 
-                                CustomServiceType =
-                                    i.RequestToLocationManagerToBookServiceItem.CustomServiceType,
+                                // CustomServiceType =
+                                //     i.RequestToLocationManagerToBookServiceItem.CustomServiceType,
 
                                 RequestedQuantity =
                                     i.RequestToLocationManagerToBookServiceItem.Quantity,
@@ -952,8 +952,8 @@ namespace FilmMaker.Services.Service
                                         ? i.RequestToLocationManagerToBookServiceItem.ServiceType!.Name
                                         : null,
 
-                                CustomServiceType =
-                                    i.RequestToLocationManagerToBookServiceItem.CustomServiceType,
+                                // CustomServiceType =
+                                //     i.RequestToLocationManagerToBookServiceItem.CustomServiceType,
 
                                 RequestedQuantity =
                                     i.RequestToLocationManagerToBookServiceItem.Quantity,
@@ -1067,8 +1067,8 @@ namespace FilmMaker.Services.Service
                                         ? i.RequestToLocationManagerToBookServiceItem.ServiceType!.Name
                                         : null,
 
-                                CustomServiceType =
-                                    i.RequestToLocationManagerToBookServiceItem.CustomServiceType,
+                                // CustomServiceType =
+                                //     i.RequestToLocationManagerToBookServiceItem.CustomServiceType,
 
                                 RequestedQuantity =
                                     i.RequestToLocationManagerToBookServiceItem.Quantity,
@@ -1191,8 +1191,8 @@ namespace FilmMaker.Services.Service
                                         ? i.RequestToLocationManagerToBookServiceItem.ServiceType!.Name
                                         : null,
 
-                                CustomServiceType =
-                                    i.RequestToLocationManagerToBookServiceItem.CustomServiceType,
+                                // CustomServiceType =
+                                //     i.RequestToLocationManagerToBookServiceItem.CustomServiceType,
 
                                 RequestedQuantity =
                                     i.RequestToLocationManagerToBookServiceItem.Quantity,
@@ -1681,8 +1681,8 @@ namespace FilmMaker.Services.Service
                                 ? i.RequestToLocationManagerToBookServiceItem.ServiceType!.Name
                                 : null,
 
-                            CustomServiceType =
-                                i.RequestToLocationManagerToBookServiceItem.CustomServiceType,
+                            // CustomServiceType =
+                            //     i.RequestToLocationManagerToBookServiceItem.CustomServiceType,
 
                             RequestedQuantity =
                                 i.RequestToLocationManagerToBookServiceItem.Quantity,

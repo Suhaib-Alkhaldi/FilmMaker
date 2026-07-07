@@ -463,10 +463,10 @@ namespace FilmMaker.Services.Service
                             .Select(s => s.ServiceType!.Name)
                             .ToList(),
 
-                        CustomServiceTypes = x.ServiceTypes
-                            .Where(s => !s.IsDeleted && s.IsCustom && s.CustomServiceTypeName != null)
-                            .Select(s => s.CustomServiceTypeName!)
-                            .ToList()
+                        // CustomServiceTypes = x.ServiceTypes
+                        //     .Where(s => !s.IsDeleted && s.IsCustom && s.CustomServiceTypeName != null)
+                        //     .Select(s => s.CustomServiceTypeName!)
+                        //     .ToList()
                     })
                     .FirstOrDefaultAsync();
 
@@ -577,14 +577,14 @@ namespace FilmMaker.Services.Service
                     UpdateServiceProviderCities(profile, request.CitiesIds, currentUserId);
                 }
 
-                if (request.CustomServiceTypes != null)
-                {
-                    UpdateServiceProviderCustomServiceTypes(
-                        profile,
-                        request.CustomServiceTypes,
-                        currentUserId
-                    );
-                }
+                // if (request.CustomServiceTypes != null)
+                // {
+                //     UpdateServiceProviderCustomServiceTypes(
+                //         profile,
+                //         request.CustomServiceTypes,
+                //         currentUserId
+                //     );
+                // }
 
                 await _context.SaveChangesAsync();
 
@@ -1203,14 +1203,14 @@ namespace FilmMaker.Services.Service
                     return serviceTypeValidationError;
             }
 
-            if (request.CustomServiceTypes != null &&
-                request.CustomServiceTypes.Any(x => string.IsNullOrWhiteSpace(x)))
-            {
-                return ApiResponse<ServiceProviderProfileResponseDto>.FailureResponse(
-                    "Custom ServiceTypes cannot contain empty values.",
-                    "أنواع الخدمات المخصصة لا يمكن أن تحتوي على قيم فارغة."
-                );
-            }
+            // if (request.CustomServiceTypes != null &&
+            //     request.CustomServiceTypes.Any(x => string.IsNullOrWhiteSpace(x)))
+            // {
+            //     return ApiResponse<ServiceProviderProfileResponseDto>.FailureResponse(
+            //         "Custom ServiceTypes cannot contain empty values.",
+            //         "أنواع الخدمات المخصصة لا يمكن أن تحتوي على قيم فارغة."
+            //     );
+            // }
 
             return null;
         }
