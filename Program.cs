@@ -78,6 +78,8 @@ builder.Services.AddScoped<ILocationService, LocationService>();
 builder.Services.AddScoped<ILocationOwnerVisitRequestService, LocationOwnerVisitRequestService>();
 builder.Services.AddScoped<ILocationOwnerBookingRequestService, LocationOwnerBookingRequestService>();
 
+builder.Services.AddScoped<ILookupService, LookupService>();
+
 builder.Services.AddScoped<ITokenService, TokenService>();
 
 
