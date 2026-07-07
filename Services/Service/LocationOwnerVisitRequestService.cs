@@ -156,14 +156,34 @@ namespace FilmMaker.Services.Service
                         LocationName = x.Location.LocationName,
 
                         LocationOwnerId = x.Location.LocationOwnerId,
-                        LocationOwnerName = x.Location.LocationOwner != null
-                            ? x.Location.LocationOwner.User.Name
-                            : string.Empty,
+
+                        LocationOwnerName =
+                            x.Location.LocationOwner != null &&
+                            x.Location.LocationOwner.User != null
+                                ? x.Location.LocationOwner.User.Name
+                                : string.Empty,
 
                         LocationManagerId = x.LocationManagerId,
-                        LocationManagerName = x.LocationManager != null
-                            ? x.LocationManager.User.Name
-                            : string.Empty,
+
+                        LocationManagerName =
+                            x.LocationManager != null &&
+                            x.LocationManager.User != null
+                                ? x.LocationManager.User.Name
+                                : null,
+
+                        ProductionCompanyId = x.ProductionCompanyId,
+
+                        ProductionCompanyName =
+                            x.ProductionCompany != null &&
+                            x.ProductionCompany.User != null
+                                ? x.ProductionCompany.User.Name
+                                : null,
+
+                        RequestedByUserId = x.RequestedByUserId,
+
+                        RequesterType = x.LocationManagerId.HasValue
+                            ? "LocationManager"
+                            : "ProductionCompany",
 
                         RequestedVisitDateUtc = x.RequestedVisitDateUtc,
                         RequestMessage = x.RequestMessage,
@@ -250,10 +270,34 @@ namespace FilmMaker.Services.Service
                         LocationName = x.Location.LocationName,
 
                         LocationOwnerId = x.Location.LocationOwnerId,
-                        LocationOwnerName = x.Location.LocationOwner.User.Name,
+
+                        LocationOwnerName =
+                            x.Location.LocationOwner != null &&
+                            x.Location.LocationOwner.User != null
+                                ? x.Location.LocationOwner.User.Name
+                                : string.Empty,
 
                         LocationManagerId = x.LocationManagerId,
-                        LocationManagerName = x.LocationManager.User.Name,
+
+                        LocationManagerName =
+                            x.LocationManager != null &&
+                            x.LocationManager.User != null
+                                ? x.LocationManager.User.Name
+                                : null,
+
+                        ProductionCompanyId = x.ProductionCompanyId,
+
+                        ProductionCompanyName =
+                            x.ProductionCompany != null &&
+                            x.ProductionCompany.User != null
+                                ? x.ProductionCompany.User.Name
+                                : null,
+
+                        RequestedByUserId = x.RequestedByUserId,
+
+                        RequesterType = x.LocationManagerId.HasValue
+                            ? "LocationManager"
+                            : "ProductionCompany",
 
                         RequestedVisitDateUtc = x.RequestedVisitDateUtc,
                         RequestMessage = x.RequestMessage,
@@ -342,10 +386,34 @@ namespace FilmMaker.Services.Service
                         LocationName = x.Location.LocationName,
 
                         LocationOwnerId = x.Location.LocationOwnerId,
-                        LocationOwnerName = x.Location.LocationOwner.User.Name,
+
+                        LocationOwnerName =
+                            x.Location.LocationOwner != null &&
+                            x.Location.LocationOwner.User != null
+                                ? x.Location.LocationOwner.User.Name
+                                : string.Empty,
 
                         LocationManagerId = x.LocationManagerId,
-                        LocationManagerName = x.LocationManager.User.Name,
+
+                        LocationManagerName =
+                            x.LocationManager != null &&
+                            x.LocationManager.User != null
+                                ? x.LocationManager.User.Name
+                                : null,
+
+                        ProductionCompanyId = x.ProductionCompanyId,
+
+                        ProductionCompanyName =
+                            x.ProductionCompany != null &&
+                            x.ProductionCompany.User != null
+                                ? x.ProductionCompany.User.Name
+                                : null,
+
+                        RequestedByUserId = x.RequestedByUserId,
+
+                        RequesterType = x.LocationManagerId.HasValue
+                            ? "LocationManager"
+                            : "ProductionCompany",
 
                         RequestedVisitDateUtc = x.RequestedVisitDateUtc,
                         RequestMessage = x.RequestMessage,

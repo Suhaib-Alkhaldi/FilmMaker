@@ -8,10 +8,20 @@ namespace FilmMaker.Entities
 
         [ForeignKey("LocationId")]
         public Location Location { get; set; } = null!;
-        public int LocationManagerId { get; set; }
+        public int? LocationManagerId { get; set; }
 
         [ForeignKey("LocationManagerId")]
-        public LocationManagerProfile LocationManager { get; set; } = null!;
+        public LocationManagerProfile? LocationManager { get; set; }
+
+        public int? ProductionCompanyId { get; set; }
+
+        [ForeignKey("ProductionCompanyId")]
+        public ProductionCompanyProfile? ProductionCompany { get; set; }
+
+        public int RequestedByUserId { get; set; }
+
+        [ForeignKey("RequestedByUserId")]
+        public User RequestedByUser { get; set; } = null!;
         public DateTime RequestedVisitDateUtc { get; set; }
         public string? RequestMessage { get; set; }
         public int VisitStatusId { get; set; }

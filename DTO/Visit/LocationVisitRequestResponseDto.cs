@@ -7,8 +7,13 @@
         public string LocationName { get; set; } = string.Empty;
         public int LocationOwnerId { get; set; }
         public string LocationOwnerName { get; set; } = string.Empty;
-        public int LocationManagerId { get; set; }
-        public string LocationManagerName { get; set; } = string.Empty;
+        public int? LocationManagerId { get; set; }
+        public string? LocationManagerName { get; set; }
+        public int? ProductionCompanyId { get; set; }
+        public string? ProductionCompanyName { get; set; }
+        public int RequestedByUserId { get; set; }
+
+        public string RequesterType { get; set; } = string.Empty;
         public DateTime RequestedVisitDateUtc { get; set; }
         public string? RequestMessage { get; set; }
         public int VisitStatusId { get; set; }

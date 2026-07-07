@@ -9,7 +9,7 @@ using System.Security.Claims;
 
 namespace FilmMaker.Controllers
 {
-    [AuthorizeLocationManager]
+    [AuthorizeProductionCompanyOrLocationManagerAttribute]
     [Route("api/[controller]")]
     [ApiController]
     public class VisitController : Controller

@@ -378,6 +378,40 @@ namespace FilmMaker.Entities
                 .WithMany()
                 .HasForeignKey(x => x.StatusId)
                 .OnDelete(DeleteBehavior.NoAction);
+
+
+            modelBuilder.Entity<LocationVisitRequest>()
+                .ToTable(table =>
+                {
+        table.HasCheckConstraint(
+            "CK_LocationVisitRequest_SingleRequesterProfile",
+            """
+            (
+                ([LocationManagerId] IS NOT NULL AND [ProductionCompanyId] IS NULL)
+                OR
+                ([LocationManagerId] IS NULL AND [ProductionCompanyId] IS NOT NULL)
+            )
+        """);
+                });
+
+
+            modelBuilder.Entity<LocationVisitRequest>()
+                .HasOne(x => x.LocationManager)
+                .WithMany()
+                .HasForeignKey(x => x.LocationManagerId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<LocationVisitRequest>()
+                .HasOne(x => x.ProductionCompany)
+                .WithMany()
+                .HasForeignKey(x => x.ProductionCompanyId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<LocationVisitRequest>()
+                .HasOne(x => x.RequestedByUser)
+                .WithMany()
+                .HasForeignKey(x => x.RequestedByUserId)
+                .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

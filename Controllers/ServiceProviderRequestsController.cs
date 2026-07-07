@@ -23,7 +23,7 @@ namespace FilmMaker.Controllers
 
 
         [HttpGet("GetMySentServiceProviderRequests")]
-        [AuthorizeLocationManager]
+        [AuthorizeProductionCompanyOrLocationManagerAttribute]
         public async Task<IActionResult> GetMySentServiceProviderRequests()
         {
             var currentUserId = GetCurrentUserId();
@@ -44,7 +44,7 @@ namespace FilmMaker.Controllers
         }
 
         [HttpGet("GetMySentServiceProviderRequestById")]
-        [AuthorizeLocationManager]
+        [AuthorizeProductionCompanyOrLocationManagerAttribute]
         public async Task<IActionResult> GetMySentServiceProviderRequestById(int requestId)
         {
             var currentUserId = GetCurrentUserId();
@@ -111,7 +111,7 @@ namespace FilmMaker.Controllers
         }
 
         [HttpPost("SendServiceRequestToProvider")]
-        [AuthorizeLocationManager]
+        [AuthorizeProductionCompanyOrLocationManagerAttribute]
         public async Task<IActionResult> SendServiceRequestToProvider([FromBody] SendServiceRequestToProviderDTO request)
         {
             var currentUserId = GetCurrentUserId();
@@ -133,7 +133,7 @@ namespace FilmMaker.Controllers
         }
 
         [HttpPut("UpdateServiceProviderRequest")]
-        [AuthorizeLocationManager]
+        [AuthorizeProductionCompanyOrLocationManagerAttribute]
         public async Task<IActionResult> UpdateServiceProviderRequest([FromBody] UpdateServiceProviderRequestDTO request)
         {
             var currentUserId = GetCurrentUserId();
@@ -157,7 +157,7 @@ namespace FilmMaker.Controllers
         
 
         [HttpPut("CancelServiceProviderRequest")]
-        [AuthorizeLocationManager]
+        [AuthorizeProductionCompanyOrLocationManagerAttribute]
         public async Task<IActionResult> CancelServiceProviderRequest(int requestId)
         {
             var currentUserId = GetCurrentUserId();
