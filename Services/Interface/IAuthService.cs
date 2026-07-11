@@ -15,13 +15,16 @@ namespace FilmMaker.Services.Interface
 
         Task<ApiResponse<object>> RefreshToken(string refreshToken);
 
-        Task<ApiResponse<object>> VerifyEmail(VerifyOtpRequest request, int currentUserId);
+        Task<ApiResponse<object>> VerifyEmail(VerifyOtpRequest request);
 
         Task<ApiResponse<object>> SendVerificationOtp(int currentUserId);
+        Task<ApiResponse<object>> SendVerificationOtp(string Email);
 
         Task<ApiResponse<object>> ForgotPassword(ForgotPasswordRequest request);
 
         Task<ApiResponse<object>> ResetPassword(ResetPasswordRequest request);
+
+        Task<ApiResponse<object>> ForceVerifyEmail(int UserId);
 
     }
 }

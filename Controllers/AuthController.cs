@@ -91,6 +91,17 @@ namespace FilmMaker.Controllers
             return Ok(result);
         }
 
+        [HttpPatch("force-verify-email/{userId}")]
+        public async Task<IActionResult> ForceVerifyEmail(int userId)
+        {
+            var result = await _authService.ForceVerifyEmail(userId);
+
+            if (!result.Success)
+                return BadRequest(result);
+
+            return Ok(result);
+        }
+
         [HttpPost("Login")]
         public async Task<IActionResult> Login(LoginRequestDto request)
         {
@@ -145,21 +156,11 @@ namespace FilmMaker.Controllers
         }
 
         [HttpPost("verify-email")]
-        [Authorize]
+        
         public async Task<IActionResult> VerifyEmail([FromBody] VerifyOtpRequest request)
         {
-            var currentUserId = GetCurrentUserId();
 
-            if (currentUserId == null)
-                return Unauthorized(new ApiResponse<object>
-                {
-                    Success = false,
-                    MessageEn = "Unauthorized.",
-                    MessageAr = "غير مصرح.",
-                    Data = null
-                });
-
-            var result = await _authService.VerifyEmail(request, GetCurrentUserId()!.Value);
+            var result = await _authService.VerifyEmail(request);
 
             return Ok(result);
         }
@@ -180,20 +181,11 @@ namespace FilmMaker.Controllers
         }
 
         [HttpPost("send-verification")]
-        [Authorize]  
-        public async Task<IActionResult> SendVerificationOtp()
+       
+        public async Task<IActionResult> SendVerificationOtp(string email)
         {
-            var currentUserId = GetCurrentUserId();
-
-            if (currentUserId == null)
-                return Unauthorized(new ApiResponse<object>
-                {
-                    Success = false,
-                    MessageEn = "Unauthorized.",
-                    MessageAr = "غير مصرح.",
-                    Data = null
-                });
-            var result = await _authService.SendVerificationOtp(currentUserId.Value);
+     
+            var result = await _authService.SendVerificationOtp(email);
 
             return Ok(result);
         }
